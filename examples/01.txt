@@ -1,0 +1,47 @@
+
+
+/* Types
+
+int
+uint
+float
+double
+long
+
+num
+
+str
+char
+
+*/
+
+
+fn get_next_prime(current: mut num) -> num {
+    return 2 if current < 2;
+
+    while true {
+        current++;
+
+        let target = sqrt(current);
+        let mut is_prime = true;
+
+        for i in range(2, target) {
+            if current % i == 0 {
+                is_prime = false;
+                break;
+            }
+        }
+
+        return current if is_prime;
+    }
+}
+
+fn main() {    
+    let mut prime = 0;
+    let mut counter = 0;
+
+    while true {
+        counter++;
+        print(f"{counter}: {prime = get_next_prime(prime)}");
+    }
+}
