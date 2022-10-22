@@ -10,7 +10,9 @@ long
 
 num
 
-str
+bool
+
+string
 char
 
 */
