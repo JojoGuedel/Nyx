@@ -1,0 +1,15 @@
+C:\dev\proj_compiler\cs_compiler\bin\Debug\net6.0\cs_compiler.exe
+C:\dev\proj_compiler\cs_compiler\bin\Debug\net6.0\cs_compiler.deps.json
+C:\dev\proj_compiler\cs_compiler\bin\Debug\net6.0\cs_compiler.runtimeconfig.json
+C:\dev\proj_compiler\cs_compiler\bin\Debug\net6.0\cs_compiler.dll
+C:\dev\proj_compiler\cs_compiler\bin\Debug\net6.0\ref\cs_compiler.dll
+C:\dev\proj_compiler\cs_compiler\bin\Debug\net6.0\cs_compiler.pdb
+C:\dev\proj_compiler\cs_compiler\obj\Debug\net6.0\cs_compiler.csproj.AssemblyReference.cache
+C:\dev\proj_compiler\cs_compiler\obj\Debug\net6.0\cs_compiler.GeneratedMSBuildEditorConfig.editorconfig
+C:\dev\proj_compiler\cs_compiler\obj\Debug\net6.0\cs_compiler.AssemblyInfoInputs.cache
+C:\dev\proj_compiler\cs_compiler\obj\Debug\net6.0\cs_compiler.AssemblyInfo.cs
+C:\dev\proj_compiler\cs_compiler\obj\Debug\net6.0\cs_compiler.csproj.CoreCompileInputs.cache
+C:\dev\proj_compiler\cs_compiler\obj\Debug\net6.0\cs_compiler.dll
+C:\dev\proj_compiler\cs_compiler\obj\Debug\net6.0\ref\cs_compiler.dll
+C:\dev\proj_compiler\cs_compiler\obj\Debug\net6.0\cs_compiler.pdb
+C:\dev\proj_compiler\cs_compiler\obj\Debug\net6.0\cs_compiler.genruntimeconfig.cache
