@@ -41,14 +41,12 @@ class Lexer
         else
         {
             (var match, kind) = Syntax.Search(SubText(pos, Text.Length - pos + 1));
-            pos += match.Length - 1;
+            pos += match.Length;
         }
 
         var len = pos - start;
         var text = SubText(start, len);
         var span = new TextSpan(text, pos, len);
-
-        pos++;
 
         return new SyntaxToken(kind, span);
     }
