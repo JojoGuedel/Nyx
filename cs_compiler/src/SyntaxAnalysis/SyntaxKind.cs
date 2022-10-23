@@ -1,7 +1,6 @@
 enum SyntaxKind
 {
-    InvalidMatch,
-    NoMatch,
+    UndefinedPattern,
 
     InvalidChar,
 

@@ -3,14 +3,14 @@ using Utils;
 class Lexer
 {
     public string Text { get; }
-    public LexerMatchGroup Matcher { get; }
-
+    public SyntaxDefinition Syntax { get; }
+    
     private int pos;
 
-    public Lexer(string text, LexerMatchGroup matcher)
+    public Lexer(string text, SyntaxDefinition syntax)
     {
         Text = text;
-        Matcher = matcher;
+        Syntax = syntax;
     }
 
     private char Peek(int offset = 0)
@@ -39,20 +39,10 @@ class Lexer
         if (char.IsDigit(Peek()))
             kind = LexDigit();
         else
-            while (true)
-            {
-                var subText = SubText(start, pos - start + 1);
-                var matchKind = Matcher.Match(subText);
-
-                if (matchKind == SyntaxKind.InvalidMatch)
-                {
-                    if (pos - start > 0) pos--;
-                    break;
-                }
-
-                pos++;
-                kind = matchKind;
-            }
+        {
+            (var match, kind) = Syntax.Search(SubText(pos, Text.Length - pos + 1));
+            pos += match.Length - 1;
+        }
 
         var len = pos - start;
         var text = SubText(start, len);

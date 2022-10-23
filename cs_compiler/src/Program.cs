@@ -1,7 +1,4 @@
-﻿using System;
-using Utils;
-
-class Program
+﻿class Program
 {
     static bool running;
 
@@ -9,14 +6,15 @@ class Program
     {
         running = true;
 
-        var matcher = new LexerMatchGroup();
-        matcher.Add(new LexerMatchGroup("\0", SyntaxKind.EndOfFile));
-        matcher.Add(new LexerMatchGroup("=", SyntaxKind.Equal));
-        matcher.Add(new LexerMatchGroup("==", SyntaxKind.EqualEqual));
+        var syntax = new SyntaxDefinition();
+        syntax.Define("\0", SyntaxKind.EndOfFile);
+
+        syntax.Define("=", SyntaxKind.Equal);
+        syntax.Define("==", SyntaxKind.EqualEqual);
 
         while (running)
         {
-            Console.Write(">");
+            Console.Write("> ");
 
             var input = Console.ReadLine();
 
@@ -30,7 +28,7 @@ class Program
             }
 
             List<SyntaxToken> tokens = new List<SyntaxToken>();
-            Lexer lexer = new Lexer(input, matcher);
+            Lexer lexer = new Lexer(input, syntax);
 
             while (true)
             {
@@ -39,10 +37,10 @@ class Program
                 tokens.Add(token);
 
                 if (token.Kind == SyntaxKind.EndOfFile)
-                    break;                
+                    break;
             }
 
-            foreach(var token in tokens)
+            foreach (var token in tokens)
                 Console.WriteLine(token.Kind);
         }
     }
