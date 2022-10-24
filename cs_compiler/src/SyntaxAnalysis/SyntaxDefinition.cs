@@ -1,27 +1,25 @@
+namespace SyntaxAnalysis;
+
 class SyntaxDefinition
 {
-    private Dictionary<string, SyntaxKind> syntaxDefs;
+    private Dictionary<string, SyntaxTokenKind> syntaxDefs;
 
     public SyntaxDefinition()
     {
-        syntaxDefs = new Dictionary<string, SyntaxKind>();
+        syntaxDefs = new Dictionary<string, SyntaxTokenKind>();
     }
 
-    public void Define(string pattern, SyntaxKind kind)
+    public void Define(string pattern, SyntaxTokenKind kind)
     {
         syntaxDefs.Add(pattern, kind);
     }
 
-    public SyntaxKind Match(string pattern)
+    public SyntaxTokenKind Match(string pattern)
     {
-        try
-        {
-            return syntaxDefs[pattern];
-        }
-        catch
-        {
-            return SyntaxKind.UndefinedPattern;
-        }
+        if (syntaxDefs.TryGetValue(pattern, out var kind))
+            return kind;
+        
+        return SyntaxTokenKind.UndefinedPattern;
     }
 
     public List<string> GetPossibleMatches(string pattern, List<string>? patterns=null)
@@ -40,9 +38,10 @@ class SyntaxDefinition
         return possibleMatches;
     }
 
-    public (string, SyntaxKind) Search(string text) 
+    public (string, SyntaxTokenKind) Search(string text) 
     {
-        var lastMatch = text[0].ToString();
+        var lastMatchPattern = String.Empty;
+        var lastMatchKind = SyntaxTokenKind.UndefinedPattern;
         List<string>? possibleMatches = null;
 
         for(var pos = 0; pos < text.Length; pos++)
@@ -53,9 +52,10 @@ class SyntaxDefinition
             if (possibleMatches.Count == 0)
                 break;
 
-            lastMatch = possibleMatches[0];
+            lastMatchPattern = pattern;
+            lastMatchKind = Match(pattern);
         }
 
-        return (lastMatch, Match(lastMatch));
+        return (lastMatchPattern, lastMatchKind);
     }
 }

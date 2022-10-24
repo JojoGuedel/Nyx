@@ -1,11 +1,13 @@
 using Utils;
 
+namespace SyntaxAnalysis;
+
 class SyntaxToken
 {
-    public SyntaxKind Kind { get; }
+    public SyntaxTokenKind Kind { get; }
     public TextSpan Span { get; }
 
-    public SyntaxToken(SyntaxKind kind, TextSpan span) 
+    public SyntaxToken(SyntaxTokenKind kind, TextSpan span) 
     {
         Kind = kind;
         Span = span;

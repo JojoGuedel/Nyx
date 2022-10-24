@@ -1,5 +1,7 @@
 using Utils;
 
+namespace SyntaxAnalysis;
+
 class Lexer
 {
     public string Text { get; }
@@ -33,7 +35,7 @@ class Lexer
 
     public SyntaxToken NextToken()
     {
-        var kind = SyntaxKind.InvalidChar;
+        var kind = SyntaxTokenKind.InvalidChar;
         var start = pos;
 
         if (char.IsDigit(Peek()))
@@ -51,11 +53,11 @@ class Lexer
         return new SyntaxToken(kind, span);
     }
 
-    public SyntaxKind LexDigit()
+    public SyntaxTokenKind LexDigit()
     {
         do pos++;
         while (char.IsDigit(Peek()));
 
-        return SyntaxKind.Int;
+        return SyntaxTokenKind.Int;
     }
 }

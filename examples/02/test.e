@@ -10,15 +10,20 @@ struct Test {
     num c;
 }
 
-fn Test.new(a: num=10, b: num=20) -> Result<Test, Error>{
+struct Test:
+    extend Constructor;
+
+    mut num a;
+    mut num b;
+    num c;
+
+pub static fn Test.test -> Result<Test, Error>:
+    pass;
+
+pub static fn Test.new(a: num=10, b: num=20) -> Result<Test, Error>{
     self = {
         a: a,
         b: b,
         ...
     }
-}
-
-
-fn Test.destory() {
-    self.free();
 }
