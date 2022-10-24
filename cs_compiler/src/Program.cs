@@ -9,17 +9,14 @@ while (running)
 
     var input = Console.ReadLine();
 
-    if (input is null || input.Length < 1)
-        continue;
+    if (input is null)
+        input=String.Empty;
 
-    if (input[0] == '#')
+    if (input.Length >= 1 && input[0] == '#')
     {
         ManageEscapeCommands(input.Substring(1));
         continue;
     }
-
-    List<SyntaxToken> tokens = new List<SyntaxToken>();
-    Lexer lexer = new Lexer(input, syntax);
 
     while (true)
     {
@@ -53,30 +50,30 @@ SyntaxDefinition GetSyntax()
 {
     var syntax = new SyntaxDefinition();
 
-    syntax.Define("\0", SyntaxTokenKind.End);
+    syntax.Define(new SyntaxPattern("\0", SyntaxTokenKind.End));
 
-    syntax.Define("+", SyntaxTokenKind.Plus);
-    syntax.Define("-", SyntaxTokenKind.Minus);
-    syntax.Define("*", SyntaxTokenKind.Star);
-    syntax.Define("/", SyntaxTokenKind.Slash);
-    syntax.Define("=", SyntaxTokenKind.Equal);
-    syntax.Define("+=", SyntaxTokenKind.PlusEqual);
-    syntax.Define("-=", SyntaxTokenKind.MinusEqual);
-    syntax.Define("*=", SyntaxTokenKind.StarEqual);
-    syntax.Define("/=", SyntaxTokenKind.SlashEqual);
-    syntax.Define("==", SyntaxTokenKind.EqualEqual);
-    syntax.Define("!=", SyntaxTokenKind.NotEqual);
-    syntax.Define("<=", SyntaxTokenKind.LessEqual);
-    syntax.Define(">=", SyntaxTokenKind.GreaterEqual);
-    syntax.Define("<", SyntaxTokenKind.Less);
-    syntax.Define(">", SyntaxTokenKind.Greater);
+    syntax.Define(new SyntaxPattern("+", SyntaxTokenKind.Plus));
+    syntax.Define(new SyntaxPattern("-", SyntaxTokenKind.Minus));
+    syntax.Define(new SyntaxPattern("*", SyntaxTokenKind.Star));
+    syntax.Define(new SyntaxPattern("/", SyntaxTokenKind.Slash));
+    syntax.Define(new SyntaxPattern("=", SyntaxTokenKind.Equal));
+    syntax.Define(new SyntaxPattern("+=", SyntaxTokenKind.PlusEqual));
+    syntax.Define(new SyntaxPattern("-=", SyntaxTokenKind.MinusEqual));
+    syntax.Define(new SyntaxPattern("*=", SyntaxTokenKind.StarEqual));
+    syntax.Define(new SyntaxPattern("/=", SyntaxTokenKind.SlashEqual));
+    syntax.Define(new SyntaxPattern("==", SyntaxTokenKind.EqualEqual));
+    syntax.Define(new SyntaxPattern("!=", SyntaxTokenKind.NotEqual));
+    syntax.Define(new SyntaxPattern("<=", SyntaxTokenKind.LessEqual));
+    syntax.Define(new SyntaxPattern(">=", SyntaxTokenKind.GreaterEqual));
+    syntax.Define(new SyntaxPattern("<", SyntaxTokenKind.Less));
+    syntax.Define(new SyntaxPattern(">", SyntaxTokenKind.Greater));
 
-    syntax.Define("(", SyntaxTokenKind.LeftParen);
-    syntax.Define(")", SyntaxTokenKind.RightParen);
-    syntax.Define("[", SyntaxTokenKind.LeftSquare);
-    syntax.Define("]", SyntaxTokenKind.RightSquare);
-    syntax.Define("{", SyntaxTokenKind.LeftCurly);
-    syntax.Define("}", SyntaxTokenKind.RightCurly);
+    syntax.Define(new SyntaxPattern("(", SyntaxTokenKind.LeftParen));
+    syntax.Define(new SyntaxPattern(")", SyntaxTokenKind.RightParen));
+    syntax.Define(new SyntaxPattern("[", SyntaxTokenKind.LeftSquare));
+    syntax.Define(new SyntaxPattern("]", SyntaxTokenKind.RightSquare));
+    syntax.Define(new SyntaxPattern("{", SyntaxTokenKind.LeftCurly));
+    syntax.Define(new SyntaxPattern("}", SyntaxTokenKind.RightCurly));
 
     return syntax;
 }
