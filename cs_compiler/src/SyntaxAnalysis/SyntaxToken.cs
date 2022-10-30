@@ -2,7 +2,7 @@ using Utils;
 
 namespace SyntaxAnalysis;
 
-class SyntaxToken
+public class SyntaxToken
 {
     public SyntaxTokenKind Kind { get; }
     public TextLocation Location { get; }

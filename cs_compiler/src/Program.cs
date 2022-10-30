@@ -18,13 +18,16 @@ while (running)
         continue;
     }
 
+    var tokenizer = new Tokenizer(input, syntax);
+    var tokens = new List<SyntaxToken>();
+
     while (true)
     {
-        var token = lexer.NextToken();
+        var token = tokenizer.GetNextToken();
 
         tokens.Add(token);
 
-        if (token.Kind == SyntaxTokenKind.End)
+        if (token.Kind == SyntaxTokenKind.END)
             break;
     }
 
@@ -50,7 +53,8 @@ SyntaxDefinition GetSyntax()
 {
     var syntax = new SyntaxDefinition();
 
-    syntax.DefineSingleToken('\0', SyntaxTokenKind.END);
+    // syntax.DefineSingleToken('\u0000', SyntaxTokenKind.END);
+    // syntax.DefineSingleToken('\n', SyntaxTokenKind.NEWLINE);
 
     syntax.DefineSingleToken('(', SyntaxTokenKind.LPAREN);
     syntax.DefineSingleToken(')', SyntaxTokenKind.RPAREN);
@@ -76,13 +80,16 @@ SyntaxDefinition GetSyntax()
     syntax.DefineDoubleToken(('<', '='), SyntaxTokenKind.LESSEQUAL);
     syntax.DefineDoubleToken(('>', '='), SyntaxTokenKind.GREATEREQUAL);
     
-    syntax.DefineDoubleToken(('+', '+'), SyntaxTokenKind.PLUSEQUAL);
+    syntax.DefineDoubleToken(('+', '+'), SyntaxTokenKind.PLUSPLUS);
     syntax.DefineDoubleToken(('+', '='), SyntaxTokenKind.PLUSEQUAL);
-    syntax.DefineDoubleToken(('-', '-'), SyntaxTokenKind.PLUSEQUAL);
+    syntax.DefineDoubleToken(('-', '-'), SyntaxTokenKind.MINUSMINUS);
     syntax.DefineDoubleToken(('-', '='), SyntaxTokenKind.MINUSEQUAL);
     syntax.DefineDoubleToken(('*', '='), SyntaxTokenKind.STAREQUAL);
     syntax.DefineDoubleToken(('/', '='), SyntaxTokenKind.SLASHEQUAL);
     syntax.DefineDoubleToken(('%', '='), SyntaxTokenKind.PERCENTEQUAL);
+
+    syntax.DefineSingleToken('"', SyntaxTokenKind.STRING);
+    syntax.DefineSingleToken('\'', SyntaxTokenKind.STRING);
 
     return syntax;
 }

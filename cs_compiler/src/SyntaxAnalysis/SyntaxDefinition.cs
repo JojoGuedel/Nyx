@@ -1,14 +1,33 @@
 namespace SyntaxAnalysis;
 
-class SyntaxDefinition
+public class SyntaxDefinition
 {
+    public int indentSize { get; }
+    public char indentSymbol { get; }
+    public char newLineSymbol { get; }
+    public char endSymbol { get; }
+
     private Dictionary<char, SyntaxTokenKind> _singleTokens;
     private Dictionary<(char, char), SyntaxTokenKind> _doubleTokens;
 
-    public SyntaxDefinition()
+    public SyntaxDefinition(
+        int indentSize=4,
+        char indentSymbol=' ',
+        char newLineSymbol='\n',
+        char endSymbol='\u0000'
+    )
     {
         _singleTokens = new Dictionary<char, SyntaxTokenKind>();
         _doubleTokens = new Dictionary<(char, char), SyntaxTokenKind>();
+
+        this.indentSize = indentSize;
+        this.indentSymbol = indentSymbol;
+
+        this.newLineSymbol = newLineSymbol;
+        DefineSingleToken(newLineSymbol, SyntaxTokenKind.NEWLINE);
+
+        this.endSymbol = endSymbol;
+        DefineSingleToken(endSymbol, SyntaxTokenKind.END);
     }
 
     public void DefineSingleToken(char pattern, SyntaxTokenKind kind)

@@ -2,46 +2,32 @@ using Utils;
 
 namespace SyntaxAnalysis;
 
-public class TokenizerConfig
-{
-    public int INDENTSIZE = 4;
-}
-
 public class Tokenizer
 {
     public string text { get; }
-    public TokenizerConfig config { get; }
+    public SyntaxDefinition syntax { get; }
     
     private int _size;
     private int _pos;
 
-    private char _curC1;
-    private char _curC2;
+    private char _curC1 { get => _Peek(0); }
+    private char _curC2 { get => _Peek(1); }
     private int _curStart;
     private int _curLen { get => _pos - _curStart; }
     private TextLocation _curLocation { get => new TextLocation(_curStart, _curLen); }
 
     private bool _newLine;
-    private int _indentLevel;
 
-    public Tokenizer(string text, TokenizerConfig config)
+    public Tokenizer(string text, SyntaxDefinition syntax)
     {
         this.text = text;
-        this.config = config;
+        this.syntax = syntax;
 
         _size = text.Length;
         _pos = 0;
 
         _newLine = true;
     }
-
-    // private char GetNextChar()
-    // {
-    //     if (pos+1 < 0 || pos+1 >= len)
-    //         return '\u0000';
-        
-    //     return Text[++pos];
-    // }
 
     private char _Peek(int offset=0)
     {
@@ -51,43 +37,54 @@ public class Tokenizer
         return text[_pos+offset];
     }
 
-    public List<SyntaxToken> GetAll()
-    {
-        for(;;)
-        {
-
-        }
-    }
-
-    public SyntaxToken GetNext()
+    public SyntaxToken GetNextToken()
     {
         _curStart = _pos;
 
-        _curC1 = _Peek(0);
-        _curC2 = _Peek(1);
-
         if (_newLine)
         {
-            _indentLevel = _GetIndentLevel();
+            for(; _curLen < syntax.indentSize && char.Equals(_curC1, syntax.indentSymbol); _pos++);
             
-            if (_indentLevel > 0)
+            if (_curLen % syntax.indentSize != 0)
+                return new SyntaxToken(SyntaxTokenKind.ERROR, _curLocation);
+            else if (_curLen > 0)
                 return new SyntaxToken(SyntaxTokenKind.INDENT, _curLocation);
-            else if (_indentLevel < 0)
-                ; // TODO: ERROR
+            
+            _newLine = false;
         }
 
-    }
+        if (char.IsDigit(_curC1))
+        {
+            while (char.IsDigit(_curC1)) _pos++;
+            // TODO: Handle '_' and '.'
+            return new SyntaxToken(SyntaxTokenKind.NUMBER, _curLocation);
+        }
+        if (syntax.GetSingleTokenKind(_curC1) == SyntaxTokenKind.STRING)
+        {
+            var terminator = _curC1;
 
-    private int _GetIndentLevel()
-    {
-        // while (char.Equals(_curC1, '\t')) _pos++; // TODO: Replace with spaces
+            while(char.Equals(_curC1, '\\') || !char.Equals(_curC2, terminator))
+            {
+                _pos++;
 
-        var indentSize = 0;
-        for(; indentSize < config.INDENTSIZE && char.Equals(_curC1, ' '); indentSize++);
-        
-        if (indentSize % config.INDENTSIZE != 0)
-            return indentSize - config.INDENTSIZE;
+                if (char.Equals(_curC1, syntax.endSymbol) || char.Equals(_curC1, syntax.newLineSymbol))
+                    return new SyntaxToken(SyntaxTokenKind.ERROR, _curLocation);
+            }
+            _pos += 2;
 
-        return indentSize / config.INDENTSIZE;
+            return new SyntaxToken(SyntaxTokenKind.STRING, _curLocation);
+        }
+        else
+        {
+            var kind = syntax.GetDoubleTokenKind((_curC1, _curC2));
+
+            if (kind == SyntaxTokenKind.ERROR)
+                kind = syntax.GetSingleTokenKind(_curC1);
+            else
+                _pos++;
+            _pos++;
+            
+            return new SyntaxToken(kind, _curLocation);
+        }
     }
 }

@@ -1,6 +1,6 @@
 namespace SyntaxAnalysis;
 
-enum SyntaxTokenKind
+public enum SyntaxTokenKind
 {
     ERROR,
     END,

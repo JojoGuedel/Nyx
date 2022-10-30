@@ -1,6 +1,6 @@
 namespace Utils;
 
-class TextLocation
+public class TextLocation
 {
     public int Pos { get; }
     public int Len { get; }
