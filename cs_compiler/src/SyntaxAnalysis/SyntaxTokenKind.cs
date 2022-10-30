@@ -4,12 +4,14 @@ public enum SyntaxTokenKind
 {
     ERROR,
     END,
+    DISCARD,
 
-    NAME,
+    INDENT,
+    NEWLINE,
     NUMBER,
     STRING,
-    NEWLINE,
-    INDENT,
+    NAME,
+    UNUSEDNAME,
 
     LPAREN,
     RPAREN,

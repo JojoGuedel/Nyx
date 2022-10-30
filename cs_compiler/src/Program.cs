@@ -19,20 +19,10 @@ while (running)
     }
 
     var tokenizer = new Tokenizer(input, syntax);
-    var tokens = new List<SyntaxToken>();
-
-    while (true)
-    {
-        var token = tokenizer.GetNextToken();
-
-        tokens.Add(token);
-
-        if (token.Kind == SyntaxTokenKind.END)
-            break;
-    }
+    var tokens = tokenizer.GetTokens().ToList();
 
     foreach (var token in tokens)
-        Console.WriteLine(token.Kind);
+        Console.WriteLine(token.kind);
 }
 
 void ManageEscapeCommands(string command)
@@ -55,6 +45,11 @@ SyntaxDefinition GetSyntax()
 
     // syntax.DefineSingleToken('\u0000', SyntaxTokenKind.END);
     // syntax.DefineSingleToken('\n', SyntaxTokenKind.NEWLINE);
+
+    syntax.DefineSingleToken(' ', SyntaxTokenKind.DISCARD);
+
+    syntax.DefineSingleToken('"', SyntaxTokenKind.STRING);
+    syntax.DefineSingleToken('\'', SyntaxTokenKind.STRING);
 
     syntax.DefineSingleToken('(', SyntaxTokenKind.LPAREN);
     syntax.DefineSingleToken(')', SyntaxTokenKind.RPAREN);
@@ -88,8 +83,7 @@ SyntaxDefinition GetSyntax()
     syntax.DefineDoubleToken(('/', '='), SyntaxTokenKind.SLASHEQUAL);
     syntax.DefineDoubleToken(('%', '='), SyntaxTokenKind.PERCENTEQUAL);
 
-    syntax.DefineSingleToken('"', SyntaxTokenKind.STRING);
-    syntax.DefineSingleToken('\'', SyntaxTokenKind.STRING);
+    syntax.DefineDoubleToken(('-', '>'), SyntaxTokenKind.RARROW);
 
     return syntax;
 }

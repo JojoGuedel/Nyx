@@ -37,10 +37,25 @@ public class Tokenizer
         return text[_pos+offset];
     }
 
+    public IEnumerable<SyntaxToken> GetTokens()
+    {
+        SyntaxToken token;
+
+        do 
+        {
+            token = GetNextToken();
+            
+            if (token.kind != SyntaxTokenKind.DISCARD)
+                yield return token;
+        }
+        while (token.kind != SyntaxTokenKind.END);
+    }
+
     public SyntaxToken GetNextToken()
     {
         _curStart = _pos;
 
+        // tokenize indents after a new line
         if (_newLine)
         {
             for(; _curLen < syntax.indentSize && char.Equals(_curC1, syntax.indentSymbol); _pos++);
@@ -53,13 +68,15 @@ public class Tokenizer
             _newLine = false;
         }
 
+        // tokenize numbers
         if (char.IsDigit(_curC1))
         {
             while (char.IsDigit(_curC1)) _pos++;
             // TODO: Handle '_' and '.'
             return new SyntaxToken(SyntaxTokenKind.NUMBER, _curLocation);
         }
-        if (syntax.GetSingleTokenKind(_curC1) == SyntaxTokenKind.STRING)
+        // tokenize strings
+        else if (syntax.GetSingleTokenKind(_curC1) == SyntaxTokenKind.STRING)
         {
             var terminator = _curC1;
 
@@ -74,12 +91,22 @@ public class Tokenizer
 
             return new SyntaxToken(SyntaxTokenKind.STRING, _curLocation);
         }
+        // tokenize operators and names
         else
         {
             var kind = syntax.GetDoubleTokenKind((_curC1, _curC2));
 
             if (kind == SyntaxTokenKind.ERROR)
+            {
                 kind = syntax.GetSingleTokenKind(_curC1);
+
+                if (kind == SyntaxTokenKind.ERROR)
+                {
+                    // TODO: filter unused names ('_')
+                    while (char.IsLetterOrDigit(_curC1) || char.Equals(_curC1, '_')) _pos++;
+                    return new SyntaxToken(SyntaxTokenKind.NAME, _curLocation);
+                }
+            }
             else
                 _pos++;
             _pos++;
