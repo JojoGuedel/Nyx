@@ -44,7 +44,7 @@ public class Tokenizer
         do 
         {
             token = GetNextToken();
-            
+
             if (token.kind != SyntaxTokenKind.DISCARD)
                 yield return token;
         }
