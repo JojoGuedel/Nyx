@@ -23,6 +23,12 @@ while (running)
 
     foreach (var token in tokens)
         Console.WriteLine(token.kind);
+
+    var parser = new Parser(tokens, syntax);
+    var compilationUnit = parser.Parse();
+
+    foreach (var node in compilationUnit.children)
+        Console.WriteLine(node.kind);
 }
 
 void ManageEscapeCommands(string command)
@@ -43,47 +49,54 @@ SyntaxDefinition GetSyntax()
 {
     var syntax = new SyntaxDefinition();
 
-    // syntax.DefineSingleToken('\u0000', SyntaxTokenKind.END);
-    // syntax.DefineSingleToken('\n', SyntaxTokenKind.NEWLINE);
+    // syntax.DefineSingleToken('\u0000', SyntaxKind.Token_End);
+    // syntax.DefineSingleToken('\n', SyntaxKind.Token_NewLine);
 
-    syntax.DefineSingleToken(' ', SyntaxTokenKind.DISCARD);
+    syntax.DefineSingleToken(' ', SyntaxKind._Discard);
 
-    syntax.DefineSingleToken('"', SyntaxTokenKind.STRING);
-    syntax.DefineSingleToken('\'', SyntaxTokenKind.STRING);
+    syntax.DefineSingleToken('"', SyntaxKind._StringMarker);
+    syntax.DefineSingleToken('\'', SyntaxKind._StringMarker);
 
-    syntax.DefineSingleToken('(', SyntaxTokenKind.LPAREN);
-    syntax.DefineSingleToken(')', SyntaxTokenKind.RPAREN);
-    syntax.DefineSingleToken('[', SyntaxTokenKind.LSQUAR);
-    syntax.DefineSingleToken(']', SyntaxTokenKind.RSQUAR);
+    syntax.DefineSingleToken('(', SyntaxKind.Token_LParen);
+    syntax.DefineSingleToken(')', SyntaxKind.Token_RParen);
+    syntax.DefineSingleToken('[', SyntaxKind.Token_LSquare);
+    syntax.DefineSingleToken(']', SyntaxKind.Token_RSquare);
 
-    syntax.DefineSingleToken('.', SyntaxTokenKind.DOT);
-    syntax.DefineSingleToken(',', SyntaxTokenKind.COMMA);
-    syntax.DefineSingleToken(';', SyntaxTokenKind.SEMICOLON);
+    syntax.DefineSingleToken('.', SyntaxKind.Token_Dot);
+    syntax.DefineSingleToken(',', SyntaxKind.Token_Comma);
+    syntax.DefineSingleToken(':', SyntaxKind.Token_Colon);
+    syntax.DefineSingleToken(';', SyntaxKind.Token_Semicolon);
 
-    syntax.DefineSingleToken('+', SyntaxTokenKind.PLUS);
-    syntax.DefineSingleToken('-', SyntaxTokenKind.MINUS);
-    syntax.DefineSingleToken('*', SyntaxTokenKind.STAR);
-    syntax.DefineSingleToken('/', SyntaxTokenKind.SLASH);
+    syntax.DefineSingleToken('+', SyntaxKind.Token_Plus);
+    syntax.DefineSingleToken('-', SyntaxKind.Token_Minus);
+    syntax.DefineSingleToken('*', SyntaxKind.Token_Star);
+    syntax.DefineSingleToken('/', SyntaxKind.Token_Slash);
 
-    syntax.DefineSingleToken('<', SyntaxTokenKind.LESS);
-    syntax.DefineSingleToken('>', SyntaxTokenKind.GREATER);
-    syntax.DefineSingleToken('=', SyntaxTokenKind.EQUAL);
-    syntax.DefineSingleToken('%', SyntaxTokenKind.PERCENT);
+    syntax.DefineSingleToken('<', SyntaxKind.Token_Less);
+    syntax.DefineSingleToken('>', SyntaxKind.Token_Greater);
+    syntax.DefineSingleToken('=', SyntaxKind.Token_Equal);
+    syntax.DefineSingleToken('%', SyntaxKind.Token_Percent);
 
-    syntax.DefineDoubleToken(('=', '='), SyntaxTokenKind.EQUALEQUAL);
-    syntax.DefineDoubleToken(('!', '='), SyntaxTokenKind.NOTEQUAL);
-    syntax.DefineDoubleToken(('<', '='), SyntaxTokenKind.LESSEQUAL);
-    syntax.DefineDoubleToken(('>', '='), SyntaxTokenKind.GREATEREQUAL);
+    syntax.DefineDoubleToken(('=', '='), SyntaxKind.Token_EqualEqual);
+    syntax.DefineDoubleToken(('!', '='), SyntaxKind.Token_NotEqual);
+    syntax.DefineDoubleToken(('<', '='), SyntaxKind.Token_LessEqual);
+    syntax.DefineDoubleToken(('>', '='), SyntaxKind.Token_GreaterEqual);
     
-    syntax.DefineDoubleToken(('+', '+'), SyntaxTokenKind.PLUSPLUS);
-    syntax.DefineDoubleToken(('+', '='), SyntaxTokenKind.PLUSEQUAL);
-    syntax.DefineDoubleToken(('-', '-'), SyntaxTokenKind.MINUSMINUS);
-    syntax.DefineDoubleToken(('-', '='), SyntaxTokenKind.MINUSEQUAL);
-    syntax.DefineDoubleToken(('*', '='), SyntaxTokenKind.STAREQUAL);
-    syntax.DefineDoubleToken(('/', '='), SyntaxTokenKind.SLASHEQUAL);
-    syntax.DefineDoubleToken(('%', '='), SyntaxTokenKind.PERCENTEQUAL);
+    syntax.DefineDoubleToken(('+', '+'), SyntaxKind.Token_PlusPlus);
+    syntax.DefineDoubleToken(('+', '='), SyntaxKind.Token_PlusEqual);
+    syntax.DefineDoubleToken(('-', '-'), SyntaxKind.Token_MinusMinus);
+    syntax.DefineDoubleToken(('-', '='), SyntaxKind.Token_MinusEqual);
+    syntax.DefineDoubleToken(('*', '='), SyntaxKind.Token_StarEqual);
+    syntax.DefineDoubleToken(('/', '='), SyntaxKind.Token_SlashEqual);
+    syntax.DefineDoubleToken(('%', '='), SyntaxKind.Token_PercentEqual);
 
-    syntax.DefineDoubleToken(('-', '>'), SyntaxTokenKind.RARROW);
+    syntax.DefineKeyword("fn", SyntaxKind.Keyword_Funcion);
+    syntax.DefineKeyword("let", SyntaxKind.Keyword_Let);
+    syntax.DefineKeyword("if", SyntaxKind.Keyword_If);
+    syntax.DefineKeyword("else", SyntaxKind.Keyword_Else);
+    syntax.DefineKeyword("for", SyntaxKind.Keyword_For);
+    syntax.DefineKeyword("do", SyntaxKind.Keyword_Do);
+    syntax.DefineKeyword("while", SyntaxKind.Keyword_While);
 
     return syntax;
 }

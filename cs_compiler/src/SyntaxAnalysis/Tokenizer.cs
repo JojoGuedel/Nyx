@@ -6,7 +6,7 @@ public class Tokenizer
 {
     public string text { get; }
     public SyntaxDefinition syntax { get; }
-    
+
     private int _size;
     private int _pos;
 
@@ -29,42 +29,44 @@ public class Tokenizer
         _newLine = true;
     }
 
-    private char _Peek(int offset=0)
+    private char _Peek(int offset = 0)
     {
-        if (_pos+offset < 0 || _pos+offset >= _size)
-            return '\u0000';
-        
-        return text[_pos+offset];
+        if (_pos + offset < 0 || _pos + offset >= _size)
+            return syntax.endSymbol;
+
+        return text[_pos + offset];
     }
 
-    public IEnumerable<SyntaxToken> GetTokens()
+    public IEnumerable<SyntaxNode> GetTokens()
     {
-        SyntaxToken token;
+        SyntaxNode token;
 
-        do 
+        do
         {
             token = GetNextToken();
 
-            if (token.kind != SyntaxTokenKind.DISCARD)
+            if (token.kind != SyntaxKind._Discard)
                 yield return token;
         }
-        while (token.kind != SyntaxTokenKind.END);
+        while (token.kind != SyntaxKind.Token_End);
     }
 
-    public SyntaxToken GetNextToken()
+    public SyntaxNode GetNextToken()
     {
         _curStart = _pos;
 
         // tokenize indents after a new line
         if (_newLine)
         {
-            for(; _curLen < syntax.indentSize && char.Equals(_curC1, syntax.indentSymbol); _pos++);
-            
+            _SkipBlankLines();
+
+            for (; _curLen < syntax.indentSize && char.Equals(_curC1, syntax.indentSymbol); _pos++) ;
+
             if (_curLen % syntax.indentSize != 0)
-                return new SyntaxToken(SyntaxTokenKind.ERROR, _curLocation);
+                return new SyntaxNode(SyntaxKind._Indent, _curLocation, false);
             else if (_curLen > 0)
-                return new SyntaxToken(SyntaxTokenKind.INDENT, _curLocation);
-            
+                return new SyntaxNode(SyntaxKind._Indent, _curLocation);
+
             _newLine = false;
         }
 
@@ -73,45 +75,82 @@ public class Tokenizer
         {
             while (char.IsDigit(_curC1)) _pos++;
             // TODO: Handle '_' and '.'
-            return new SyntaxToken(SyntaxTokenKind.NUMBER, _curLocation);
+            return new SyntaxNode(SyntaxKind.Token_Number, _curLocation);
         }
         // tokenize strings
-        else if (syntax.GetSingleTokenKind(_curC1) == SyntaxTokenKind.STRING)
+        else if (syntax.GetSingleTokenKind(_curC1) == SyntaxKind._StringMarker)
         {
             var terminator = _curC1;
 
-            while(char.Equals(_curC1, '\\') || !char.Equals(_curC2, terminator))
+            while (char.Equals(_curC1, '\\') || !char.Equals(_curC2, terminator))
             {
                 _pos++;
 
-                if (char.Equals(_curC1, syntax.endSymbol) || char.Equals(_curC1, syntax.newLineSymbol))
-                    return new SyntaxToken(SyntaxTokenKind.ERROR, _curLocation);
+                if (syntax.IsLineTerminator(_curC1))
+                    // TODO: add this to diagnostics
+                    return new SyntaxNode(SyntaxKind.Token_String, _curLocation, false);
             }
             _pos += 2;
 
-            return new SyntaxToken(SyntaxTokenKind.STRING, _curLocation);
+            return new SyntaxNode(SyntaxKind.Token_String, _curLocation);
         }
         // tokenize operators and names
         else
         {
             var kind = syntax.GetDoubleTokenKind((_curC1, _curC2));
 
-            if (kind == SyntaxTokenKind.ERROR)
+            if (kind == SyntaxKind._Error)
             {
                 kind = syntax.GetSingleTokenKind(_curC1);
 
-                if (kind == SyntaxTokenKind.ERROR)
+                if (kind == SyntaxKind._Error)
                 {
                     // TODO: filter unused names ('_')
                     while (char.IsLetterOrDigit(_curC1) || char.Equals(_curC1, '_')) _pos++;
-                    return new SyntaxToken(SyntaxTokenKind.NAME, _curLocation);
+
+                    if (_curLen > 0)
+                    {
+                        kind = syntax.GetKeyword(text.Substring(_curStart, _curLen));
+
+                        if (kind != SyntaxKind._Error)
+                            return new SyntaxNode(kind, _curLocation);
+
+                        return new SyntaxNode(SyntaxKind.Token_Identifier, _curLocation);
+                    }
+
+                    _pos += 1;
+                    return new SyntaxNode(SyntaxKind.Token_InvalidChar, _curLocation);
                 }
+                else if (kind == SyntaxKind.Token_NewLine)
+                    _newLine = true;
             }
             else
                 _pos++;
             _pos++;
-            
-            return new SyntaxToken(kind, _curLocation);
+
+            return new SyntaxNode(kind, _curLocation);
         }
+    }
+
+    private void _SkipBlankLines()
+    {
+        int offset = 0;
+        int blankLineCount = 0;
+
+        while (true)
+        {
+            int curOffset = 0;
+
+            while (char.IsWhiteSpace(_Peek(offset + curOffset))) curOffset++;
+
+            if (!char.Equals(_Peek(offset + curOffset), syntax.newLineSymbol))
+                break;
+            // TODO: checks special case with endSymbol
+
+            offset += curOffset;
+            blankLineCount++;
+        }
+
+        _pos += offset;
     }
 }
