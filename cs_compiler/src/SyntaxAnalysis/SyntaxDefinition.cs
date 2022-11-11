@@ -80,7 +80,7 @@ public class SyntaxDefinition
     public bool IsWhiteSpace(SyntaxKind kind)
     {
         return
-            kind == SyntaxKind._Indent ||
+            kind == SyntaxKind.Token_Indent ||
             kind == SyntaxKind.Token_NewLine;
     }
 }

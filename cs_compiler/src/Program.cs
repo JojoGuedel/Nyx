@@ -21,14 +21,20 @@ while (running)
     var tokenizer = new Tokenizer(input, syntax);
     var tokens = tokenizer.GetTokens().ToList();
 
+    // foreach (var token in tokens)
+    //     Console.WriteLine(token.kind);
+
+    var indentAnalyzer = new IndentAnalyzer(tokens);
+    tokens = indentAnalyzer.GetAll().ToList();
+
     foreach (var token in tokens)
         Console.WriteLine(token.kind);
 
-    var parser = new Parser(tokens, syntax);
-    var compilationUnit = parser.Parse();
+    // var parser = new Parser(tokens, syntax);
+    // var compilationUnit = parser.Parse();
 
-    foreach (var node in compilationUnit.children)
-        Console.WriteLine(node.kind);
+    // foreach (var node in compilationUnit.children)
+    //     Console.WriteLine(node.kind);
 }
 
 void ManageEscapeCommands(string command)

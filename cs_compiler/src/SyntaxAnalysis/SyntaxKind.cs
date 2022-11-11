@@ -8,8 +8,8 @@ public enum SyntaxKind
     Token_End,
     Token_InvalidChar,
 
-    _Indent,
-    Token_NewBlock,
+    Token_Indent,
+    Token_BeginBlock,
     Token_EndBlock,
     Token_NewLine,
     Token_Number,

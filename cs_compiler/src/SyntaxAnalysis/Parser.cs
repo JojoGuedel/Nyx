@@ -6,8 +6,6 @@ public class Parser
     private SyntaxDefinition _syntax;
     private int _pos;
 
-    private int _expectedIndetDepth;
-
     private SyntaxNode _curTok { get => _Peek(0); }
 
     public Parser(List<SyntaxNode> tokens, SyntaxDefinition syntax)
@@ -15,8 +13,6 @@ public class Parser
         _tokens = tokens;
         _syntax = syntax;
         _pos = 0;
-
-        _expectedIndetDepth = 0;
     }
 
     private void _IncrementPos()
@@ -29,7 +25,7 @@ public class Parser
         if (_pos + offset >= 0 && _pos + offset < _tokens.Count)
             return _tokens[_pos + offset];
 
-        return _tokens[_tokens.Count - 1];
+        return _tokens.Last();
     }
 
     private SyntaxNode _NextToken()
@@ -67,18 +63,6 @@ public class Parser
         nodes.Add(_curTok);
 
         return new SyntaxNode(SyntaxKind.Syntax_CompilationUnit, nodes);
-    }
-
-    private void _ParseNewLine()
-    {
-        var indentDepth = 0;
-        for (; _curTok.kind == SyntaxKind._Indent; _pos++) indentDepth++;
-
-        // TODO: implement a maxIndentDepth
-        int diff = _expectedIndetDepth - indentDepth;
-
-        if (diff < 0) ; // TODO: add to diagnostics: not enough indents
-        if (diff > 0) ; // TODO: add to diagnostics: too many indents
     }
 
     private SyntaxNode _ParseDeclarationStatement()

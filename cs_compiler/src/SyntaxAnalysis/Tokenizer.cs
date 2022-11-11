@@ -60,12 +60,12 @@ public class Tokenizer
         {
             _SkipBlankLines();
 
-            for (; _curLen < syntax.indentSize && char.Equals(_curC1, syntax.indentSymbol); _pos++) ;
+            while (_curLen < syntax.indentSize && char.Equals(_curC1, syntax.indentSymbol))_pos++;
 
             if (_curLen % syntax.indentSize != 0)
-                return new SyntaxNode(SyntaxKind._Indent, _curLocation, false);
+                return new SyntaxNode(SyntaxKind.Token_Indent, _curLocation, false);
             else if (_curLen > 0)
-                return new SyntaxNode(SyntaxKind._Indent, _curLocation);
+                return new SyntaxNode(SyntaxKind.Token_Indent, _curLocation);
 
             _newLine = false;
         }
