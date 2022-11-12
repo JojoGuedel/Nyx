@@ -10,6 +10,9 @@ public class Error_UnexpectedToken : ADiagnostic
     public Error_UnexpectedToken(SyntaxNode unexpectedToken, SyntaxKind[] expectedKinds) : base(unexpectedToken.location)
     {
         // TODO: add diagnosticKind hint so errors can be even more distinguished
+        _severity = DiagnosticSeverity.Error;
+        _kind = DiagnosticKind.Error_UnexpectedToken;
+
         _unexpectedToken = unexpectedToken;
         _expectedKinds = expectedKinds;
     }
