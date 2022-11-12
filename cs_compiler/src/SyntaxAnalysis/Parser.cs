@@ -1,7 +1,10 @@
+using Diagnostics;
 using SyntaxAnalysis;
 
 public class Parser
 {
+    public DiagnosticCollection diagnostics { get; }
+
     private readonly List<SyntaxNode> _tokens;
     private SyntaxDefinition _syntax;
     private int _pos;
@@ -10,6 +13,8 @@ public class Parser
 
     public Parser(List<SyntaxNode> tokens, SyntaxDefinition syntax)
     {
+        diagnostics = new DiagnosticCollection();
+
         _tokens = tokens;
         _syntax = syntax;
         _pos = 0;
@@ -41,6 +46,7 @@ public class Parser
             if (_curTok.kind == kind) return _NextToken();
 
         _IncrementPos();
+        diagnostics.Add(new Error_UnexpectedToken(_curTok, kinds));
         return new SyntaxNode(kinds[0], _curTok.location);
     }
 

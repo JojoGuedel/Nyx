@@ -33,8 +33,11 @@ while (running)
     foreach (var token in tokens)
         Console.WriteLine(token.kind);
 
-    // var parser = new Parser(tokens, syntax);
-    // var compilationUnit = parser.Parse();
+    var parser = new Parser(tokens, syntax);
+    var compilationUnit = parser.Parse();
+
+    foreach(var diagnostic in parser.diagnostics.GetAll())
+        Console.WriteLine(diagnostic.GetMessage());
 
     // foreach (var node in compilationUnit.children)
     //     Console.WriteLine(node.kind);
