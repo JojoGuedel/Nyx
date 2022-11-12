@@ -1,3 +1,4 @@
+using Diagnostics;
 using Utils;
 
 namespace SyntaxAnalysis;
@@ -6,6 +7,7 @@ public class Tokenizer
 {
     public string text { get; }
     public SyntaxDefinition syntax { get; }
+    public DiagnosticCollection diagnostics { get; }
 
     private int _size;
     private int _pos;
@@ -22,6 +24,7 @@ public class Tokenizer
     {
         this.text = text;
         this.syntax = syntax;
+        diagnostics = new DiagnosticCollection();
 
         _size = text.Length;
         _pos = 0;
@@ -87,8 +90,10 @@ public class Tokenizer
                 _pos++;
 
                 if (syntax.IsLineTerminator(_curC1))
-                    // TODO: add this to diagnostics
+                {
+                    diagnostics.Add(new Error_StringNotClosed(_curLocation, terminator));
                     return new SyntaxNode(SyntaxKind.Token_String, _curLocation, false);
+                }
             }
             _pos += 2;
 

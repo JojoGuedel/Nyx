@@ -24,6 +24,9 @@ while (running)
     // foreach (var token in tokens)
     //     Console.WriteLine(token.kind);
 
+    foreach(var diagnostic in tokenizer.diagnostics.GetAll())
+        Console.WriteLine(diagnostic.GetMessage());
+
     var indentAnalyzer = new IndentAnalyzer(tokens);
     tokens = indentAnalyzer.GetAll().ToList();
 
@@ -43,6 +46,11 @@ void ManageEscapeCommands(string command)
     {
         case "exit":
             running = false;
+            break;
+
+        case "clear":
+        case "cls":
+            Console.Clear();
             break;
 
         default:
