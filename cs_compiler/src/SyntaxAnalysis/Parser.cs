@@ -45,9 +45,10 @@ public class Parser
         foreach (var kind in kinds)
             if (_curTok.kind == kind) return _NextToken();
 
-        _IncrementPos();
+        var ret = new SyntaxNode(kinds[0], _curTok.location);
         diagnostics.Add(new Error_UnexpectedToken(_curTok, kinds));
-        return new SyntaxNode(kinds[0], _curTok.location);
+        _IncrementPos();
+        return ret;
     }
 
     private void _SkipWhiteSpaces()
@@ -145,7 +146,7 @@ public class Parser
             case SyntaxKind.Token_Identifier:
             case SyntaxKind.Token_Number:
             case SyntaxKind.Token_String:
-                return _curTok;
+                return _NextToken();
 
             default:
                 return new SyntaxNode(SyntaxKind.Syntax_Error, _curTok.location);
