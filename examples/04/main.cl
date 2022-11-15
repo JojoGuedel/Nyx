@@ -2,58 +2,46 @@ include "stdio.h" as stdio;
 
 section std;
 
-struct Enumerator<T>:
+interface IEnumerator<T>:
     pub def get_current() -> T;
     pub def move_next() -> bool;
-    pub def reset() -> null;
 
-pub constructor Enumerator(
-        get_current: def() -> T,
-        move_next: def() -> T, 
-        reset: def() -> T
-    ) -> null:
+struct ArrayEnumeartor<T>:
+    extends IEnumeartor<T>;
 
-    self.get_current = get_current;
-    self.move_next = move_next;
-    self.reset = reset;
+    var _val: T[];
+    var _index uint;
 
-interface IEnumerator<T>:
-    pub abstract def get_Enumerator() -> Enumerator<T>;
+pub constructor ArrayEnumeartor<T>(val: T[]) -> null:
+    self._val = val;
 
+pub def ArrayEnumeartor.get_current() -> T:
+    return self._val[self._index];
+
+pub def ArrayEnumeartor.move_next() -> bool:
+    return ++self._index < self._val.length();
+
+interface IEnumerable<T>:
+    pub def get_enumerator() -> IEnumeartor<T>;
 
 struct string:
-    extends IEnumerator<char>;
+    extends IEnumerable<char>;
 
     var _val: char[];
-    pub var length: uint;
 
     pub operator [] (int index) -> char;
 
-    section enumerator:
-        var _enu: Enumerator<char>;
-        mut var _index: int;
-
 pub constructor string() -> null:
-    def get_current() -> char:
-        return self._val[self.enumerator._index];
-    
-    def move_next() -> bool:
-        return ++self.enumerator._index < self.length;
+    self._val = new char[0];
 
-    def reset() -> null:
-        self.enumerator._index = 0;
-
-    self.enumerator._enu = new Enumerator(
-        get_current;
-        move_next;
-        reset;
-    );
+pub constructor string(var val: char[]):
+    self._val = val;
 
 pub operator string[] (int index) -> char:
     return self._val[index];
 
-pub def string.get_enumerator() -> Enumerator<char>:
-    return self.enumerator._enu;
+pub def string.get_enumerator() -> IEnumeartor<Char>:
+    return new ArrayEnumeartor<char>(self._val);
 
 pub static def main() -> null:
     var str: string = "test";
