@@ -12,13 +12,13 @@ struct ArrayEnumeartor<T>:
     var _val: T[];
     var _index uint;
 
-pub constructor ArrayEnumeartor<T>(val: T[]) -> null:
+pub constructor ArrayEnumeartor<T>(val):
     self._val = val;
 
-pub def ArrayEnumeartor.get_current() -> T:
+pub def ArrayEnumeartor.get_current():
     return self._val[self._index];
 
-pub def ArrayEnumeartor.move_next() -> bool:
+pub def ArrayEnumeartor.move_next():
     return ++self._index < self._val.length();
 
 interface IEnumerable<T>:
@@ -29,21 +29,24 @@ struct string:
 
     var _val: char[];
 
-    pub operator [] (int index) -> char;
+    pub constructor string();
+    pub constructor string(val: char[]);
+    
+    pub operator [] (index: int) -> char;
 
-pub constructor string() -> null:
+pub constructor string():
     self._val = new char[0];
 
-pub constructor string(var val: char[]):
+pub constructor string(val):
     self._val = val;
 
-pub operator string[] (int index) -> char:
+pub operator string[] (index):
     return self._val[index];
 
-pub def string.get_enumerator() -> IEnumeartor<Char>:
+pub def string.get_enumerator():
     return new ArrayEnumeartor<char>(self._val);
 
-pub static def main() -> null:
+def main(args[]: str[]):
     var str: string = "test";
     
     for var c in str:
