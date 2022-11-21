@@ -1,75 +1,51 @@
 using Diagnostics;
 using SyntaxAnalysis;
 
-public class Parser
+class Parser : AAnalyzer<SyntaxNode, SyntaxNode>
 {
-    public DiagnosticCollection diagnostics { get; }
+    public DiagnosticCollection diagnostics;
+    SyntaxDefinition _syntax;
+    SyntaxNode _currentToken { get => _Peek(0); }
+    bool _isCurrentValid;
 
-    private readonly List<SyntaxNode> _tokens;
-    private SyntaxDefinition _syntax;
-    private int _pos;
-
-    private SyntaxNode _curTok { get => _Peek(0); }
-
-    public Parser(List<SyntaxNode> tokens, SyntaxDefinition syntax)
+    public Parser(SyntaxDefinition syntax, List<SyntaxNode> tokens) : base(tokens, tokens.Last())
     {
         diagnostics = new DiagnosticCollection();
-
-        _tokens = tokens;
         _syntax = syntax;
-        _pos = 0;
+        _isCurrentValid = true;
     }
 
-    private void _IncrementPos()
+    public override IEnumerable<SyntaxNode> GetAll()
     {
-        if (_pos < _tokens.Count) _pos++;
+        yield return GetNext();
     }
 
-    private SyntaxNode _Peek(int offset)
+    public override SyntaxNode GetNext()
     {
-        if (_pos + offset >= 0 && _pos + offset < _tokens.Count)
-            return _tokens[_pos + offset];
-
-        return _tokens.Last();
-    }
-
-    private SyntaxNode _NextToken()
-    {
-        var token = _curTok;
-        _IncrementPos();
-        return token;
+        return _ParseCompilationUnit();
     }
 
     private SyntaxNode _MatchToken(params SyntaxKind[] kinds)
     {
         foreach (var kind in kinds)
-            if (_curTok.kind == kind) return _NextToken();
+            if (_currentToken.kind == kind) return _ReadNext();
 
-        var ret = new SyntaxNode(kinds[0], _curTok.location);
-        diagnostics.Add(new Error_UnexpectedToken(_curTok, kinds));
+        var ret = new SyntaxNode(kinds[0], _currentToken.location);
+        diagnostics.Add(new Error_UnexpectedToken(_currentToken, kinds));
         _IncrementPos();
         return ret;
     }
 
-    private void _SkipWhiteSpaces()
-    {
-        while (_syntax.IsWhiteSpace(_curTok.kind)) _pos++;
-    }
-
-    public SyntaxNode Parse()
-    {
-        return _ParseCompilationUnit();   
-    }
 
     private SyntaxNode _ParseCompilationUnit()
     {
-        List<SyntaxNode> nodes = new List<SyntaxNode>();
+        List<SyntaxNode> syntaxNodes = new List<SyntaxNode>();
 
-        while (_curTok.kind != SyntaxKind.Token_End)
-            nodes.Add(_ParseDeclarationStatement());
-        nodes.Add(_curTok);
+        while (_currentToken.kind != SyntaxKind.Token_End)
+            syntaxNodes.Add(_ParseDeclarationStatement());
+        syntaxNodes.Add(_currentToken);
 
-        return new SyntaxNode(SyntaxKind.Syntax_CompilationUnit, nodes);
+        return new SyntaxNode(SyntaxKind.Syntax_CompilationUnit, syntaxNodes);
     }
 
     private SyntaxNode _ParseDeclarationStatement()
@@ -92,10 +68,10 @@ public class Parser
 
     private SyntaxNode _ParseOptionalTypeClause()
     {
-        if (_curTok.kind == SyntaxKind.Token_Colon)
+        if (_currentToken.kind == SyntaxKind.Token_Colon)
             return _ParseTypeClause();
 
-        return SyntaxNode.EmptySyntax(_curTok.location.pos + _curTok.location.len);
+        return SyntaxNode.EmptySyntax(_currentToken.location.pos + _currentToken.location.len);
     }
 
     private SyntaxNode _ParseTypeClause()
@@ -116,10 +92,10 @@ public class Parser
         var left = _ParseMultiplication();
 
         while (true)
-            if (_curTok.kind == SyntaxKind.Token_Plus)
-                left = new SyntaxNode(SyntaxKind.Syntax_Addition, left, _NextToken(), _ParseMultiplication());
-            else if (_curTok.kind == SyntaxKind.Token_Minus)
-                left = new SyntaxNode(SyntaxKind.Syntax_Subtraction, left, _NextToken(), _ParseMultiplication());
+            if (_currentToken.kind == SyntaxKind.Token_Plus)
+                left = new SyntaxNode(SyntaxKind.Syntax_Addition, left, _ReadNext(), _ParseMultiplication());
+            else if (_currentToken.kind == SyntaxKind.Token_Minus)
+                left = new SyntaxNode(SyntaxKind.Syntax_Subtraction, left, _ReadNext(), _ParseMultiplication());
             else break;
 
         return left;
@@ -130,10 +106,10 @@ public class Parser
         var left = _ParsePrimary();
 
         while (true)
-            if (_curTok.kind == SyntaxKind.Token_Star)
-                left = new SyntaxNode(SyntaxKind.Syntax_Multiplication, left, _NextToken(), _ParsePrimary());
-            else if (_curTok.kind == SyntaxKind.Token_Slash)
-                left = new SyntaxNode(SyntaxKind.Syntax_Division, left, _NextToken(), _ParsePrimary());
+            if (_currentToken.kind == SyntaxKind.Token_Star)
+                left = new SyntaxNode(SyntaxKind.Syntax_Multiplication, left, _ReadNext(), _ParsePrimary());
+            else if (_currentToken.kind == SyntaxKind.Token_Slash)
+                left = new SyntaxNode(SyntaxKind.Syntax_Division, left, _ReadNext(), _ParsePrimary());
             else break;
 
         return left;
@@ -141,15 +117,15 @@ public class Parser
 
     private SyntaxNode _ParsePrimary()
     {
-        switch (_curTok.kind)
+        switch (_currentToken.kind)
         {
             case SyntaxKind.Token_Identifier:
             case SyntaxKind.Token_Number:
             case SyntaxKind.Token_String:
-                return _NextToken();
+                return _ReadNext();
 
             default:
-                return new SyntaxNode(SyntaxKind.Syntax_Error, _curTok.location);
+                return new SyntaxNode(SyntaxKind.Syntax_Error, _currentToken.location);
         }
     }
 }

@@ -18,13 +18,13 @@ while (running)
         continue;
     }
 
-    var tokenizer = new Tokenizer(input, syntax);
-    var tokens = tokenizer.GetTokens().ToList();
+    var lexer = new Lexer(syntax, input);
+    var tokens = lexer.GetAll().ToList();
 
     // foreach (var token in tokens)
     //     Console.WriteLine(token.kind);
 
-    foreach(var diagnostic in tokenizer.diagnostics.GetAll())
+    foreach(var diagnostic in lexer.diagnostics.GetAll())
         Console.WriteLine(diagnostic.GetMessage());
 
     var indentAnalyzer = new IndentAnalyzer(tokens);
@@ -33,8 +33,8 @@ while (running)
     foreach (var token in tokens)
         Console.WriteLine(token.kind);
 
-    var parser = new Parser(tokens, syntax);
-    var compilationUnit = parser.Parse();
+    var parser = new Parser(syntax, tokens);
+    var compilationUnit = parser.GetAll();
 
     foreach(var diagnostic in parser.diagnostics.GetAll())
         Console.WriteLine(diagnostic.GetMessage());
