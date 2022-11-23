@@ -6,14 +6,14 @@ class PostlexicalAnalyzer: AAnalyzer<SyntaxNode, SyntaxNode>
 {
     private SyntaxDefinition _syntax;
     private bool _isNewLine;
-    private int _currrentIndentDepth;
+    private int _currentIndentDepth;
     private SyntaxNode _currentToken { get => _Peek(0); }
     private TextLocation _currentHiddenLocation { get => new TextLocation(_currentToken.location.pos, 0); }
 
     public PostlexicalAnalyzer(SyntaxDefinition syntax, List<SyntaxNode> tokens) : base(tokens, tokens.Last())
     {
         _syntax = syntax;
-        _currrentIndentDepth = 0;
+        _currentIndentDepth = 0;
         _isNewLine = true;
     }
 
@@ -38,7 +38,7 @@ class PostlexicalAnalyzer: AAnalyzer<SyntaxNode, SyntaxNode>
             for (; _currentToken.kind == SyntaxKind.Token_Indent && _currentToken.valid; _IncrementPos())
                     indentDepth++;
 
-            var d = indentDepth - _currrentIndentDepth;
+            var d = indentDepth - _currentIndentDepth;
             if (d == 0)
                 yield return _ReadNext();
             else if (d == 1)
@@ -49,7 +49,7 @@ class PostlexicalAnalyzer: AAnalyzer<SyntaxNode, SyntaxNode>
             else
                 yield return new SyntaxNode(SyntaxKind.Token_BeginBlock, _currentHiddenLocation, false);
             
-            _currrentIndentDepth += d;
+            _currentIndentDepth += d;
             _isNewLine = false;
         }
         else
@@ -65,7 +65,7 @@ class PostlexicalAnalyzer: AAnalyzer<SyntaxNode, SyntaxNode>
                     yield return token;
         }
 
-        for (var i = 0; i < _currrentIndentDepth; i++)
+        for (var i = 0; i < _currentIndentDepth; i++)
             yield return new SyntaxNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation);
 
         yield return _currentToken;

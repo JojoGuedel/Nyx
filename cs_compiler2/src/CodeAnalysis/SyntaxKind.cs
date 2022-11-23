@@ -72,6 +72,13 @@ public enum SyntaxKind
     Keyword_Do,
     Keyword_While,
 
+    Keyword_Int,
+    Keyword_UInt,
+    Keyword_Float,
+    Keyword_Number,
+    // Keyword_Char,
+    // Keyword_String,
+
     Syntax_Empty,
     Syntax_Error,
 

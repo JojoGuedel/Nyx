@@ -49,7 +49,7 @@ class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
         {
             while (char.IsDigit(_currentChar)) 
                 _pos++;
-            // TODO: Handle '_' and '.'
+            // TODO: Handle '.'
             return new SyntaxNode(SyntaxKind.Token_Number, _location);
         }
         // lex strings
@@ -57,7 +57,7 @@ class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
         {
             var terminator = _currentChar;
 
-            while (char.Equals(_currentChar, '\\') || !char.Equals(_nextChar, terminator))
+            while (char.Equals(_currentChar, _syntax.escapeSymbol) || !char.Equals(_nextChar, terminator))
             {
                 _pos++;
 
@@ -82,8 +82,8 @@ class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
 
                 if (kind == SyntaxKind.Token_Error)
                 {
-                    // TODO: filter unused names ('_')
-                    while (char.IsLetterOrDigit(_currentChar) || char.Equals(_currentChar, '_')) _pos++;
+                    while (char.IsLetterOrDigit(_currentChar) || char.Equals(_currentChar, '_')) 
+                        _pos++;
 
                     if (_length > 0)
                     {
@@ -95,7 +95,7 @@ class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
                         return new SyntaxNode(SyntaxKind.Token_Identifier, _location);
                     }
 
-                    _pos += 1;
+                    _pos++;
                     return new SyntaxNode(SyntaxKind.Token_InvalidChar, _location);
                 }
                 else if (kind == SyntaxKind.Token_NewLine)
@@ -116,7 +116,6 @@ class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
         do
         {
             token = GetNext();
-            // if (token.kind != SyntaxKind._Discard)
             yield return token;
         }
         while (token.kind != SyntaxKind.Token_End);
@@ -129,15 +128,16 @@ class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
 
         while (true)
         {
-            int curOffset = 0;
+            int currentOffset = 0;
 
-            while (char.IsWhiteSpace(_Peek(offset + curOffset))) curOffset++;
+            while (char.IsWhiteSpace(_Peek(offset + currentOffset)))
+                currentOffset++;
 
-            if (!char.Equals(_Peek(offset + curOffset), _syntax.lineEndSymbol))
+            if (!char.Equals(_Peek(offset + currentOffset), _syntax.newLineSymbol))
                 break;
             // TODO: checks special case with endSymbol
 
-            offset += curOffset;
+            offset += currentOffset;
             blankLineCount++;
         }
 

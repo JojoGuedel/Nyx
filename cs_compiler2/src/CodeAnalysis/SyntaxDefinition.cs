@@ -3,7 +3,8 @@ namespace CodeAnalysis;
 public class SyntaxDefinition
 {
     public int indentSize { get; }
-    public char lineEndSymbol { get; }
+    public char escapeSymbol { get; }
+    public char newLineSymbol { get; }
     public char endSymbol { get; }
 
     private Dictionary<char, SyntaxKind> _singleTokens;
@@ -13,6 +14,7 @@ public class SyntaxDefinition
 
     public SyntaxDefinition(
         int indentSize=4,
+        char escapeSymbol = '\\',
         char lineEndSymbol = '\n',
         char endSymbol='\u0000'
     )
@@ -24,7 +26,9 @@ public class SyntaxDefinition
 
         this.indentSize = indentSize;
 
-        this.lineEndSymbol = lineEndSymbol;
+        this.escapeSymbol = escapeSymbol;
+
+        this.newLineSymbol = lineEndSymbol;
         DefineSingleToken(lineEndSymbol, SyntaxKind.Token_NewLine);
 
         this.endSymbol = endSymbol;
@@ -70,7 +74,7 @@ public class SyntaxDefinition
     public bool IsLineTerminator(char pattern)
     {
         return
-            pattern == lineEndSymbol ||
+            pattern == newLineSymbol ||
             pattern == endSymbol;
     }
 
@@ -144,6 +148,13 @@ public class SyntaxDefinition
         syntax.DefineKeyword("for", SyntaxKind.Keyword_For);
         syntax.DefineKeyword("do", SyntaxKind.Keyword_Do);
         syntax.DefineKeyword("while", SyntaxKind.Keyword_While);
+
+        syntax.DefineKeyword("int", SyntaxKind.Keyword_Int);
+        syntax.DefineKeyword("uint", SyntaxKind.Keyword_UInt);
+        syntax.DefineKeyword("float", SyntaxKind.Keyword_Float);
+        syntax.DefineKeyword("number", SyntaxKind.Keyword_Number);
+        // syntax.DefineKeyword("char", SyntaxKind.Keyword_Char);
+        // syntax.DefineKeyword("string", SyntaxKind.Keyword_String);
 
         return syntax;
     }

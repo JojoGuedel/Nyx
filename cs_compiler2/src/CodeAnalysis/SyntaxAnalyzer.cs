@@ -53,13 +53,15 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         var syntax_Expression = _ParseExpression();
         var token_SemiColon = _MatchToken(SyntaxKind.Token_Semicolon);
 
-        return new SyntaxNode(SyntaxKind.Syntax_DeclarationStatement,
-                              keyword_Let,
-                              token_Identifier,
-                              syntax_OptionalTypeClause,
-                              token_Equal,
-                              syntax_Expression,
-                              token_SemiColon);
+        return new SyntaxNode(
+            SyntaxKind.Syntax_DeclarationStatement,
+            keyword_Let,
+            token_Identifier,
+            syntax_OptionalTypeClause,
+            token_Equal,
+            syntax_Expression,
+            token_SemiColon
+        );
     }
 
     private SyntaxNode _ParseOptionalTypeClause()
@@ -92,7 +94,8 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
                 left = new SyntaxNode(SyntaxKind.Syntax_Addition, left, _ReadNext(), _ParseMultiplication());
             else if (_currentToken.kind == SyntaxKind.Token_Minus)
                 left = new SyntaxNode(SyntaxKind.Syntax_Subtraction, left, _ReadNext(), _ParseMultiplication());
-            else break;
+            else
+                break;
 
         return left;
     }
@@ -106,7 +109,8 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
                 left = new SyntaxNode(SyntaxKind.Syntax_Multiplication, left, _ReadNext(), _ParsePrimary());
             else if (_currentToken.kind == SyntaxKind.Token_Slash)
                 left = new SyntaxNode(SyntaxKind.Syntax_Division, left, _ReadNext(), _ParsePrimary());
-            else break;
+            else
+                break;
 
         return left;
     }
