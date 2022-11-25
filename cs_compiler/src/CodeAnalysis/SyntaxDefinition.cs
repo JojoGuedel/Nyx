@@ -93,8 +93,6 @@ public class SyntaxDefinition
         syntax.DefineSingleToken('\r', SyntaxKind.Token_Discard);
         syntax.DefineSingleToken(' ', SyntaxKind.Token_Space);
         syntax.DefineDoubleToken(('/', '/'), SyntaxKind.Token_CommentMarker);
-
-        syntax.DefineSingleToken('\n', SyntaxKind.Token_NewLine);
         syntax.DefineSingleToken('"', SyntaxKind.Token_StringMarker);
 
         syntax.DefineSingleToken('(', SyntaxKind.Token_LParen);
