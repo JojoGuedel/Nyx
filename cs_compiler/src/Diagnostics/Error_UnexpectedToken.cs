@@ -1,4 +1,4 @@
-using SyntaxAnalysis;
+using CodeAnalysis;
 
 namespace Diagnostics;
 
