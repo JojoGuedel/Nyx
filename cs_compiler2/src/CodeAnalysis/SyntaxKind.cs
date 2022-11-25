@@ -103,4 +103,5 @@ public enum SyntaxKind
     Syntax_BreakStatement,
     Syntax_FunctionBlock,
     Syntax_ReturnStatement,
+    Syntax_PassStatement,
 }
