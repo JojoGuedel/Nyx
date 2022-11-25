@@ -140,6 +140,8 @@ public class SyntaxDefinition
         syntax.DefineKeyword("struct", SyntaxKind.Keyword_Struct);
         syntax.DefineKeyword("include", SyntaxKind.Keyword_Include);
         syntax.DefineKeyword("func", SyntaxKind.Keyword_Function);
+        syntax.DefineKeyword("return", SyntaxKind.Keyword_Return);
+        syntax.DefineKeyword("pass", SyntaxKind.Keyword_Pass);
         syntax.DefineKeyword("var", SyntaxKind.Keyword_Var);
         syntax.DefineKeyword("mut", SyntaxKind.Keyword_Mut);
         syntax.DefineKeyword("if", SyntaxKind.Keyword_If);
@@ -148,11 +150,13 @@ public class SyntaxDefinition
         syntax.DefineKeyword("for", SyntaxKind.Keyword_For);
         syntax.DefineKeyword("do", SyntaxKind.Keyword_Do);
         syntax.DefineKeyword("while", SyntaxKind.Keyword_While);
+        syntax.DefineKeyword("continue", SyntaxKind.Keyword_While);
+        syntax.DefineKeyword("break", SyntaxKind.Keyword_While);
 
-        syntax.DefineKeyword("int", SyntaxKind.Keyword_Int);
-        syntax.DefineKeyword("uint", SyntaxKind.Keyword_UInt);
-        syntax.DefineKeyword("float", SyntaxKind.Keyword_Float);
-        syntax.DefineKeyword("number", SyntaxKind.Keyword_Number);
+        // syntax.DefineKeyword("int", SyntaxKind.Keyword_Int);
+        // syntax.DefineKeyword("uint", SyntaxKind.Keyword_UInt);
+        // syntax.DefineKeyword("float", SyntaxKind.Keyword_Float);
+        // syntax.DefineKeyword("number", SyntaxKind.Keyword_Number);
         // syntax.DefineKeyword("char", SyntaxKind.Keyword_Char);
         // syntax.DefineKeyword("string", SyntaxKind.Keyword_String);
 

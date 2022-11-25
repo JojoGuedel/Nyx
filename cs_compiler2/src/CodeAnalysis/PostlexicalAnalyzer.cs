@@ -21,6 +21,7 @@ class PostlexicalAnalyzer: AAnalyzer<SyntaxNode, SyntaxNode>
     {
         return
             token.kind == SyntaxKind.Token_Discard ||
+            token.kind == SyntaxKind.Token_Comment ||
             _syntax.IsWhiteSpace(token.kind);
     }
 

@@ -71,6 +71,13 @@ class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
 
             return new SyntaxNode(SyntaxKind.Token_String, _location);
         }
+        else if (_syntax.GetDoubleTokenKind((_currentChar, _nextChar)) == SyntaxKind.Token_CommentMarker)
+        {
+            while (_currentChar != _syntax.newLineSymbol)
+                _IncrementPos();
+            
+            return new SyntaxNode(SyntaxKind.Token_Comment, _location);
+        }
         // lex operators and names
         else
         {
