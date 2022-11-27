@@ -136,6 +136,7 @@ public class SyntaxDefinition
         syntax.DefineKeyword("abstract", SyntaxKind.Keyword_Abstract);
         syntax.DefineKeyword("section", SyntaxKind.Keyword_Section);
         syntax.DefineKeyword("struct", SyntaxKind.Keyword_Struct);
+        syntax.DefineKeyword("extend", SyntaxKind.Keyword_Extend);
         syntax.DefineKeyword("include", SyntaxKind.Keyword_Include);
         syntax.DefineKeyword("func", SyntaxKind.Keyword_Function);
         syntax.DefineKeyword("return", SyntaxKind.Keyword_Return);

@@ -38,10 +38,90 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         List<SyntaxNode> syntaxNodes = new List<SyntaxNode>();
 
         while (_currentToken.kind != SyntaxKind.Token_End)
-            syntaxNodes.Add(_ParseDeclarationStatement());
+            syntaxNodes.Add(_ParseVariableDeclarationStatement());
         syntaxNodes.Add(_currentToken);
 
         return new SyntaxNode(SyntaxKind.Syntax_CompilationUnit, syntaxNodes);
+    }
+
+    private SyntaxNode _ParseTopLevelItem()
+    {
+        switch (_currentToken.kind)
+        {
+            case SyntaxKind.Token_Semicolon:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Public:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Static:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Abstract:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Section:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Struct:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Include:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Function:
+                return _ParseFunctionDeclaration();
+        }
+
+        // TODO: filter in switch to give better feedback
+        diagnostics.Add(new Error_InvalidTopLevelItem(_currentToken));
+        return new SyntaxNode(SyntaxKind.Syntax_Error, _ReadNext());
+    }
+
+    private SyntaxNode _ParseStructDeclaration()
+    {
+        return new SyntaxNode
+        (
+            SyntaxKind.Syntax_StructDeclaration,
+            _MatchToken(SyntaxKind.Keyword_Struct),
+            _MatchToken(SyntaxKind.Token_Colon),
+            _MatchToken(SyntaxKind.Token_BeginBlock),
+            _ParseStructBody(),
+            _MatchToken(SyntaxKind.Token_EndBlock)
+        );
+    }
+
+    private SyntaxNode _ParseStructBody()
+    {
+        var children = new List<SyntaxNode>();
+
+        if (_currentToken.kind == SyntaxKind.Token_EndBlock)
+            diagnostics.Add(new Error_EmptyBlock(_currentToken.location));
+        else
+            while(_currentToken.kind != SyntaxKind.Token_EndBlock)
+                children.Add(_ParseStructChildren());
+
+        return new SyntaxNode(SyntaxKind.Syntax_StructBody, children);
+    }
+
+    private SyntaxNode _ParseStructChildren()
+    {
+        switch(_currentToken.kind)
+        {
+            case SyntaxKind.Keyword_Public:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Static:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Section:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Extend:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Function:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Pass:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Mut:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Var:
+                throw new NotImplementedException();
+        }
+
+        // TODO: filter in switch to give better feedback
+        diagnostics.Add(new Error_InvalidStatement(_currentToken));
+        return new SyntaxNode(SyntaxKind.Syntax_Error, _ReadNext());
     }
 
     private SyntaxNode _ParseFunctionDeclaration()
@@ -82,8 +162,14 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
     private SyntaxNode _ParseOptionalArguments()
     {
         var arguments = new List<SyntaxNode>();
+
         while (_currentToken.kind != SyntaxKind.Token_RParen)
+        {
             arguments.Add(_ParseArgument());
+            // TODO: make this prettier
+            if (_currentToken.kind != SyntaxKind.Token_RParen)
+                _MatchToken(SyntaxKind.Token_Comma);
+        }
 
         if (arguments.Count == 0)
             return SyntaxNode.EmptySyntax(_currentEmptySyntaxPos);
@@ -131,11 +217,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
             while(_currentToken.kind != SyntaxKind.Token_EndBlock)
                 children.Add(_ParseStatement());
 
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_FunctionBlock,
-            children
-        );
+        return new SyntaxNode(SyntaxKind.Syntax_FunctionBlock, children);
     }
 
     private SyntaxNode _ParseStatement()
@@ -143,17 +225,19 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         switch (_currentToken.kind)
         {
             case SyntaxKind.Token_Semicolon:
-                break;
+                throw new NotImplementedException();
+            case SyntaxKind.Token_Identifier:
+                throw new NotImplementedException();
 
             case SyntaxKind.Keyword_Function:
                 return _ParseFunctionDeclaration();
             case SyntaxKind.Keyword_Return:
                 return _ParseReturnStatement();
             case SyntaxKind.Keyword_Pass:
-                break;
+                return _ParsePassStatement();
             case SyntaxKind.Keyword_Mut:
             case SyntaxKind.Keyword_Var:
-                return _ParseDeclarationStatement();
+                return _ParseVariableDeclarationStatement();
             case SyntaxKind.Keyword_If:
                 throw new NotImplementedException();
             case SyntaxKind.Keyword_Else:
@@ -172,6 +256,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
                 return _ParseBreakStatement();
         }
 
+        // TODO: filter in switch to give better feedback
         diagnostics.Add(new Error_InvalidStatement(_currentToken));
         return new SyntaxNode(SyntaxKind.Syntax_Error, _ReadNext());
     }
@@ -225,7 +310,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         );
     }
 
-    private SyntaxNode _ParseDeclarationStatement()
+    private SyntaxNode _ParseVariableDeclarationStatement()
     {
         return new SyntaxNode
         (

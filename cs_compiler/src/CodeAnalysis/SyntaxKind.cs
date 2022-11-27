@@ -61,6 +61,7 @@ public enum SyntaxKind
     Keyword_Abstract,
     Keyword_Section,
     Keyword_Struct,
+    Keyword_Extend,
     Keyword_Include,
     Keyword_Function,
     Keyword_Return,
@@ -104,4 +105,6 @@ public enum SyntaxKind
     Syntax_FunctionBlock,
     Syntax_ReturnStatement,
     Syntax_PassStatement,
+    Syntax_StructDeclaration,
+    Syntax_StructBody,
 }
