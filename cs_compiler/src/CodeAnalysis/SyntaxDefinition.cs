@@ -86,6 +86,33 @@ public class SyntaxDefinition
             kind == SyntaxKind.Token_NewLine;
     }
 
+    public int OperatorPrecedence(SyntaxKind kind)
+    {
+        switch (kind)
+        {
+            case SyntaxKind.Keyword_Or:
+                return 6;
+            case SyntaxKind.Keyword_And:
+                return 5;
+            case SyntaxKind.Token_EqualEqual:
+            case SyntaxKind.Token_NotEqual:
+                return 4;
+            case SyntaxKind.Token_Greater:
+            case SyntaxKind.Token_GreaterEqual:
+            case SyntaxKind.Token_Less:
+            case SyntaxKind.Token_LessEqual:
+                return 3;
+            case SyntaxKind.Token_Plus:
+            case SyntaxKind.Token_Minus:
+                return 2;
+            case SyntaxKind.Token_Star:
+            case SyntaxKind.Token_Slash:
+                return 1;
+            default: 
+                return 0;
+        }
+    }
+
     public static SyntaxDefinition Default()
     {
         var syntax = new SyntaxDefinition();
@@ -135,6 +162,7 @@ public class SyntaxDefinition
         syntax.DefineKeyword("static", SyntaxKind.Keyword_Static);
         syntax.DefineKeyword("abstract", SyntaxKind.Keyword_Abstract);
         syntax.DefineKeyword("section", SyntaxKind.Keyword_Section);
+        syntax.DefineKeyword("enum", SyntaxKind.Keyword_Enum);
         syntax.DefineKeyword("struct", SyntaxKind.Keyword_Struct);
         syntax.DefineKeyword("extend", SyntaxKind.Keyword_Extend);
         syntax.DefineKeyword("include", SyntaxKind.Keyword_Include);
@@ -145,6 +173,8 @@ public class SyntaxDefinition
         syntax.DefineKeyword("mut", SyntaxKind.Keyword_Mut);
         syntax.DefineKeyword("if", SyntaxKind.Keyword_If);
         syntax.DefineKeyword("else", SyntaxKind.Keyword_Else);
+        syntax.DefineKeyword("and", SyntaxKind.Keyword_And);
+        syntax.DefineKeyword("or", SyntaxKind.Keyword_Or);
         syntax.DefineKeyword("switch", SyntaxKind.Keyword_Switch);
         syntax.DefineKeyword("for", SyntaxKind.Keyword_For);
         syntax.DefineKeyword("do", SyntaxKind.Keyword_Do);
