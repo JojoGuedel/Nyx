@@ -40,7 +40,6 @@ public enum SyntaxKind
     Token_Greater,
     Token_Equal,
     Token_Percent,
-    // Token_Bang,
 
     // Token_LBrace,
     // Token_RBrace,
@@ -103,7 +102,6 @@ public enum SyntaxKind
     Syntax_CompilationUnit,
     Syntax_FunctionDeclaration,
     Syntax_Arguments,
-    Syntax_Argument,
     Syntax_ReturnType,
     Syntax_ContinueStatement,
     Syntax_BreakStatement,
@@ -119,4 +117,11 @@ public enum SyntaxKind
     Syntax_PrefixNot,
     Syntax_PrefixPlusPlus,
     Syntax_PrefixMinusMinus,
+    Syntax_BinaryOperation,
+    Syntax_FunctionCall,
+    Syntax_OptionalArgument,
+    Syntax_Argument,
+    Syntax_Subscript,
+    Syntax_PostfixIncrement,
+    Syntax_PostfixDecrement,
 }

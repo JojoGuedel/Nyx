@@ -7,6 +7,8 @@ public class SyntaxDefinition
     public char newLineSymbol { get; }
     public char endSymbol { get; }
 
+    public int maxOperatorPrecedence { get; }
+
     private Dictionary<char, SyntaxKind> _singleTokens;
     private Dictionary<(char, char), SyntaxKind> _doubleTokens;
 
@@ -33,6 +35,8 @@ public class SyntaxDefinition
 
         this.endSymbol = endSymbol;
         DefineSingleToken(endSymbol, SyntaxKind.Token_End);
+
+        maxOperatorPrecedence = 6;
     }
 
     public void DefineSingleToken(char pattern, SyntaxKind kind)
@@ -86,7 +90,7 @@ public class SyntaxDefinition
             kind == SyntaxKind.Token_NewLine;
     }
 
-    public int OperatorPrecedence(SyntaxKind kind)
+    public int BinaryOperatorPrecedence(SyntaxKind kind)
     {
         switch (kind)
         {

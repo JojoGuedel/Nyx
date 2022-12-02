@@ -49,7 +49,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
 
     private SyntaxNode _ParseTopLevelItem()
     {
-        switch(_currentToken.kind)
+        switch (_currentToken.kind)
         {
             case SyntaxKind.Keyword_Public:
             case SyntaxKind.Keyword_Static:
@@ -73,11 +73,11 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
     // ----------------------------- _ParseTopLevelItem -----------------------------
     private SyntaxNode _ParseTopLevelMember()
     {
-        var syntaxPublic = _ParseOptionalPublic(); 
-        var syntaxAbstract = _ParseOptionalAbstract(); 
-        var syntaxStatic = _ParseOptinoalStatic(); 
+        var syntaxPublic = _ParseOptionalPublic();
+        var syntaxAbstract = _ParseOptionalAbstract();
+        var syntaxStatic = _ParseOptinoalStatic();
 
-        switch(_currentToken.kind)
+        switch (_currentToken.kind)
         {
             case SyntaxKind.Keyword_Enum:
                 // TODO: parse enums
@@ -121,14 +121,14 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
     {
         if (_currentToken.kind == SyntaxKind.Keyword_Public)
             return _MatchToken(SyntaxKind.Keyword_Public);
-        
+
         return SyntaxNode.EmptySyntax(_currentEmptySyntaxPos);
     }
     private SyntaxNode _ParseOptionalAbstract()
     {
         if (_currentToken.kind == SyntaxKind.Keyword_Abstract)
             return _MatchToken(SyntaxKind.Keyword_Abstract);
-        
+
         return SyntaxNode.EmptySyntax(_currentEmptySyntaxPos);
     }
 
@@ -136,7 +136,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
     {
         if (_currentToken.kind == SyntaxKind.Keyword_Static)
             return _MatchToken(SyntaxKind.Keyword_Static);
-        
+
         return SyntaxNode.EmptySyntax(_currentEmptySyntaxPos);
     }
 
@@ -150,7 +150,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
             syntaxStatic,
             _MatchToken(SyntaxKind.Token_Identifier),
             _MatchToken(SyntaxKind.Token_Colon)
-            // TODO: parse struct body
+        // TODO: parse struct body
         );
     }
 
@@ -167,20 +167,40 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
             _MatchToken(SyntaxKind.Token_RParen),
             // TODO: parse optional type clause
             _MatchToken(SyntaxKind.Token_Colon)
-            // TODO: parse function body
+        // TODO: parse function body
         );
     }
     // ---------------------------- _ParseTopLevelMember ----------------------------
 
     private SyntaxNode _ParseExpression()
     {
-        var left = _ParsePrefix();
+        return _ParseBinaryExpression();
+    }
 
-        
+    // ------------------------------ _ParseExpression ------------------------------
+    private SyntaxNode _ParseBinaryExpression(int currentPrecedence = 1)
+    {
+        if (currentPrecedence > _syntax.maxOperatorPrecedence)
+            return _ParsePrefix();
+
+        var left = _ParseBinaryExpression(currentPrecedence + 1);
+
+        while (_syntax.BinaryOperatorPrecedence(_currentToken.kind) == currentPrecedence)
+        {
+            left = new SyntaxNode
+            (
+                SyntaxKind.Syntax_BinaryOperation,
+                left,
+                _ReadNext(),
+                _ParseBinaryExpression(currentPrecedence + 1)
+            );
+        }
 
         return left;
     }
+    // ------------------------------ _ParseExpression ------------------------------
 
+    // --------------------------- _ParseBinaryExpression ---------------------------
     private SyntaxNode _ParsePrefix()
     {
         var syntaxKind = SyntaxKind.Syntax_Empty;
@@ -204,16 +224,17 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
                 break;
         }
 
-        if (syntaxKind != SyntaxKind.Syntax_Empty)
-            return new SyntaxNode
-            (
-                syntaxKind,
-                _ReadNext(),
-                _ParsePrefix()
-            );
+        if (syntaxKind == SyntaxKind.Syntax_Empty)
+            return _ParsePostfix();
 
-        return _ParsePostfix();
+        return new SyntaxNode
+        (
+            syntaxKind,
+            _ReadNext(),
+            _ParsePrefix()
+        );
     }
+    // --------------------------- _ParseBinaryExpression ---------------------------
 
     // -------------------------------- _ParsePrefix --------------------------------
     private SyntaxNode _ParsePostfix()
@@ -221,15 +242,46 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         var expr = _ParsePrimary();
         var isPostfix = true;
 
-        while(isPostfix)
+        while (isPostfix)
         {
-            switch(_currentToken.kind)
+            switch (_currentToken.kind)
             {
                 case SyntaxKind.Token_LParen:
-                    throw new NotImplementedException();
+                    expr = new SyntaxNode
+                    (
+                        SyntaxKind.Syntax_FunctionCall,
+                        expr,
+                        _MatchToken(SyntaxKind.Token_LParen),
+                        _ParseFunctionArguments(),
+                        _MatchToken(SyntaxKind.Token_RParen)
+                    );
+                    break;
+                case SyntaxKind.Token_LSquare:
+                    expr = new SyntaxNode
+                    (
+                        SyntaxKind.Syntax_Subscript,
+                        expr,
+                        _MatchToken(SyntaxKind.Token_LSquare),
+                        _ParseSubscriptArguments(),
+                        _MatchToken(SyntaxKind.Token_RSquare)
+                    );
+                    break;
                 case SyntaxKind.Token_PlusPlus:
+                    expr = new SyntaxNode
+                    (
+                        SyntaxKind.Syntax_PostfixIncrement,
+                        expr,
+                        _ReadNext()
+                    );
+                    break;
                 case SyntaxKind.Token_MinusMinus:
-                    throw new NotImplementedException();
+                    expr = new SyntaxNode
+                    (
+                        SyntaxKind.Syntax_PostfixDecrement,
+                        expr,
+                        _ReadNext()
+                    );
+                    break;
                 default:
                     isPostfix = false;
                     break;
@@ -257,5 +309,82 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
             _ReadNext()
         );
     }
+
+    // TODO: maybe merge this somehow with _ParseSubscriptArguments
+    private SyntaxNode _ParseFunctionArguments()
+    {
+        var nodes = new List<SyntaxNode>();
+        var isArgRemaining = _currentToken.kind != SyntaxKind.Token_RParen;
+
+        while (isArgRemaining)
+        {
+            // TODO: diagnostics
+            _ParseArgument();
+
+            isArgRemaining = _currentToken.kind == SyntaxKind.Token_Comma;
+            if (!isArgRemaining) break; 
+
+            nodes.Add(_MatchToken(SyntaxKind.Token_Comma));
+        }
+
+        if (nodes.Count == 0)
+            nodes.Add(SyntaxNode.EmptySyntax(_currentEmptySyntaxPos));
+
+        return new SyntaxNode
+        (
+            SyntaxKind.Syntax_Arguments,
+            nodes
+        );
+    }
+
+    private SyntaxNode _ParseSubscriptArguments()
+    {
+        var nodes = new List<SyntaxNode>();
+        var isArgRemaining = _currentToken.kind != SyntaxKind.Token_RParen;
+
+        while (isArgRemaining)
+        {
+            // TODO: diagnostics
+            nodes.Add(new SyntaxNode(SyntaxKind.Syntax_Argument, _ParseExpression()));
+
+            isArgRemaining = _currentToken.kind == SyntaxKind.Token_Comma;
+            if (!isArgRemaining) break; 
+
+            nodes.Add(_MatchToken(SyntaxKind.Token_Comma));
+        }
+
+        if (nodes.Count == 0)
+            // TODO: diagnostics
+            throw new NotImplementedException();
+
+        return new SyntaxNode
+        (
+            SyntaxKind.Syntax_Arguments,
+            nodes
+        );
+    }
     // -------------------------------- _ParsePostfix -------------------------------
+
+    // --------------------------- _ParseFunctionArguments --------------------------
+    private SyntaxNode _ParseArgument()
+    {
+        var expr = _ParseExpression();
+
+        if (expr.kind == SyntaxKind.Token_Identifier &&
+            _currentToken.kind == SyntaxKind.Token_Equal)
+            return new SyntaxNode
+            (
+                SyntaxKind.Syntax_OptionalArgument,
+                expr,
+                _ReadNext(),
+                _ParseExpression()
+            );
+        
+        return new SyntaxNode
+        (
+            SyntaxKind.Syntax_Argument,
+            expr
+        );
+    }
+    // --------------------------- _ParseFunctionArguments --------------------------
 }
