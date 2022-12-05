@@ -6,6 +6,7 @@ public class SyntaxNode
 {
     public SyntaxKind kind { get; }
     public TextLocation location { get; }
+    // TODO: remove this if it isn't useful later
     public bool valid { get; }
 
     public List<SyntaxNode> children { get; }
