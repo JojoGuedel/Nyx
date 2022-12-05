@@ -1,4 +1,4 @@
-namespace Utils;
+namespace Nyx.Utils;
 
 class TextSpan
 {

@@ -1,4 +1,4 @@
-namespace CodeAnalysis;
+namespace Nyx.CodeAnalysis;
 
 public enum SyntaxKind
 {

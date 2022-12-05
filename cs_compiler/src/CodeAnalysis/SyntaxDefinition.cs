@@ -1,4 +1,4 @@
-namespace CodeAnalysis;
+namespace Nyx.CodeAnalysis;
 
 public class SyntaxDefinition
 {
@@ -9,10 +9,10 @@ public class SyntaxDefinition
 
     public int maxOperatorPrecedence { get; }
 
-    private Dictionary<char, SyntaxKind> _singleTokens;
-    private Dictionary<(char, char), SyntaxKind> _doubleTokens;
+    public Dictionary<char, SyntaxKind> singleTokens { get; }
+    public Dictionary<(char, char), SyntaxKind> doubleTokens { get; }
 
-    private Dictionary<string, SyntaxKind> _keywords;
+    public Dictionary<string, SyntaxKind> keywords { get; }
 
     public SyntaxDefinition(
         int indentSize=4,
@@ -21,10 +21,10 @@ public class SyntaxDefinition
         char endSymbol='\u0000'
     )
     {
-        _singleTokens = new Dictionary<char, SyntaxKind>();
-        _doubleTokens = new Dictionary<(char, char), SyntaxKind>();
+        singleTokens = new Dictionary<char, SyntaxKind>();
+        doubleTokens = new Dictionary<(char, char), SyntaxKind>();
 
-        _keywords = new Dictionary<string, SyntaxKind>();
+        keywords = new Dictionary<string, SyntaxKind>();
 
         this.indentSize = indentSize;
 
@@ -41,37 +41,37 @@ public class SyntaxDefinition
 
     public void DefineSingleToken(char pattern, SyntaxKind kind)
     {
-        _singleTokens.Add(pattern, kind);
+        singleTokens.Add(pattern, kind);
     }
 
     public SyntaxKind GetSingleTokenKind(char pattern)
     {
         var kind = SyntaxKind.Token_Error;
-        _singleTokens.TryGetValue(pattern, out kind);
+        singleTokens.TryGetValue(pattern, out kind);
         return kind;
     }
 
     public void DefineDoubleToken((char, char) pattern, SyntaxKind kind)
     {
-        _doubleTokens.Add(pattern, kind);
+        doubleTokens.Add(pattern, kind);
     }
 
     public SyntaxKind GetDoubleTokenKind((char, char) pattern)
     {
         var kind = SyntaxKind.Token_Error;
-        _doubleTokens.TryGetValue(pattern, out kind);
+        doubleTokens.TryGetValue(pattern, out kind);
         return kind;
     }
 
     public void DefineKeyword(string pattern, SyntaxKind kind)
     {
-        _keywords.Add(pattern, kind);
+        keywords.Add(pattern, kind);
     }
 
     public SyntaxKind GetKeyword(string pattern)
     {
         var kind = SyntaxKind.Token_Error;
-        _keywords.TryGetValue(pattern, out kind);
+        keywords.TryGetValue(pattern, out kind);
         return kind;
     }
 

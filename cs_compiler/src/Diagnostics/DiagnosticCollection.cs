@@ -1,6 +1,4 @@
-using System.Collections;
-
-namespace Diagnostics;
+namespace Nyx.Diagnostics;
 
 public class DiagnosticCollection
 {

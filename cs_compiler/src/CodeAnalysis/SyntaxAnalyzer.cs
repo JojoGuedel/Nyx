@@ -1,6 +1,6 @@
-using Diagnostics;
+namespace Nyx.CodeAnalysis;
 
-namespace CodeAnalysis;
+using Diagnostics;
 
 class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
 {

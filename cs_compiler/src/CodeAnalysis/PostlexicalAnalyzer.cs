@@ -1,6 +1,6 @@
-using Utils;
+namespace Nyx.CodeAnalysis;
 
-namespace CodeAnalysis;
+using Utils;
 
 class PostlexicalAnalyzer: AAnalyzer<SyntaxNode, SyntaxNode>
 {

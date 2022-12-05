@@ -1,6 +1,6 @@
-namespace CodeAnalysis;
+namespace Nyx.CodeAnalysis;
 
-abstract class AAnalyzer<InputT, OutputT>
+public abstract class AAnalyzer<InputT, OutputT>
 {
     protected readonly List<InputT> _values;
     protected readonly InputT _terminator;

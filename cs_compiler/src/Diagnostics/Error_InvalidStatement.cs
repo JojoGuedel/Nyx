@@ -1,6 +1,6 @@
-using CodeAnalysis;
+namespace Nyx.Diagnostics;
 
-namespace Diagnostics;
+using CodeAnalysis;
 
 public class Error_InvalidStatement : ADiagnostic
 {

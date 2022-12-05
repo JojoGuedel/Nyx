@@ -1,4 +1,4 @@
-﻿using CodeAnalysis;
+﻿using Nyx.CodeAnalysis;
 
 var running = true;
 var syntax = SyntaxDefinition.Default();
@@ -29,10 +29,10 @@ while (running)
     syntaxNodeWriter.Write(tokens);
     Console.WriteLine();
 
-    var syntaxAnaylzer = new SyntaxAnalyzer(syntax, tokens);
-    var compilationUnit = syntaxAnaylzer.GetAll().ToList();
-    syntaxNodeWriter.Write(compilationUnit);
-    Console.WriteLine();
+    // var syntaxAnaylzer = new SyntaxAnalyzer(syntax, tokens);
+    // var compilationUnit = syntaxAnaylzer.GetAll().ToList();
+    // syntaxNodeWriter.Write(compilationUnit);
+    // Console.WriteLine();
 }
 
 void ManageEscapeCommands(string command)

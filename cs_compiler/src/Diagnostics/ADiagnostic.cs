@@ -1,6 +1,6 @@
-using Utils;
+namespace Nyx.Diagnostics;
 
-namespace Diagnostics;
+using Utils;
 
 public abstract class ADiagnostic
 {

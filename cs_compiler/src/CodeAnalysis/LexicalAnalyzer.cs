@@ -1,9 +1,9 @@
-namespace CodeAnalysis;
+namespace Nyx.CodeAnalysis;
 
 using Diagnostics;
 using Utils;
 
-class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
+public class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
 {
     public DiagnosticCollection diagnostics;
     SyntaxDefinition _syntax;
@@ -73,7 +73,7 @@ class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
         }
         else if (_syntax.GetDoubleTokenKind((_currentChar, _nextChar)) == SyntaxKind.Token_CommentMarker)
         {
-            while (_currentChar != _syntax.newLineSymbol)
+            while (!_syntax.IsLineTerminator(_currentChar))
                 _IncrementPos();
             
             return new SyntaxNode(SyntaxKind.Token_Comment, _location);

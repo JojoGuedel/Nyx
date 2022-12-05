@@ -1,4 +1,4 @@
-namespace Diagnostics;
+namespace Nyx.Diagnostics;
 
 public enum DiagnosticSeverity
 {
