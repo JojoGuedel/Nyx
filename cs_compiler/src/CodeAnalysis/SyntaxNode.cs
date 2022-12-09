@@ -44,4 +44,9 @@ public class SyntaxNode
         var syntaxNode = new SyntaxNode(SyntaxKind.Syntax_Empty, location, valid);
         return syntaxNode;
     }
+
+    public bool isEmptySyntax()
+    {
+        return kind == SyntaxKind.Syntax_Empty;
+    }
 }

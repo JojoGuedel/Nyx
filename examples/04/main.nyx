@@ -2,12 +2,12 @@ include "stdio.h" as stdio;
 
 section std;
 
-interface IEnumerator<T>:
+interface Enumerator<T>:
     pub def get_current() -> T;
     pub def move_next() -> bool;
 
 struct ArrayEnumeartor<T>:
-    extends IEnumeartor<T>;
+    extends Enumeartor<T>;
 
     var _val: T[];
     var _index uint;
@@ -21,11 +21,11 @@ pub def ArrayEnumeartor.get_current():
 pub def ArrayEnumeartor.move_next():
     return ++self._index < self._val.length();
 
-interface IEnumerable<T>:
-    pub def get_enumerator() -> IEnumeartor<T>;
+interface Enumerable<T>:
+    pub def get_enumerator() -> Enumeartor<T>;
 
 struct string:
-    extends IEnumerable<char>;
+    extends Enumerable<char>;
 
     var _val: char[];
 

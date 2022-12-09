@@ -12,39 +12,38 @@ public class LexicalAnalyzerTests
     [MemberData(nameof(GetDoubleTokenData))]
     [MemberData(nameof(GetKeywordData))]
     [MemberData(nameof(GetAdditionalTokenData))]
-    void TestTokens(string input, List<SyntaxKind> expected)
+    // TODO: make this work.
+    void TestTokens(string input, params SyntaxKind[] expected)
     {
         var lexicalAnalyzer = new LexicalAnalyzer(_syntax, input);
         var result = lexicalAnalyzer.GetAll().ToList();
 
-        for (int i = 0; i < expected.Count; i++)
+        for (int i = 0; i < expected.Length; i++)
             Assert.Equal(expected[i], result[i].kind);
 
-        Assert.Equal(expected.Count + 1, result.Count);
+        Assert.Equal(expected.Length + 1, result.Count);
         Assert.Equal(SyntaxKind.Token_End, result.Last().kind);
     }
 
     // ------------------------------ Basic Token Tests -----------------------------
-    static object[]? FinalizeTokenData(string pattern, SyntaxKind kind)
+    static object[]? FinalizeTokenData(string pattern, SyntaxKind expected)
     {
-        var expected = new List<SyntaxKind>(1);
 
-        switch (kind)
+        switch (expected)
         {
             case SyntaxKind.Token_Space:
             case SyntaxKind.Token_End:
                 return null;
             case SyntaxKind.Token_CommentMarker:
                 pattern = "// test comment";
-                kind = SyntaxKind.Token_Comment;
+                expected = SyntaxKind.Token_Comment;
                 break;
             case SyntaxKind.Token_StringMarker:
                 pattern = "\"test string\"";
-                kind = SyntaxKind.Token_String;
+                expected = SyntaxKind.Token_String;
                 break;
         }
 
-        expected.Add(kind);
         return new object[] { pattern, expected };
     }
 
@@ -96,8 +95,7 @@ public class LexicalAnalyzerTests
             // "1.582092e99",
         };
 
-        var expected = new List<SyntaxKind>();
-        expected.Add(SyntaxKind.Token_Number);
+        var expected = SyntaxKind.Token_Number;
         
         foreach(var e in numberData)
             yield return new object[] { e, expected };
@@ -105,6 +103,8 @@ public class LexicalAnalyzerTests
     // ------------------------------ Basic Token Tests -----------------------------
 
     // ---------------------------- Combined Token Tests ----------------------------
+
+    // TODO
     
     // ---------------------------- Combined Token Tests ----------------------------
 }

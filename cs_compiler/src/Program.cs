@@ -9,6 +9,16 @@ while (running)
     Console.Write("> ");
 
     var input = Console.ReadLine();
+    input = 
+@"
+static struct a:
+    pass;
+
+func b(c,):
+    pass;
+
+func d():
+    pass;";
 
     if (input is null)
         input=String.Empty;
@@ -29,10 +39,10 @@ while (running)
     syntaxNodeWriter.Write(tokens);
     Console.WriteLine();
 
-    // var syntaxAnaylzer = new SyntaxAnalyzer(syntax, tokens);
-    // var compilationUnit = syntaxAnaylzer.GetAll().ToList();
-    // syntaxNodeWriter.Write(compilationUnit);
-    // Console.WriteLine();
+    var syntaxAnaylzer = new SyntaxAnalyzer(syntax, tokens);
+    var compilationUnit = syntaxAnaylzer.GetAll().ToList();
+    syntaxNodeWriter.Write(compilationUnit);
+    Console.WriteLine();
 }
 
 void ManageEscapeCommands(string command)

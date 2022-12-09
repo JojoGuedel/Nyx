@@ -162,19 +162,21 @@ public class SyntaxDefinition
         syntax.DefineDoubleToken(('/', '='), SyntaxKind.Token_SlashEqual);
         syntax.DefineDoubleToken(('%', '='), SyntaxKind.Token_PercentEqual);
 
-        syntax.DefineKeyword("public", SyntaxKind.Keyword_Public);
+        // syntax.DefineKeyword("pub", SyntaxKind.Keyword_Public);
         syntax.DefineKeyword("static", SyntaxKind.Keyword_Static);
-        syntax.DefineKeyword("abstract", SyntaxKind.Keyword_Abstract);
+        // syntax.DefineKeyword("abstract", SyntaxKind.Keyword_Abstract);
+        // syntax.DefineKeyword("mut", SyntaxKind.Keyword_Mutable);
         syntax.DefineKeyword("section", SyntaxKind.Keyword_Section);
         syntax.DefineKeyword("enum", SyntaxKind.Keyword_Enum);
         syntax.DefineKeyword("struct", SyntaxKind.Keyword_Struct);
-        syntax.DefineKeyword("extend", SyntaxKind.Keyword_Extend);
+        // syntax.DefineKeyword("extend", SyntaxKind.Keyword_Extend);
         syntax.DefineKeyword("include", SyntaxKind.Keyword_Include);
+        syntax.DefineKeyword("var", SyntaxKind.Keyword_Var);
         syntax.DefineKeyword("func", SyntaxKind.Keyword_Function);
+        syntax.DefineKeyword("constructor", SyntaxKind.Keyword_Constructor);
+        syntax.DefineKeyword("operator", SyntaxKind.Keyword_Operator);
         syntax.DefineKeyword("return", SyntaxKind.Keyword_Return);
         syntax.DefineKeyword("pass", SyntaxKind.Keyword_Pass);
-        syntax.DefineKeyword("var", SyntaxKind.Keyword_Var);
-        syntax.DefineKeyword("mut", SyntaxKind.Keyword_Mut);
         syntax.DefineKeyword("if", SyntaxKind.Keyword_If);
         syntax.DefineKeyword("else", SyntaxKind.Keyword_Else);
         syntax.DefineKeyword("and", SyntaxKind.Keyword_And);
