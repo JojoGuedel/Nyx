@@ -2,7 +2,7 @@ namespace Nyx.Diagnostics;
 
 using CodeAnalysis;
 
-public class Error_InvalidTopLevelItem : ADiagnostic
+public class Error_InvalidTopLevelItem : Diagnostic
 {
     private SyntaxNode _token;
 

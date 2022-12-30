@@ -2,7 +2,7 @@ namespace Nyx.Diagnostics;
 
 using Utils;
 
-public class Error_EmptyBlock : ADiagnostic
+public class Error_EmptyBlock : Diagnostic
 {
     public Error_EmptyBlock(TextLocation location) : base(location)
     {

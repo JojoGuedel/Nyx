@@ -2,7 +2,7 @@ namespace Nyx.Diagnostics;
 
 public class DiagnosticCollection
 {
-    private List<ADiagnostic> _diagnostics;
+    private List<Diagnostic> _diagnostics;
 
     public bool containsAny { get => _diagnostics.Count > 0; }
     public bool containsErrors { get => _diagnostics.Any((a) => a.severity == DiagnosticSeverity.Error); }
@@ -10,15 +10,15 @@ public class DiagnosticCollection
 
     public DiagnosticCollection()
     {
-        _diagnostics = new List<ADiagnostic>();
+        _diagnostics = new List<Diagnostic>();
     }
 
-    public void Add(ADiagnostic diagnostic)
+    public void Add(Diagnostic diagnostic)
     {
         _diagnostics.Add(diagnostic);
     }
 
-    public IEnumerable<ADiagnostic> GetAll()
+    public IEnumerable<Diagnostic> GetAll()
     {
         // TODO: make this better
         foreach(var diagnostic in _diagnostics)

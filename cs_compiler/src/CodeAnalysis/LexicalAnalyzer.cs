@@ -3,7 +3,7 @@ namespace Nyx.CodeAnalysis;
 using Diagnostics;
 using Utils;
 
-public class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
+public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
 {
     public DiagnosticCollection diagnostics;
     SyntaxDefinition _syntax;
@@ -125,7 +125,7 @@ public class LexicalAnalyzer : AAnalyzer<char, SyntaxNode>
             token = GetNext();
             yield return token;
         }
-        while (token.kind != SyntaxKind.Token_End);
+        while (!isFinished);
     }
 
     private void _SkipBlankLines()

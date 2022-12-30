@@ -2,7 +2,7 @@ namespace Nyx.CodeAnalysis;
 
 using Diagnostics;
 
-class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
+class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
 {
     public DiagnosticCollection diagnostics;
     SyntaxDefinition _syntax;
@@ -38,13 +38,13 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
 
     private SyntaxNode _ParseCompilationUnit()
     {
-        List<SyntaxNode> children = new List<SyntaxNode>();
+        List<SyntaxNode> nodes = new List<SyntaxNode>();
 
-        while (_currentToken.kind != SyntaxKind.Token_End)
-            children.Add(_ParseTopLevelItem());
-        children.Add(_currentToken);
+        while (_pos <  _values.Count - 1)
+            nodes.Add(_ParseTopLevelItem());
+        nodes.Add(_MatchToken(SyntaxKind.Token_End));
 
-        return new SyntaxNode(SyntaxKind.Syntax_CompilationUnit, children);
+        return new SyntaxNode(SyntaxKind.Syntax_CompilationUnit, nodes);
     }
 
     private SyntaxNode _ParseTopLevelItem()
@@ -123,8 +123,8 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
             SyntaxKind.Syntax_Modifiers,
             // _ParseOptional(SyntaxKind.Keyword_Public),
             _ParseOptional(SyntaxKind.Keyword_Static)
-            // _ParseOptional(SyntaxKind.Keyword_Abstract),
-            // _ParseOptional(SyntaxKind.Keyword_Mutable)
+        // _ParseOptional(SyntaxKind.Keyword_Abstract),
+        // _ParseOptional(SyntaxKind.Keyword_Mutable)
         );
     }
 
@@ -132,7 +132,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
     {
         if (_currentToken.kind == kind)
             return _ReadNext();
-        
+
         return SyntaxNode.EmptySyntax(_currentEmptySyntaxPos);
     }
 
@@ -145,7 +145,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
             _MatchToken(SyntaxKind.Keyword_Struct),
             _MatchToken(SyntaxKind.Token_Identifier),
             _MatchToken(SyntaxKind.Token_Colon),
-            _ParseStructBody()
+            _ParseStructBlock()
         );
     }
 
@@ -166,7 +166,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
     {
         return new SyntaxNode
         (
-            SyntaxKind.Syntax_FunctionDeclaration,
+            SyntaxKind.Syntax_FunctionImplementation,
             modifiers,
             _MatchToken(SyntaxKind.Keyword_Function),
             _ParseName(),
@@ -178,7 +178,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         );
     }
 
-    private SyntaxNode _ParseStructBody()
+    private SyntaxNode _ParseStructBlock()
     {
         var nodes = new List<SyntaxNode>();
         nodes.Add(_MatchToken(SyntaxKind.Token_BeginBlock));
@@ -197,7 +197,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
                 case SyntaxKind.Keyword_Function:
                 case SyntaxKind.Keyword_Constructor:
                 case SyntaxKind.Keyword_Operator:
-                    nodes.Add(_ParseStructBodyMember());
+                    nodes.Add(_ParseStructMember());
                     break;
                 // case SyntaxKind.Keyword_Extend:
                 //     throw new NotImplementedException();
@@ -217,7 +217,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         nodes.Add(_MatchToken(SyntaxKind.Token_EndBlock));
         return new SyntaxNode
         (
-            SyntaxKind.Syntax_StructBody,
+            SyntaxKind.Syntax_StructBlock,
             nodes
         );
     }
@@ -237,12 +237,12 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         var nodes = new List<SyntaxNode>();
 
         while (_currentToken.kind != SyntaxKind.Token_RParen)
-        {   
+        {
             nodes.Add(_ParseName());
 
             if (_currentToken.kind != SyntaxKind.Token_Comma)
                 break;
-            
+
             nodes.Add(_ReadNext());
         }
 
@@ -262,31 +262,77 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         nodes.Add(_MatchToken(SyntaxKind.Token_BeginBlock));
 
         while (_currentToken.kind != SyntaxKind.Token_EndBlock)
+            nodes.Add(_ParseStatement());
+
+        if (nodes.Count <= 1)
+            // TODO: diagnostics, empty blocks musst contain pass
+            throw new NotImplementedException();
+
+        nodes.Add(_MatchToken(SyntaxKind.Token_EndBlock));
+        return new SyntaxNode
+        (
+            SyntaxKind.Syntax_Block,
+            nodes
+        );
+    }
+
+    private SyntaxNode _ParseStatement()
+    {
+        switch (_currentToken.kind)
+        {
+            // case SyntaxKind.Keyword_Mutable:
+            case SyntaxKind.Keyword_Var:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Function:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Return:
+                return _ParseReturnStatement();
+            case SyntaxKind.Keyword_Pass:
+                return _ParsePassStatement();
+            case SyntaxKind.Keyword_If:
+                return _ParseIfStatement();
+            case SyntaxKind.Keyword_Switch:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_For:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Do:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_While:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Continue:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Break:
+                throw new NotImplementedException();
+            default:
+                return _ParseExpression();
+        }
+    }
+
+    private SyntaxNode _ParseSwitchStatement()
+    {
+        return new SyntaxNode
+        (
+            SyntaxKind.Syntax_SwitchStatement,
+            _MatchToken(SyntaxKind.Keyword_Switch),
+            _ParseSwitchBlock()
+        );
+    }
+
+    private SyntaxNode _ParseSwitchBlock()
+    {
+        var nodes = new List<SyntaxNode>();
+        nodes.Add(_MatchToken(SyntaxKind.Token_BeginBlock));
+
+        while (_currentToken.kind != SyntaxKind.Token_EndBlock)
         {
             switch (_currentToken.kind)
             {
-                case SyntaxKind.Keyword_Var:
-                case SyntaxKind.Keyword_Function:
-                    throw new NotImplementedException();
-                case SyntaxKind.Keyword_Return:
+                case SyntaxKind.Keyword_Case:
+                case SyntaxKind.Keyword_Default:
                     throw new NotImplementedException();
                 case SyntaxKind.Keyword_Pass:
                     nodes.Add(_ParsePassStatement());
                     break;
-                case SyntaxKind.Keyword_If:
-                    throw new NotImplementedException();
-                case SyntaxKind.Keyword_Switch:
-                    throw new NotImplementedException();
-                case SyntaxKind.Keyword_For:
-                    throw new NotImplementedException();
-                case SyntaxKind.Keyword_Do:
-                    throw new NotImplementedException();
-                case SyntaxKind.Keyword_While:
-                    throw new NotImplementedException();
-                case SyntaxKind.Keyword_Continue:
-                    throw new NotImplementedException();
-                case SyntaxKind.Keyword_Break:
-                    throw new NotImplementedException();
                 default:
                     // TODO: diagnostics
                     throw new NotImplementedException();
@@ -300,8 +346,54 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         nodes.Add(_MatchToken(SyntaxKind.Token_EndBlock));
         return new SyntaxNode
         (
-            SyntaxKind.Syntax_Block,
+            SyntaxKind.Syntax_SwitchBlock,
             nodes
+        );
+    }
+
+    private SyntaxNode _ParseIfStatement()
+    {
+        return new SyntaxNode
+        (
+            SyntaxKind.Syntax_IfStatement,
+            _MatchToken(SyntaxKind.Keyword_If),
+            _ParseExpression(),
+            _MatchToken(SyntaxKind.Token_Colon),
+            _ParseBlock(),
+            _ParseOptionalElse()
+        );
+    }
+
+    private SyntaxNode _ParseOptionalElse()
+    {
+        if (_currentToken.kind != SyntaxKind.Keyword_Else)
+            return SyntaxNode.EmptySyntax(_currentEmptySyntaxPos);
+
+        if (_Peek(1).kind == SyntaxKind.Keyword_If)
+            return new SyntaxNode
+            (
+                SyntaxKind.Syntax_ElseIfStatement,
+                _ReadNext(),
+                _ParseIfStatement()
+            );
+
+        return new SyntaxNode
+        (
+            SyntaxKind.Syntax_ElseStatement,
+            _ReadNext(),
+            _MatchToken(SyntaxKind.Token_Colon),
+            _ParseBlock()
+        );
+    }
+
+    private SyntaxNode _ParseReturnStatement()
+    {
+        // TODO: parse return error
+        return new SyntaxNode
+        (
+            SyntaxKind.Syntax_ReturnStatement,
+            _ParseExpression(),
+            _MatchToken(SyntaxKind.Token_Semicolon)
         );
     }
 
@@ -311,7 +403,7 @@ class SyntaxAnalyzer : AAnalyzer<SyntaxNode, SyntaxNode>
         return _MatchToken(SyntaxKind.Token_Identifier);
     }
 
-    private SyntaxNode _ParseStructBodyMember()
+    private SyntaxNode _ParseStructMember()
     {
         var modifiers = _ParseModifiers();
 

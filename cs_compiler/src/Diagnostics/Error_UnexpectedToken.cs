@@ -2,7 +2,7 @@ namespace Nyx.Diagnostics;
 
 using CodeAnalysis;
 
-public class Error_UnexpectedToken : ADiagnostic
+public class Error_UnexpectedToken : Diagnostic
 {
     private SyntaxNode _unexpectedToken;
     private SyntaxKind[] _expectedKinds;

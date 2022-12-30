@@ -2,7 +2,7 @@ namespace Nyx.Diagnostics;
 
 using Utils;
 
-public abstract class ADiagnostic
+public abstract class Diagnostic
 {
     public DiagnosticSeverity severity { get => _severity; }
     protected DiagnosticSeverity _severity;
@@ -13,7 +13,7 @@ public abstract class ADiagnostic
     public TextLocation location { get => _location; }
     protected TextLocation _location;
 
-    public ADiagnostic(TextLocation location)
+    public Diagnostic(TextLocation location)
     {
         _location = location;
     }

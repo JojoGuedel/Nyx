@@ -2,7 +2,7 @@ namespace Nyx.Diagnostics;
 
 using Utils;
 
-public class Error_StringNotClosed : ADiagnostic
+public class Error_StringNotClosed : Diagnostic
 {
     private char _terminator;
 

@@ -36,7 +36,7 @@ public class SyntaxDefinition
         this.endSymbol = endSymbol;
         DefineSingleToken(endSymbol, SyntaxKind.Token_End);
 
-        maxOperatorPrecedence = 6;
+        maxOperatorPrecedence = 7;
     }
 
     public void DefineSingleToken(char pattern, SyntaxKind kind)
@@ -82,6 +82,13 @@ public class SyntaxDefinition
             pattern == endSymbol;
     }
 
+    public bool IsLineTerminator(SyntaxKind kind)
+    {
+        return
+            kind == SyntaxKind.Token_NewLine ||
+            kind == SyntaxKind.Token_End;
+    }
+
     public bool IsWhiteSpace(SyntaxKind kind)
     {
         return
@@ -94,6 +101,13 @@ public class SyntaxDefinition
     {
         switch (kind)
         {
+            case SyntaxKind.Token_Equal:
+            case SyntaxKind.Token_PlusEqual:
+            case SyntaxKind.Token_MinusEqual:
+            case SyntaxKind.Token_StarEqual:
+            case SyntaxKind.Token_SlashEqual:
+            case SyntaxKind.Token_PercentEqual:
+                return 7;
             case SyntaxKind.Keyword_Or:
                 return 6;
             case SyntaxKind.Keyword_And:
@@ -182,6 +196,8 @@ public class SyntaxDefinition
         syntax.DefineKeyword("and", SyntaxKind.Keyword_And);
         syntax.DefineKeyword("or", SyntaxKind.Keyword_Or);
         syntax.DefineKeyword("switch", SyntaxKind.Keyword_Switch);
+        syntax.DefineKeyword("case", SyntaxKind.Keyword_Case);
+        syntax.DefineKeyword("default", SyntaxKind.Keyword_Default);
         syntax.DefineKeyword("for", SyntaxKind.Keyword_For);
         syntax.DefineKeyword("do", SyntaxKind.Keyword_Do);
         syntax.DefineKeyword("while", SyntaxKind.Keyword_While);

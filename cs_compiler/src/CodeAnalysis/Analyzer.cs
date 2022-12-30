@@ -1,23 +1,29 @@
 namespace Nyx.CodeAnalysis;
 
-public abstract class AAnalyzer<InputT, OutputT>
+public abstract class Analyzer<InputT, OutputT>
 {
     protected readonly List<InputT> _values;
     protected readonly InputT _terminator;
 
+    public bool isFinished { get; private set; }
     protected int _pos;
 
-    protected AAnalyzer(List<InputT> values, InputT terminator)
+    protected Analyzer(List<InputT> values, InputT terminator)
     {
         _values = values;
         _terminator = terminator;
 
+        isFinished = false;
         _pos = 0;
     }
 
     protected void _IncrementPos()
     {
-        if (_pos <= _values.Count) _pos++;
+        if (!isFinished)
+            _pos++;
+
+        else if (_pos >= _values.Count)
+            isFinished = true;
     }
 
     protected InputT _ReadNext()

@@ -15,7 +15,13 @@ static struct a:
     pass;
 
 func b(c,):
-    pass;
+        // var a = 10;
+    if true:
+        pass;
+    else if true:
+        pass;
+    else:
+        pass;
 
 func d():
     pass;";
