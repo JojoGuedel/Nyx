@@ -1,12 +1,12 @@
+using Nyx.Utils;
+
 namespace Nyx.CodeAnalysis;
 
-using Utils;
-
-class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
+public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
 {
     private SyntaxDefinition _syntax;
-    private bool _isNewLine;
     private int _currentIndentDepth;
+    private int _currentLineIndentDepth;
     private SyntaxNode _currentToken { get => _Peek(0); }
     private TextLocation _currentHiddenLocation { get => new TextLocation(_currentToken.location.pos, 0); }
 
@@ -14,7 +14,7 @@ class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
     {
         _syntax = syntax;
         _currentIndentDepth = 0;
-        _isNewLine = true;
+        _currentLineIndentDepth = 0;
     }
 
     private bool _Discard(SyntaxNode token)
@@ -25,75 +25,79 @@ class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             _syntax.IsWhiteSpace(token.kind);
     }
 
-    // private IEnumerable<SyntaxNode> _GetNext()
-    // {
-    //     if (_currentToken.kind == SyntaxKind.Token_NewLine)
-    //         _isNewLine = true;
+    private bool _IsEmptyToken(SyntaxNode token)
+    {
+        return
+            _Discard(token) ||
+            token.kind == SyntaxKind.Token_BeginBlock ||
+            token.kind == SyntaxKind.Token_EndBlock;
+    }
 
-    //     if (_isNewLine)
-    //     {
-    //         var indentDepth = 0;
+    private bool _IsEmptyLine(List<SyntaxNode> line)
+    {
+        var isEmpty = true;
 
-    //         while (_currentToken.kind == SyntaxKind.Token_NewLine)
-    //             _IncrementPos();
-    //         for (; _currentToken.kind == SyntaxKind.Token_Indent && _currentToken.valid; _IncrementPos())
-    //             indentDepth++;
+        foreach(var token in line)
+        {
+            if (!_IsEmptyToken(token))
+            {
+                isEmpty = false;
+                break;
+            }
+        }
 
-    //         var d = indentDepth - _currentIndentDepth;
-    //         if (d == 0)
-    //             yield return _ReadNext();
-    //         else if (d == 1)
-    //             yield return new SyntaxNode(SyntaxKind.Token_BeginBlock, _currentHiddenLocation);
-    //         else if (d < 0)
-    //             for (var i = 0; i < -d; i++)
-    //                 yield return new SyntaxNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation);
-    //         else
-    //             yield return new SyntaxNode(SyntaxKind.Token_BeginBlock, _currentHiddenLocation, false);
+        return isEmpty;
+    }
 
-    //         _currentIndentDepth += d;
-    //         _isNewLine = false;
-    //     }
-    //     else
-    //         yield return _ReadNext();
-    // }
+    List<SyntaxNode> GetNextLine()
+    {
+        var line = new List<SyntaxNode>();
+        var indentDepth = 0;
 
-    // private IEnumerable<List<SyntaxNode>> GetLines()
-    // {
-    //     var currentLine = new List<SyntaxNode>();
-    //     var isFinished = false;
+        while (_currentToken.kind == SyntaxKind.Token_Indent && _currentToken.valid)
+        {
+            _IncrementPos();
+            indentDepth++;
+        }
 
-    //     while (!isFinished)
-    //     {
-    //         currentLine.Clear();
+        var d = indentDepth - _currentIndentDepth;
 
-    //         while (!_syntax.IsLineTerminator(_currentToken.kind))
-    //         {
-    //             foreach (var token in _GetNext())
-    //                 if (!_Discard(token))
-    //                     currentLine.Add(token);
-    //         }
+        if (d == 1)
+            line.Add(new SyntaxNode(SyntaxKind.Token_BeginBlock, _currentHiddenLocation));
+        else if (d < 0)
+            for (var i = 0; i < -d; i++)
+                line.Add(new SyntaxNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation));
+        else if (d > 1)
+            // TODO: diagnostics, unexpected indent
+            line.Add(new SyntaxNode(SyntaxKind.Token_BeginBlock, _currentHiddenLocation, false));
+        
+        _currentLineIndentDepth = indentDepth;
 
-    //         if (_currentToken.kind == SyntaxKind.Token_End)
-    //         {
-    //             for (var i = 0; i < _currentIndentDepth; i++)
-    //                 currentLine.Add(new SyntaxNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation));
-    //             currentLine.Add(_ReadNext());
-    //             isFinished = true;
-    //         }
-    //         else
-    //             _IncrementPos();
+        while(!_syntax.IsLineTerminator(_currentToken.kind))
+            line.Add(_ReadNext());
 
-    //         if (currentLine.Count == 0)
-    //             continue;
-
-    //         yield return currentLine;
-    //     }
-    // }
+        if (_currentToken.kind == SyntaxKind.Token_End)
+            for (var i = 0; i < _currentIndentDepth + d; i++)
+                line.Add(new SyntaxNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation));
+        line.Add(_ReadNext());
+        
+        return line;
+    }
 
     public override IEnumerable<SyntaxNode> GetAll()
     {
-        while(!isFinished)
-            if (!_Discard(_currentToken))
-                yield return _ReadNext();
+        while (!isFinished)
+        {
+            var currentLine = GetNextLine();
+
+            if (!_IsEmptyLine(currentLine))
+            {
+                foreach(var token in currentLine)
+                    if (!_Discard(token))
+                        yield return token;
+
+                _currentIndentDepth = _currentLineIndentDepth;
+            }
+        }
     }
 }

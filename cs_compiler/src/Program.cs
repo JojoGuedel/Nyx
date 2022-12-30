@@ -4,44 +4,56 @@ var running = true;
 var syntax = SyntaxDefinition.Default();
 var syntaxNodeWriter = new SytnaxNodeWriter(Console.Out);
 
-while (running)
-{
-    Console.Write("> ");
-
-    var input = Console.ReadLine();
-    input = 
+var input =
 @"
-static struct a:
-    pass;
-
 func b(c,):
-        // var a = 10;
-    if true:
-        pass;
-    else if true:
-        pass;
-    else:
-        pass;
+    while true:
+        var a = 10;
+        a++;";
 
-func d():
-    pass;";
+Compile(input);
+Console.ReadKey(true);
 
-    if (input is null)
-        input=String.Empty;
+// while (running)
+// {
+//     Console.Write("> ");
 
-    if (input.Length >= 1 && input[0] == '#')
-    {
-        ManageEscapeCommands(input.Substring(1));
-        continue;
-    }
+//     var input = Console.ReadLine();
+//     input =
+// @"
+// func b(c,):
+//         // var a = 10;
+//     if true:
+//         pass;
+//     else if true:
+//         pass;
+//     else:
+//         pass;
 
+// func d():
+//     pass;";
+
+//     if (input is null)
+//         input=String.Empty;
+
+//     if (input.Length >= 1 && input[0] == '#')
+//     {
+//         ManageEscapeCommands(input.Substring(1));
+//         continue;
+//     }
+
+//     Compile(input);
+// }
+
+void Compile(string input)
+{
     var lexicalAnalyzer = new LexicalAnalyzer(syntax, input);
     var tokens = lexicalAnalyzer.GetAll().ToList();
     syntaxNodeWriter.Write(tokens);
     Console.WriteLine();
 
-    var postlexicalAnalyzer = new PostlexicalAnalyzer(syntax, tokens);
-    tokens = postlexicalAnalyzer.GetAll().ToList();
+    var postLexicalAnalyzer = new PostlexicalAnalyzer(syntax, tokens);
+    tokens = postLexicalAnalyzer.GetAll().ToList();
     syntaxNodeWriter.Write(tokens);
     Console.WriteLine();
 
@@ -49,6 +61,7 @@ func d():
     var compilationUnit = syntaxAnaylzer.GetAll().ToList();
     syntaxNodeWriter.Write(compilationUnit);
     Console.WriteLine();
+
 }
 
 void ManageEscapeCommands(string command)

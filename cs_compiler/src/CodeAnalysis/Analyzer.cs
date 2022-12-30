@@ -5,7 +5,7 @@ public abstract class Analyzer<InputT, OutputT>
     protected readonly List<InputT> _values;
     protected readonly InputT _terminator;
 
-    public bool isFinished { get; private set; }
+    public bool isFinished { get => _pos >= _values.Count; }
     protected int _pos;
 
     protected Analyzer(List<InputT> values, InputT terminator)
@@ -13,7 +13,6 @@ public abstract class Analyzer<InputT, OutputT>
         _values = values;
         _terminator = terminator;
 
-        isFinished = false;
         _pos = 0;
     }
 
@@ -21,9 +20,6 @@ public abstract class Analyzer<InputT, OutputT>
     {
         if (!isFinished)
             _pos++;
-
-        else if (_pos >= _values.Count)
-            isFinished = true;
     }
 
     protected InputT _ReadNext()

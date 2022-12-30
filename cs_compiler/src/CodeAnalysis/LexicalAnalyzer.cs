@@ -33,7 +33,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
         {
             _SkipBlankLines();
 
-            while (_length < _syntax.indentSize && _syntax.GetSingleTokenKind(_currentChar).Equals(SyntaxKind.Token_Space)) 
+            while (_length < _syntax.indentSize && _syntax.GetSingleTokenKind(_currentChar) == SyntaxKind.Token_Space) 
                 _pos++;
 
             if (_length % _syntax.indentSize != 0)
@@ -57,7 +57,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
         {
             var terminator = _currentChar;
 
-            while (char.Equals(_currentChar, _syntax.escapeSymbol) || !char.Equals(_nextChar, terminator))
+            while (_currentChar == _syntax.escapeSymbol || _nextChar != terminator)
             {
                 _pos++;
 
@@ -89,7 +89,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
 
                 if (kind == SyntaxKind.Token_Error)
                 {
-                    while (char.IsLetterOrDigit(_currentChar) || char.Equals(_currentChar, '_')) 
+                    while (char.IsLetterOrDigit(_currentChar) || _currentChar == '_') 
                         _pos++;
 
                     if (_length > 0)
@@ -126,6 +126,8 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
             yield return token;
         }
         while (!isFinished);
+
+        yield return GetNext();
     }
 
     private void _SkipBlankLines()
@@ -140,7 +142,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
             while (char.IsWhiteSpace(_Peek(offset + currentOffset)))
                 currentOffset++;
 
-            if (!char.Equals(_Peek(offset + currentOffset), _syntax.newLineSymbol))
+            if (_Peek(offset + currentOffset) != _syntax.newLineSymbol)
                 break;
             // TODO: checks special case with endSymbol
 

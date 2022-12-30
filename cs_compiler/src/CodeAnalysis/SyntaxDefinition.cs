@@ -97,6 +97,13 @@ public class SyntaxDefinition
             kind == SyntaxKind.Token_NewLine;
     }
 
+    public bool IsBlockTerminator(SyntaxKind kind)
+    {
+        return 
+            kind == SyntaxKind.Token_EndBlock ||
+            kind == SyntaxKind.Token_End;
+    }
+
     public int BinaryOperatorPrecedence(SyntaxKind kind)
     {
         switch (kind)
@@ -177,18 +184,18 @@ public class SyntaxDefinition
         syntax.DefineDoubleToken(('%', '='), SyntaxKind.Token_PercentEqual);
 
         // syntax.DefineKeyword("pub", SyntaxKind.Keyword_Public);
-        syntax.DefineKeyword("static", SyntaxKind.Keyword_Static);
+        // syntax.DefineKeyword("static", SyntaxKind.Keyword_Static);
         // syntax.DefineKeyword("abstract", SyntaxKind.Keyword_Abstract);
         // syntax.DefineKeyword("mut", SyntaxKind.Keyword_Mutable);
-        syntax.DefineKeyword("section", SyntaxKind.Keyword_Section);
-        syntax.DefineKeyword("enum", SyntaxKind.Keyword_Enum);
-        syntax.DefineKeyword("struct", SyntaxKind.Keyword_Struct);
+        // syntax.DefineKeyword("section", SyntaxKind.Keyword_Section);
+        // syntax.DefineKeyword("enum", SyntaxKind.Keyword_Enum);
+        // syntax.DefineKeyword("struct", SyntaxKind.Keyword_Struct);
         // syntax.DefineKeyword("extend", SyntaxKind.Keyword_Extend);
-        syntax.DefineKeyword("include", SyntaxKind.Keyword_Include);
+        // syntax.DefineKeyword("include", SyntaxKind.Keyword_Include);
         syntax.DefineKeyword("var", SyntaxKind.Keyword_Var);
         syntax.DefineKeyword("func", SyntaxKind.Keyword_Function);
-        syntax.DefineKeyword("constructor", SyntaxKind.Keyword_Constructor);
-        syntax.DefineKeyword("operator", SyntaxKind.Keyword_Operator);
+        // syntax.DefineKeyword("constructor", SyntaxKind.Keyword_Constructor);
+        // syntax.DefineKeyword("operator", SyntaxKind.Keyword_Operator);
         syntax.DefineKeyword("return", SyntaxKind.Keyword_Return);
         syntax.DefineKeyword("pass", SyntaxKind.Keyword_Pass);
         syntax.DefineKeyword("if", SyntaxKind.Keyword_If);
@@ -199,6 +206,7 @@ public class SyntaxDefinition
         syntax.DefineKeyword("case", SyntaxKind.Keyword_Case);
         syntax.DefineKeyword("default", SyntaxKind.Keyword_Default);
         syntax.DefineKeyword("for", SyntaxKind.Keyword_For);
+        syntax.DefineKeyword("in", SyntaxKind.Keyword_In);
         syntax.DefineKeyword("do", SyntaxKind.Keyword_Do);
         syntax.DefineKeyword("while", SyntaxKind.Keyword_While);
         syntax.DefineKeyword("continue", SyntaxKind.Keyword_While);
