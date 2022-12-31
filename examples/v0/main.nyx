@@ -1,6 +1,15 @@
 // no public modifier
 // no abstract modifier
-// no mut modifier
 // no extend syntax
 
 // no templates
+
+static func test(mut var a: i32):
+    var b = 10;
+    a += b;
+    return a;
+
+static func main():
+    mut var a: i32 = 20;
+    var b: i32 = test(10);
+    a = test(b);

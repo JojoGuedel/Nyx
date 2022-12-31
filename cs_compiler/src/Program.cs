@@ -1,4 +1,4 @@
-﻿using Nyx.CodeAnalysis;
+﻿using Nyx.Analysis;
 
 var running = true;
 var syntax = SyntaxDefinition.Default();

@@ -1,4 +1,4 @@
-namespace Nyx.CodeAnalysis;
+namespace Nyx.Analysis;
 
 public enum SyntaxKind
 {
@@ -18,7 +18,6 @@ public enum SyntaxKind
     Token_StringMarker,
     Token_String,
     Token_Identifier,
-    // Token_UnusedIdentifier,
 
     Token_LParen,
     Token_RParen,
@@ -56,21 +55,11 @@ public enum SyntaxKind
     Token_SlashEqual,
     Token_PercentEqual,
 
-    // Keyword_Public,
-    // Keyword_Static,
-    // Keyword_Abstract,
-    // Keyword_Mutable,
-    // Keyword_Section,
-    // Keyword_Enum,
-    // Keyword_Struct,
-    // Keyword_Extend,
-    // Keyword_Include,
+    Keyword_Static,
+    Keyword_Mutable,
     Keyword_Var,
     Keyword_Function,
-    // Keyword_Constructor,
-    // Keyword_Operator,
     Keyword_Return,
-    Keyword_Pass,
     Keyword_If,
     Keyword_Else,
     Keyword_Not,
@@ -85,14 +74,6 @@ public enum SyntaxKind
     Keyword_While,
     Keyword_Continue,
     Keyword_Break,
-
-
-    // Keyword_Int,
-    // Keyword_UInt,
-    // Keyword_Float,
-    // Keyword_Number,
-    // Keyword_Char,
-    // Keyword_String,
 
     Syntax_Empty,
     Syntax_Error,
@@ -141,4 +122,5 @@ public enum SyntaxKind
     Syntax_SwitchBlock,
     Syntax_VariableDeclarationStatement,
     Syntax_WhileStatement,
+    Syntax_Parameter,
 }

@@ -1,18 +1,16 @@
 namespace Nyx.Diagnostics;
 
-using CodeAnalysis;
+using Analysis;
 
-public class Error_UnexpectedToken : Diagnostic
+public class UnexpectedToken : Diagnostic
 {
     private SyntaxNode _unexpectedToken;
     private SyntaxKind[] _expectedKinds;
 
-    public Error_UnexpectedToken(SyntaxNode unexpectedToken, SyntaxKind[] expectedKinds) : base(unexpectedToken.location)
+    public UnexpectedToken(SyntaxNode unexpectedToken, SyntaxKind[] expectedKinds) : 
+        base(DiagnosticSeverity.Error, DiagnosticKind.Error_UnexpectedToken, DiagnosticOrigin.LexicalAnalyisis, unexpectedToken.location)
     {
         // TODO: add diagnosticKind hint so errors can be even more distinguished
-        _severity = DiagnosticSeverity.Error;
-        _kind = DiagnosticKind.Error_UnexpectedToken;
-
         _unexpectedToken = unexpectedToken;
         _expectedKinds = expectedKinds;
     }

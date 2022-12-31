@@ -4,18 +4,17 @@ using Utils;
 
 public abstract class Diagnostic
 {
-    public DiagnosticSeverity severity { get => _severity; }
-    protected DiagnosticSeverity _severity;
+    public DiagnosticSeverity severity { get; }
+    public DiagnosticKind kind { get; }
+    public DiagnosticOrigin origin { get; }
+    public TextLocation location { get; }
 
-    public DiagnosticKind kind { get => _kind; }
-    protected DiagnosticKind _kind;
-
-    public TextLocation location { get => _location; }
-    protected TextLocation _location;
-
-    public Diagnostic(TextLocation location)
+    public Diagnostic(DiagnosticSeverity sevierity, DiagnosticKind kind, DiagnosticOrigin origin, TextLocation location)
     {
-        _location = location;
+        this.severity = severity;
+        this.kind = kind;
+        this.origin = origin;
+        this.location = location;
     }
 
     public abstract string GetMessage();

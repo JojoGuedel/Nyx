@@ -1,5 +1,5 @@
 using Xunit;
-using Nyx.CodeAnalysis;
+using Nyx.Analysis;
 
 namespace Nyx.Tests;
 

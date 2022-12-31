@@ -1,4 +1,4 @@
-namespace Nyx.CodeAnalysis;
+namespace Nyx.Analysis;
 
 using Diagnostics;
 using Utils;
@@ -63,7 +63,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
 
                 if (_syntax.IsLineTerminator(_currentChar))
                 {
-                    diagnostics.Add(new Error_StringNotClosed(_location, terminator));
+                    diagnostics.Add(new StringNotClosed(_location, terminator));
                     return new SyntaxNode(SyntaxKind.Token_String, _location, false);
                 }
             }

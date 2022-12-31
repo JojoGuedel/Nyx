@@ -1,4 +1,4 @@
-namespace Nyx.CodeAnalysis;
+namespace Nyx.Analysis;
 
 public abstract class Analyzer<InputT, OutputT>
 {
