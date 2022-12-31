@@ -9,7 +9,7 @@ public abstract class Diagnostic
     public DiagnosticOrigin origin { get; }
     public TextLocation location { get; }
 
-    public Diagnostic(DiagnosticSeverity sevierity, DiagnosticKind kind, DiagnosticOrigin origin, TextLocation location)
+    public Diagnostic(DiagnosticSeverity severity, DiagnosticKind kind, DiagnosticOrigin origin, TextLocation location)
     {
         this.severity = severity;
         this.kind = kind;

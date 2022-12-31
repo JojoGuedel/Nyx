@@ -37,7 +37,10 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
                 _pos++;
 
             if (_length % _syntax.indentSize != 0)
+            {
+                diagnostics.Add(new InvalidIndent(_location));
                 return new SyntaxNode(SyntaxKind.Token_Indent, _location, false);
+            }
             else if (_length > 0)
                 return new SyntaxNode(SyntaxKind.Token_Indent, _location);
 
@@ -63,7 +66,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
 
                 if (_syntax.IsLineTerminator(_currentChar))
                 {
-                    diagnostics.Add(new StringNotClosed(_location, terminator));
+                    diagnostics.Add(new StringNotTerminated(_location, terminator));
                     return new SyntaxNode(SyntaxKind.Token_String, _location, false);
                 }
             }

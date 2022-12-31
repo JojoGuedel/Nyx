@@ -8,7 +8,7 @@ public class UnexpectedToken : Diagnostic
     private SyntaxKind[] _expectedKinds;
 
     public UnexpectedToken(SyntaxNode unexpectedToken, SyntaxKind[] expectedKinds) : 
-        base(DiagnosticSeverity.Error, DiagnosticKind.Error_UnexpectedToken, DiagnosticOrigin.LexicalAnalyisis, unexpectedToken.location)
+        base(DiagnosticSeverity.Error, DiagnosticKind.Error_UnexpectedToken, DiagnosticOrigin.LexicalAnalysis, unexpectedToken.location)
     {
         // TODO: add diagnosticKind hint so errors can be even more distinguished
         _unexpectedToken = unexpectedToken;
@@ -17,16 +17,16 @@ public class UnexpectedToken : Diagnostic
 
     public override string GetMessage()
     {
-        var ret = $"unexpected token kind <{_unexpectedToken.kind}>";
+        var msg = $"Unexpected token kind <{_unexpectedToken.kind}>";
 
         if (_expectedKinds.Length == 0)
-            return ret;
+            return msg;
 
-        ret += $", expected <{_expectedKinds[0]}>";
+        msg += $", expected <{_expectedKinds[0]}>";
 
         for(var i = 1; i < _expectedKinds.Length; i++)
-            ret += $", <{_expectedKinds[i]}>";
+            msg += $", <{_expectedKinds[i]}>";
 
-        return ret;
+        return msg + ".";
     }
 }

@@ -19,3 +19,10 @@ static func main():
     
     var b: i32 = test(10);
     var c: i32 = a.test(b);
+
+    switch a:
+        print(a);   // default case
+        break;
+    case 10:
+        print(a + 1);
+        break;

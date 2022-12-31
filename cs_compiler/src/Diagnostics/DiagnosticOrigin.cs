@@ -2,8 +2,9 @@ namespace Nyx.Diagnostics;
 
 public enum DiagnosticOrigin
 {
-    LexicalAnalyisis,
-    SyntaxAnalyisis,
-    SemanticAnalyisis,
+    LexicalAnalysis,
+    PostlexicalAnalysis,
+    SyntaxAnalysis,
+    SemanticAnalysis,
     Evaluation,
 }

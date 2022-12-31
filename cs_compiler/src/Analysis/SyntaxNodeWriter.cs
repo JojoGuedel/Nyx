@@ -7,7 +7,6 @@ class SytnaxNodeWriter
     private const string _childNode = "├── ";
     private const string _leafNode = "└── ";
 
-
     private TextWriter _writer;
 
     public SytnaxNodeWriter(TextWriter writer)

@@ -25,15 +25,23 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
     private SyntaxNode _MatchToken(params SyntaxKind[] kinds)
     {
         foreach (var kind in kinds)
-            if (_currentToken.kind == kind) return _ReadNext();
+        {
+            if (_currentToken.kind == kind) 
+            {
+                _isCurrentValid = true;
 
-        // TODO: diagnostics
-        throw new NotImplementedException();
+                return _ReadNext();
+            }
+        }
 
-        // var ret = new SyntaxNode(kinds[0], _currentToken.location);
-        // diagnostics.Add(new Error_UnexpectedToken(_currentToken, kinds));
-        // _IncrementPos();
-        // return ret;
+        if (!_isCurrentValid)
+            return new SyntaxNode(kinds[0], _currentToken.location);
+
+        _isCurrentValid = false;
+
+        var ret = new SyntaxNode(kinds[0], _currentToken.location);
+        diagnostics.Add(new UnexpectedToken(_ReadNext(), kinds));
+        return ret;
     }
 
     private SyntaxNode _ParseCompilationUnit()
@@ -49,20 +57,6 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
 
     private SyntaxNode _ParseTopLevelItem()
     {
-        switch (_currentToken.kind)
-        {
-            case SyntaxKind.Keyword_Function:
-                return _ParseTopLevelMember();
-            default:
-                // TODO: diagnostics
-                // diagnostics.Add(new Error_InvalidTopLevelItem(_currentToken));
-                // return new SyntaxNode(SyntaxKind.Syntax_Error, _ReadNext());
-                throw new NotImplementedException();
-        }
-    }
-
-    private SyntaxNode _ParseTopLevelMember()
-    {
         var modifiers = _ParseModifiers();
 
         switch (_currentToken.kind)
@@ -70,8 +64,8 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             case SyntaxKind.Keyword_Function:
                 return _ParseFunctionImplementation(modifiers);
             default:
-                // TODO: diagnostics
-                throw new NotImplementedException();
+                diagnostics.Add(new InvalidToplevelItem(_currentToken));
+                return new SyntaxNode(SyntaxKind.Syntax_Error, _ReadNext());
         }
     }
 
@@ -170,8 +164,7 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             nodes.Add(_ParseStatement());
 
         if (nodes.Count <= 1)
-            // TODO: diagnostics, empty blocks musst contain pass
-            throw new NotImplementedException();
+            diagnostics.Add(new EmptyBlock(_currentToken.location));
 
         nodes.Add(_MatchToken(SyntaxKind.Token_EndBlock));
         return new SyntaxNode
@@ -232,6 +225,7 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
         return new SyntaxNode
         (
             SyntaxKind.Syntax_ReturnStatement,
+            _MatchToken(SyntaxKind.Keyword_Return),
             _ParseExpression(),
             _MatchToken(SyntaxKind.Token_Semicolon)
         );
@@ -328,14 +322,13 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
                 case SyntaxKind.Keyword_Default:
                     throw new NotImplementedException();
                 default:
-                    // TODO: diagnostics
-                    throw new NotImplementedException();
+                    diagnostics.Add(new InvalidSwitchBlock(_currentToken));
+                    return new SyntaxNode(SyntaxKind.Syntax_Error, _ReadNext());
             }
         }
 
         if (nodes.Count <= 1)
-            // TODO: diagnostics, empty structs musst contain pass
-            throw new NotImplementedException();
+            diagnostics.Add(new EmptyBlock(_currentToken.location));
 
         nodes.Add(_MatchToken(SyntaxKind.Token_EndBlock));
         return new SyntaxNode
@@ -420,7 +413,7 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
                         SyntaxKind.Syntax_FunctionCall,
                         expr,
                         _MatchToken(SyntaxKind.Token_LParen),
-                        _ParseFunctionArguments(),
+                        _ParseArguments(SyntaxKind.Syntax_Arguments, SyntaxKind.Token_RParen),
                         _MatchToken(SyntaxKind.Token_RParen)
                     );
                     break;
@@ -430,7 +423,7 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
                         SyntaxKind.Syntax_Subscript,
                         expr,
                         _MatchToken(SyntaxKind.Token_LSquare),
-                        _ParseSubscriptArguments(),
+                        _ParseArguments(SyntaxKind.Syntax_Subscript, SyntaxKind.Token_RSquare),
                         _MatchToken(SyntaxKind.Token_RSquare)
                     );
                     break;
@@ -476,21 +469,18 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
         );
     }
 
-    // TODO: maybe merge this somehow with _ParseSubscriptArguments
-    private SyntaxNode _ParseFunctionArguments()
+    private SyntaxNode _ParseArguments(SyntaxKind kind, SyntaxKind terminator)
     {
         var nodes = new List<SyntaxNode>();
-        var isArgRemaining = _currentToken.kind != SyntaxKind.Token_RParen;
-
-        while (isArgRemaining)
+        
+        while (_currentToken.kind != terminator)
         {
-            // TODO: diagnostics
-            _ParseArgument();
+            nodes.Add(new SyntaxNode(SyntaxKind.Syntax_Argument, _ParseExpression()));
 
-            isArgRemaining = _currentToken.kind == SyntaxKind.Token_Comma;
-            if (!isArgRemaining) break;
+            if (_currentToken.kind != SyntaxKind.Token_Comma)
+                break;
 
-            nodes.Add(_MatchToken(SyntaxKind.Token_Comma));
+            nodes.Add(_ReadNext());
         }
 
         if (nodes.Count == 0)
@@ -498,34 +488,7 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
 
         return new SyntaxNode
         (
-            SyntaxKind.Syntax_Arguments,
-            nodes
-        );
-    }
-
-    private SyntaxNode _ParseSubscriptArguments()
-    {
-        var nodes = new List<SyntaxNode>();
-        var isArgRemaining = _currentToken.kind != SyntaxKind.Token_RParen;
-
-        while (isArgRemaining)
-        {
-            // TODO: diagnostics
-            nodes.Add(new SyntaxNode(SyntaxKind.Syntax_Argument, _ParseExpression()));
-
-            isArgRemaining = _currentToken.kind == SyntaxKind.Token_Comma;
-            if (!isArgRemaining) break;
-
-            nodes.Add(_MatchToken(SyntaxKind.Token_Comma));
-        }
-
-        if (nodes.Count == 0)
-            // TODO: diagnostics
-            throw new NotImplementedException();
-
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_Arguments,
+            kind,
             nodes
         );
     }

@@ -1,9 +1,11 @@
+using Nyx.Diagnostics;
 using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
 public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
 {
+    public DiagnosticCollection diagnostics;
     private SyntaxDefinition _syntax;
     private int _currentIndentDepth;
     private int _currentLineIndentDepth;
@@ -12,6 +14,7 @@ public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
 
     public PostlexicalAnalyzer(SyntaxDefinition syntax, List<SyntaxNode> tokens) : base(tokens, tokens.Last())
     {
+        diagnostics = new DiagnosticCollection();
         _syntax = syntax;
         _currentIndentDepth = 0;
         _currentLineIndentDepth = 0;
@@ -68,8 +71,7 @@ public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             for (var i = 0; i < -d; i++)
                 line.Add(new SyntaxNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation));
         else if (d > 1)
-            // TODO: diagnostics, unexpected indent
-            line.Add(new SyntaxNode(SyntaxKind.Token_BeginBlock, _currentHiddenLocation, false));
+            diagnostics.Add(new TooManyIndents(_currentToken.location));
         
         _currentLineIndentDepth = indentDepth;
 

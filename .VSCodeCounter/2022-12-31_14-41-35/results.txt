@@ -1,0 +1,67 @@
+Date : 2022-12-31 14:41:35
+Directory : c:\dev\proj_compiler
+Total : 32 files,  1433 codes, 74 comments, 310 blanks, all 1817 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C#       |         30 |      1,402 |         74 |        301 |      1,777 |
+| XML      |          2 |         31 |          0 |          9 |         40 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                           | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                              |         32 |      1,433 |         74 |        310 |      1,817 |
+| cs_compiler                                                                    |         30 |      1,332 |         63 |        283 |      1,678 |
+| cs_compiler\src                                                                |         29 |      1,324 |         63 |        280 |      1,667 |
+| cs_compiler\src\Analysis                                                       |          8 |      1,045 |         33 |        196 |      1,274 |
+| cs_compiler\src\Diagnostics                                                    |         10 |        139 |          5 |         40 |        184 |
+| cs_compiler\src\Diagnostics\Errors                                             |          5 |         79 |          1 |         27 |        107 |
+| cs_compiler\src\Evaluation                                                     |          1 |          4 |          0 |          2 |          6 |
+| cs_compiler\src\Symbols                                                        |          7 |         66 |          0 |         19 |         85 |
+| cs_compiler\src\Utils                                                          |          2 |         27 |          0 |          7 |         34 |
+| cs_compiler_tests                                                              |          2 |        101 |         11 |         27 |        139 |
+| cs_compiler_tests\src                                                          |          1 |         78 |         11 |         21 |        110 |
++--------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                       | language | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\dev\proj_compiler\cs_compiler\cs_compiler.csproj                            | XML      |          8 |          0 |          3 |         11 |
+| c:\dev\proj_compiler\cs_compiler\src\Analysis\Analyzer.cs                      | C#       |         32 |          0 |          9 |         41 |
+| c:\dev\proj_compiler\cs_compiler\src\Analysis\LexicalAnalyzer.cs               | C#       |        119 |          6 |         30 |        155 |
+| c:\dev\proj_compiler\cs_compiler\src\Analysis\PostlexicalAnalyzer.cs           | C#       |         83 |          1 |         19 |        103 |
+| c:\dev\proj_compiler\cs_compiler\src\Analysis\SyntaxAnalyzer.cs                | C#       |        447 |         23 |         72 |        542 |
+| c:\dev\proj_compiler\cs_compiler\src\Analysis\SyntaxDefinition.cs              | C#       |        173 |          0 |         32 |        205 |
+| c:\dev\proj_compiler\cs_compiler\src\Analysis\SyntaxKind.cs                    | C#       |        112 |          2 |         13 |        127 |
+| c:\dev\proj_compiler\cs_compiler\src\Analysis\SyntaxNode.cs                    | C#       |         41 |          1 |         11 |         53 |
+| c:\dev\proj_compiler\cs_compiler\src\Analysis\SyntaxNodeWriter.cs              | C#       |         38 |          0 |         10 |         48 |
+| c:\dev\proj_compiler\cs_compiler\src\Diagnostics\Diagnostic.cs                 | C#       |         17 |          3 |          4 |         24 |
+| c:\dev\proj_compiler\cs_compiler\src\Diagnostics\DiagnosticCollection.cs       | C#       |         21 |          1 |          6 |         28 |
+| c:\dev\proj_compiler\cs_compiler\src\Diagnostics\DiagnosticKind.cs             | C#       |          8 |          0 |          1 |          9 |
+| c:\dev\proj_compiler\cs_compiler\src\Diagnostics\DiagnosticOrigin.cs           | C#       |          8 |          0 |          1 |          9 |
+| c:\dev\proj_compiler\cs_compiler\src\Diagnostics\DiagnosticSeverity.cs         | C#       |          6 |          0 |          1 |          7 |
+| c:\dev\proj_compiler\cs_compiler\src\Diagnostics\Errors\EmptyBlock.cs          | C#       |         11 |          0 |          3 |         14 |
+| c:\dev\proj_compiler\cs_compiler\src\Diagnostics\Errors\InvalidStatement.cs    | C#       |         15 |          0 |          6 |         21 |
+| c:\dev\proj_compiler\cs_compiler\src\Diagnostics\Errors\InvalidTopLevelItem.cs | C#       |         15 |          0 |          6 |         21 |
+| c:\dev\proj_compiler\cs_compiler\src\Diagnostics\Errors\StringNotClosed.cs     | C#       |         15 |          0 |          4 |         19 |
+| c:\dev\proj_compiler\cs_compiler\src\Diagnostics\Errors\UnexpectedToken.cs     | C#       |         23 |          1 |          8 |         32 |
+| c:\dev\proj_compiler\cs_compiler\src\Evaluation\Evaluator.cs                   | C#       |          4 |          0 |          2 |          6 |
+| c:\dev\proj_compiler\cs_compiler\src\Program.cs                                | C#       |         43 |         25 |         16 |         84 |
+| c:\dev\proj_compiler\cs_compiler\src\Symbols\BuiltinType.cs                    | C#       |          7 |          0 |          2 |          9 |
+| c:\dev\proj_compiler\cs_compiler\src\Symbols\FunctionSymbol.cs                 | C#       |         13 |          0 |          3 |         16 |
+| c:\dev\proj_compiler\cs_compiler\src\Symbols\Symbol.cs                         | C#       |         11 |          0 |          3 |         14 |
+| c:\dev\proj_compiler\cs_compiler\src\Symbols\SymbolKind.cs                     | C#       |          7 |          0 |          2 |          9 |
+| c:\dev\proj_compiler\cs_compiler\src\Symbols\SymbolModifiers.cs                | C#       |          9 |          0 |          3 |         12 |
+| c:\dev\proj_compiler\cs_compiler\src\Symbols\TypeSymbol.cs                     | C#       |          8 |          0 |          3 |         11 |
+| c:\dev\proj_compiler\cs_compiler\src\Symbols\VariableSymbol.cs                 | C#       |         11 |          0 |          3 |         14 |
+| c:\dev\proj_compiler\cs_compiler\src\Utils\TextLocation.cs                     | C#       |         15 |          0 |          4 |         19 |
+| c:\dev\proj_compiler\cs_compiler\src\Utils\TextSpan.cs                         | C#       |         12 |          0 |          3 |         15 |
+| c:\dev\proj_compiler\cs_compiler_tests\cs_compiler_tests.csproj                | XML      |         23 |          0 |          6 |         29 |
+| c:\dev\proj_compiler\cs_compiler_tests\src\LexicalAnalyzerTests.cs             | C#       |         78 |         11 |         21 |        110 |
+| Total                                                                          |          |      1,433 |         74 |        310 |      1,817 |
++--------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
