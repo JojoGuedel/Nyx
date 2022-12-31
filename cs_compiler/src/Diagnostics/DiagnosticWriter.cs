@@ -23,7 +23,7 @@ public class DiagnosticWriter
             var lineNumber = line.lineNumber.ToString();
             var relativePos = diagnostic.location.pos - line.start;
             
-            Console.WriteLine($"{diagnostic.severity} during {diagnostic.origin} ({diagnostic.kind} on Line {line.lineNumber}, {relativePos}):");
+            Console.WriteLine($"{diagnostic.severity} during {diagnostic.origin} ({diagnostic.kind} on line {line.lineNumber} at {relativePos}):");
 
             for (int i = 0; i < _lineSpy; i++)
             {

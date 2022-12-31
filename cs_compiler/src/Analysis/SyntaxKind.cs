@@ -123,4 +123,5 @@ public enum SyntaxKind
     Syntax_VariableDeclarationStatement,
     Syntax_WhileStatement,
     Syntax_Parameter,
+    Syntax_TerminatedExpression,
 }

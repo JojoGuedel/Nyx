@@ -14,12 +14,12 @@ var input =
 // no templates
 
 static func test(mut var a: i32):
-    var b: i32 = 10;
-    a += b;
+    var b: i32 = 20;
+    a += a - b - c - 10;
     return a;
 
 static func main():
-    mut var a: i32  20;
+    mut var a: i32 = 20;
     var b: i32 = test(10);
     a = test(b);";
 
@@ -62,6 +62,7 @@ void Compile(string input)
     var diagnosticWriter = new DiagnosticWriter(Console.Out, input, 2);
 
     Console.WriteLine(input);
+    Console.WriteLine();
 
     var lexicalAnalyzer = new LexicalAnalyzer(syntax, input);
     var tokens = lexicalAnalyzer.GetAll().ToList();

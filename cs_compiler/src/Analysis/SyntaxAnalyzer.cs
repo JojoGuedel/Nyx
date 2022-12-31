@@ -199,7 +199,7 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             case SyntaxKind.Keyword_Break:
                 return _ParseBreakStatement();
             default:
-                return _ParseExpression();
+                return _ParseExpression(true);
         }
     }
     
@@ -215,7 +215,8 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             _ParseTypeClause(),
             // TODO: make assignment optional maybe?
             _MatchToken(SyntaxKind.Token_Equal),
-            _ParseExpression()
+            _ParseExpression(),
+            _MatchToken(SyntaxKind.Token_Semicolon)
         );
     }
     
@@ -338,17 +339,25 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
         );
     }
 
-    private SyntaxNode _ParseExpression()
+    private SyntaxNode _ParseExpression(bool isTerminated = false)
     {
-        return _ParseBinaryExpression();
+        if (!isTerminated)
+            return _ParseBinaryExpression(_syntax.maxOperatorPrecedence);
+        
+        return new SyntaxNode
+        (
+            SyntaxKind.Syntax_TerminatedExpression,
+            _ParseBinaryExpression(_syntax.maxOperatorPrecedence),
+            _MatchToken(SyntaxKind.Token_Semicolon)
+        );
     }
 
-    private SyntaxNode _ParseBinaryExpression(int currentPrecedence = 1)
+    private SyntaxNode _ParseBinaryExpression(int currentPrecedence)
     {
-        if (currentPrecedence > _syntax.maxOperatorPrecedence)
+        if (currentPrecedence == 0)
             return _ParsePrefix();
-
-        var left = _ParseBinaryExpression(currentPrecedence + 1);
+ 
+        var left = _ParseBinaryExpression(currentPrecedence - 1);
 
         while (_syntax.BinaryOperatorPrecedence(_currentToken.kind) == currentPrecedence)
         {
@@ -357,7 +366,7 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
                 SyntaxKind.Syntax_BinaryOperation,
                 left,
                 _ReadNext(),
-                _ParseBinaryExpression(currentPrecedence + 1)
+                _ParseBinaryExpression(currentPrecedence - 1)
             );
         }
 
@@ -461,6 +470,8 @@ class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             case SyntaxKind.Token_Identifier:
                 return _ReadNext();
         }
+
+        diagnostics.Add(new InvalidStatement(_currentToken));
 
         return new SyntaxNode
         (
