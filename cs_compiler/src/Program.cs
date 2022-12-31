@@ -1,5 +1,6 @@
 ﻿using Nyx.Analysis;
 using Nyx.Diagnostics;
+using Nyx.Utils;
 
 var running = true;
 var syntax = SyntaxDefinition.Default();
@@ -15,7 +16,7 @@ var input =
 
 static func test(mut var a: i32):
     var b: i32 = 20;
-    a += a - b - c - 10;
+    a += a = b = c = 10;
     return a;
 
 static func main():
@@ -61,18 +62,14 @@ void Compile(string input)
 {
     var diagnosticWriter = new DiagnosticWriter(Console.Out, input, 2);
 
-    Console.WriteLine(input);
-    Console.WriteLine();
+    var textInfo = new TextInfo(input);
+    Console.WriteLine(textInfo.ToString());
 
     var lexicalAnalyzer = new LexicalAnalyzer(syntax, input);
     var tokens = lexicalAnalyzer.GetAll().ToList();
-    // syntaxNodeWriter.Write(tokens);
-    // Console.WriteLine();
 
     var postLexicalAnalyzer = new PostlexicalAnalyzer(syntax, tokens);
     tokens = postLexicalAnalyzer.GetAll().ToList();
-    // syntaxNodeWriter.Write(tokens);
-    // Console.WriteLine();
 
     var syntaxAnaylzer = new SyntaxAnalyzer(syntax, tokens);
     var compilationUnit = syntaxAnaylzer.GetAll().ToList();

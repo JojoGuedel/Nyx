@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Nyx.Utils;
 
 public class TextInfo
@@ -34,13 +36,15 @@ public class TextInfo
                 start = i;
             }
         }
+
+        lines.Add(new LineInfo(line, lines.Count + 1, start));
     }
 
     public LineInfo GetLineAtIndex(int pos)
     {
         var last = 0;
 
-        for(int i = 0; i < lines.Count - 1; i++)
+        for(int i = 0; i < lines.Count; i++)
         {
             if (lines[i].start < pos)
                 last = i;
@@ -49,5 +53,23 @@ public class TextInfo
         }
 
         return lines[last];
+    }
+
+    public override string ToString()
+    {
+        if (lines.Count == 0)
+            return "";
+
+        StringBuilder ret = new StringBuilder();
+
+        var maxLen = lines.Last().lineNumber.ToString().Length;
+        foreach(var line in lines)
+        {
+            for(int i = 0; i < maxLen - line.lineNumber.ToString().Length; i++)
+                ret.Append(" ");
+            ret.Append(line.ToString());
+        }    
+
+        return ret.ToString();
     }
 }
