@@ -51,7 +51,9 @@ public class SyntaxAnalyzer2 : Analyzer<LexerNode, Node>
     Function _ParseFunction() => new Function
     (
         _ParseModifiers(),
+        _Match(SyntaxKind.Token_LParen),
         _ParseUntil(SyntaxKind.Token_RParen, _PraseParameter),
+        _Match(SyntaxKind.Token_RParen),
         _ParseFunctionTypeClause(),
         _ParseBlock()
     );
@@ -195,82 +197,63 @@ public class SyntaxAnalyzer2 : Analyzer<LexerNode, Node>
     {
         var expr = _ParsePrimary();
 
-        for (var hasPostfix = true; hasPostfix;)
+        while(true)
         {
             switch (_current.kind)
             {
                 case SyntaxKind.Token_LParen:
-                    expr = new SyntaxNode
-                    (
-                        SyntaxKind.Syntax_FunctionCall,
-                        expr,
-                        _MatchToken(SyntaxKind.Token_LParen),
-                        _ParseArguments(SyntaxKind.Syntax_Arguments, SyntaxKind.Token_RParen),
-                        _MatchToken(SyntaxKind.Token_RParen)
-                    );
+                    expr = _ParseFunctionCall(expr);
                     break;
                 case SyntaxKind.Token_LSquare:
-                    expr = new SyntaxNode
-                    (
-                        SyntaxKind.Syntax_Subscript,
-                        expr,
-                        _MatchToken(SyntaxKind.Token_LSquare),
-                        _ParseArguments(SyntaxKind.Syntax_Subscript, SyntaxKind.Token_RSquare),
-                        _MatchToken(SyntaxKind.Token_RSquare)
-                    );
+                    expr = _ParseSubscript(expr);
                     break;
                 case SyntaxKind.Token_PlusPlus:
-                    expr = new SyntaxNode
-                    (
-                        SyntaxKind.Syntax_PostfixIncrement,
-                        expr,
-                        _ReadNext()
-                    );
-                    break;
                 case SyntaxKind.Token_MinusMinus:
-                    expr = new SyntaxNode
-                    (
-                        SyntaxKind.Syntax_PostfixDecrement,
-                        expr,
-                        _ReadNext()
-                    );
+                    expr = new Postfix(expr, _ReadNext());
                     break;
                 default:
-                    hasPostfix = false;
-                    break;
+                    return expr;
             }
-        }        
-
-        return expr;
+        }
     }
+
+    FunctionCall _ParseFunctionCall(Expression expr) => new FunctionCall
+    (
+        expr,
+        _Match(SyntaxKind.Token_LParen),
+        _ParseUntil(SyntaxKind.Token_RParen, _ParseExpression),
+        _Match(SyntaxKind.Token_RParen)
+    );
+
+    Subscript _ParseSubscript(Expression expr) => new Subscript
+    (
+        expr,
+        _Match(SyntaxKind.Token_LSquare),
+        _ParseUntil(SyntaxKind.Token_RSquare, _ParseExpression),
+        _Match(SyntaxKind.Token_RSquare)
+    );
 
     Expression _ParsePrimary()
     {
-        switch (_currentToken.kind)
+        switch (_current.kind)
         {
             case SyntaxKind.Token_Number:
+                return new Number(_ReadNext());
             case SyntaxKind.Token_String:
+                return new String(_ReadNext());
             case SyntaxKind.Token_Literal:
-                return _ReadNext();
+                return new Literal(_ReadNext());
             case SyntaxKind.Keyword_True:
             case SyntaxKind.Keyword_False:
-                break;
+                return new Bool(_ReadNext());
             case SyntaxKind.Token_LParen:
-                break;                
+                _ReadNext();
+                var expr = _ParseExpression();
+                _Match(SyntaxKind.Token_RParen);
+                return expr;
         }
 
-        diagnostics.Add(new InvalidStatement(_currentToken));
-
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_Error,
-            _ReadNext()
-        );
+        // TODO: diagnostics
+        throw new NotImplementedException();
     }
-
-    FunctionCall _ParseFunctionCall() => new FunctionCall
-    (
-        _ParseName(),
-        _ParseUntil(SyntaxKind.Token_RParen, _ParseExpression)
-    );
 }

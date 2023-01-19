@@ -12,7 +12,6 @@ public class LexicalAnalyzerTests
     [MemberData(nameof(GetDoubleTokenData))]
     [MemberData(nameof(GetKeywordData))]
     [MemberData(nameof(GetAdditionalTokenData))]
-    // TODO: make this work.
     void TestTokens(string input, params SyntaxKind[] expected)
     {
         var lexicalAnalyzer = new LexicalAnalyzer(_syntax, input);
@@ -25,7 +24,6 @@ public class LexicalAnalyzerTests
         Assert.Equal(SyntaxKind.Token_End, result.Last().kind);
     }
 
-    // ------------------------------ Basic Token Tests -----------------------------
     static object[]? FinalizeTokenData(string pattern, SyntaxKind expected)
     {
 
@@ -100,11 +98,6 @@ public class LexicalAnalyzerTests
         foreach(var e in numberData)
             yield return new object[] { e, expected };
     }
-    // ------------------------------ Basic Token Tests -----------------------------
-
-    // ---------------------------- Combined Token Tests ----------------------------
-
-    // TODO
     
-    // ---------------------------- Combined Token Tests ----------------------------
+    // TODO: Combined Token Tests
 }

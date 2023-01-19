@@ -1,31 +1,16 @@
+using System.Diagnostics;
 using Nyx.Symbols;
-using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
 public class Literal : Expression
 {
-    public string name;
-
+    public string name { get; }
     public override TypeSymbol? typeSymbol => throw new NotImplementedException();
-
-     public Literal(TextLocation location) : base(location)
+    
+    public Literal(LexerNode name) : base(name.location)
     {
-    }
-}
-
-public class Number : Expression
-{
-
-}
-
-public class Bool : Expression
-{
-    public SyntaxKind value { get; }
-    public override TypeSymbol? typeSymbol => TypeSymbol.Bool;
-
-    public Bool(LexerNode @bool) : base(@bool.location)
-    {
-        value = @bool.kind;
+        Debug.Assert(name.value != null);
+        this.name = name.value;
     }
 }

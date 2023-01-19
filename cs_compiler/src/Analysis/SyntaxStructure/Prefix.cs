@@ -14,6 +14,7 @@ public class Prefix : Expression
     public Prefix(LexerNode prefix, Expression expression) : 
         base(TextLocation.Embrace(prefix.location, expression.location))
     {
+        this.prefix = prefix.kind;
         this.expression = expression;
     }
 }
