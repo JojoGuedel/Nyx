@@ -1,3 +1,5 @@
+using Nyx.Diagnostics;
+
 namespace Nyx.Analysis;
 
 public abstract class Analyzer<InputT, OutputT>
@@ -5,13 +7,20 @@ public abstract class Analyzer<InputT, OutputT>
     protected readonly List<InputT> _values;
     protected readonly InputT _terminator;
 
-    public bool isFinished { get => _pos >= _values.Count; }
+    public DiagnosticCollection diagnostics { get; }
+
     protected int _pos;
+    protected InputT _last { get => _Peek(-1); }
+    protected InputT _current { get => _Peek(0); }
+    protected InputT _next { get => _Peek(1); }
+    public bool isFinished { get => _pos >= _values.Count; }
 
     protected Analyzer(List<InputT> values, InputT terminator)
     {
         _values = values;
         _terminator = terminator;
+
+        diagnostics = new DiagnosticCollection();
 
         _pos = 0;
     }

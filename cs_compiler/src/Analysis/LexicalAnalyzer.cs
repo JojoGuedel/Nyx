@@ -5,7 +5,6 @@ using Utils;
 
 public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
 {
-    public DiagnosticCollection diagnostics;
     SyntaxDefinition _syntax;
     string _text;
     int _start;
@@ -13,12 +12,12 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
     char _nextChar { get => _Peek(1); }
     int _length { get => _pos - _start; }
     TextLocation _location { get => new TextLocation(_start, _length); }
+    string _subString { get => _text.Substring(_start, _length); }
     bool _newLine;
 
 
     public LexicalAnalyzer(SyntaxDefinition syntax, string text) : base(text.ToList(), syntax.endSymbol)
     {
-        diagnostics = new DiagnosticCollection();
         _syntax = syntax;
         _text = text;
         _newLine = true;
@@ -39,7 +38,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
             if (_length % _syntax.indentSize != 0)
             {
                 diagnostics.Add(new InvalidIndent(_location));
-                return new SyntaxNode(SyntaxKind.Token_Indent, _location, false);
+                return new SyntaxNode(SyntaxKind.Token_Indent, _location, isValid: false);
             }
             else if (_length > 0)
                 return new SyntaxNode(SyntaxKind.Token_Indent, _location);
@@ -53,7 +52,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
             while (char.IsDigit(_currentChar)) 
                 _pos++;
             // TODO: Handle '.'
-            return new SyntaxNode(SyntaxKind.Token_Number, _location);
+            return new SyntaxNode(SyntaxKind.Token_Number, _location, value: _subString);
         }
         // lex strings
         else if (_syntax.GetSingleTokenKind(_currentChar) == SyntaxKind.Token_StringMarker)
@@ -67,7 +66,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
                 if (_syntax.IsLineTerminator(_currentChar))
                 {
                     diagnostics.Add(new StringNotTerminated(_location, terminator));
-                    return new SyntaxNode(SyntaxKind.Token_String, _location, false);
+                    return new SyntaxNode(SyntaxKind.Token_String, _location, isValid: false);
                 }
             }
             _pos += 2;
@@ -102,11 +101,11 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
                         if (kind != SyntaxKind.Token_Error)
                             return new SyntaxNode(kind, _location);
 
-                        return new SyntaxNode(SyntaxKind.Token_Identifier, _location);
+                        return new SyntaxNode(SyntaxKind.Token_Literal, _location, value: _subString);
                     }
 
                     _pos++;
-                    return new SyntaxNode(SyntaxKind.Token_InvalidChar, _location);
+                    return new SyntaxNode(SyntaxKind.Token_InvalidChar, _location, value: _subString);
                 }
                 else if (kind == SyntaxKind.Token_NewLine)
                     _newLine = true;
@@ -133,7 +132,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
         yield return GetNext();
     }
 
-    private void _SkipBlankLines()
+    void _SkipBlankLines()
     {
         int offset = 0;
         int blankLineCount = 0;

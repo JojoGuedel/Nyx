@@ -2,12 +2,12 @@ namespace Nyx.Analysis;
 
 class SytnaxNodeWriter
 {
-    private const string _indent = "    ";
-    private const string _childIndent = "│   ";
-    private const string _childNode = "├── ";
-    private const string _leafNode = "└── ";
+    const string _indent = "    ";
+    const string _childIndent = "│   ";
+    const string _childNode = "├── ";
+    const string _leafNode = "└── ";
 
-    private TextWriter _writer;
+    TextWriter _writer;
 
     public SytnaxNodeWriter(TextWriter writer)
     {
@@ -33,7 +33,7 @@ class SytnaxNodeWriter
         }
     }
 
-    private void _Write(SyntaxNode syntaxNode, string indent = _indent)
+    void _Write(SyntaxNode syntaxNode, string indent = _indent)
     {
         for (int i = 0; i < syntaxNode.children.Count; i++)
         {

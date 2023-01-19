@@ -1,6 +1,6 @@
 struct StructA:
-    pub var a: i32 => get, set;
-    var b: i32 => get, init;
+    var a: i32 => pub get, set;
+    var b: i32 => get;
 
     pub func test(var a: i32): i32 => get;
 

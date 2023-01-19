@@ -193,9 +193,9 @@ public class SyntaxDefinition
         syntax.DefineKeyword("switch", SyntaxKind.Keyword_Switch);
         syntax.DefineKeyword("case", SyntaxKind.Keyword_Case);
         syntax.DefineKeyword("default", SyntaxKind.Keyword_Default);
-        syntax.DefineKeyword("for", SyntaxKind.Keyword_For);
-        syntax.DefineKeyword("in", SyntaxKind.Keyword_In);
-        syntax.DefineKeyword("do", SyntaxKind.Keyword_Do);
+        // syntax.DefineKeyword("for", SyntaxKind.Keyword_For);
+        // syntax.DefineKeyword("in", SyntaxKind.Keyword_In);
+        // syntax.DefineKeyword("do", SyntaxKind.Keyword_Do);
         syntax.DefineKeyword("while", SyntaxKind.Keyword_While);
         syntax.DefineKeyword("continue", SyntaxKind.Keyword_While);
         syntax.DefineKeyword("break", SyntaxKind.Keyword_While);

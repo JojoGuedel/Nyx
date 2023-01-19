@@ -5,22 +5,20 @@ namespace Nyx.Analysis;
 
 public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
 {
-    public DiagnosticCollection diagnostics;
-    private SyntaxDefinition _syntax;
-    private int _currentIndentDepth;
-    private int _currentLineIndentDepth;
-    private SyntaxNode _currentToken { get => _Peek(0); }
-    private TextLocation _currentHiddenLocation { get => new TextLocation(_currentToken.location.pos, 0); }
+    SyntaxDefinition _syntax;
+    int _currentIndentDepth;
+    int _currentLineIndentDepth;
+    SyntaxNode _currentToken { get => _Peek(0); }
+    TextLocation _currentHiddenLocation { get => new TextLocation(_currentToken.location.pos, 0); }
 
     public PostlexicalAnalyzer(SyntaxDefinition syntax, List<SyntaxNode> tokens) : base(tokens, tokens.Last())
     {
-        diagnostics = new DiagnosticCollection();
         _syntax = syntax;
         _currentIndentDepth = 0;
         _currentLineIndentDepth = 0;
     }
 
-    private bool _Discard(SyntaxNode token)
+    bool _Discard(SyntaxNode token)
     {
         return
             token.kind == SyntaxKind.Token_Discard ||
@@ -28,7 +26,7 @@ public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             _syntax.IsWhiteSpace(token.kind);
     }
 
-    private bool _IsEmptyToken(SyntaxNode token)
+    bool _IsEmptyToken(SyntaxNode token)
     {
         return
             _Discard(token) ||
@@ -36,7 +34,7 @@ public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             token.kind == SyntaxKind.Token_EndBlock;
     }
 
-    private bool _IsEmptyLine(List<SyntaxNode> line)
+    bool _IsEmptyLine(List<SyntaxNode> line)
     {
         var isEmpty = true;
 
@@ -57,7 +55,7 @@ public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
         var line = new List<SyntaxNode>();
         var indentDepth = 0;
 
-        while (_currentToken.kind == SyntaxKind.Token_Indent && _currentToken.valid)
+        while (_currentToken.kind == SyntaxKind.Token_Indent && _currentToken.isValid)
         {
             _IncrementPos();
             indentDepth++;

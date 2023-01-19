@@ -4,6 +4,7 @@ public class TextLocation
 {
     public int pos { get; }
     public int len { get; }
+    public int end { get => pos + len; }
 
     public TextLocation(int pos, int len) 
     {
@@ -13,6 +14,6 @@ public class TextLocation
 
     public static TextLocation Embrace(TextLocation a, TextLocation b)
     {
-        return new TextLocation(a.pos, b.pos - a.pos + b.len);
+        return new TextLocation(a.pos, b.end - a.pos);
     }
 }

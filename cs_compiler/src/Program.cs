@@ -1,5 +1,6 @@
 ﻿using Nyx.Analysis;
 using Nyx.Diagnostics;
+using Nyx.Evaluation;
 using Nyx.Utils;
 
 var running = true;
@@ -21,8 +22,9 @@ static func test(mut var a: i32):
 
 static func main():
     mut var a: i32 = 20;
-    var b: i32 = test(10);
-    a = test(b);";
+    // var b: i32 = test(10);
+    // a = test(b);
+    var b = a + 10";
 
 Compile(input);
 Console.ReadKey(true);
@@ -80,6 +82,8 @@ void Compile(string input)
     diagnosticWriter.Write(postLexicalAnalyzer.diagnostics);
     diagnosticWriter.Write(syntaxAnaylzer.diagnostics);
 
+    var evaluator = new Evaluator(input, compilationUnit[0]);
+    evaluator.Evaluate();
 }
 
 void ManageEscapeCommands(string command)
