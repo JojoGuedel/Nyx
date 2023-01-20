@@ -38,7 +38,7 @@ public class Evaluator
 
     private TypeSymbol _GetType(SyntaxNode identifier)
     {
-        if (identifier.kind != SyntaxKind.Token_Literal)
+        if (identifier.kind != SyntaxKind.Token_Identifier)
             throw new Exception("This must be a identifier.");
 
         var str = _GetString(identifier.location);

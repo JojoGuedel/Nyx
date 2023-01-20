@@ -7,20 +7,17 @@ namespace Nyx.Analysis;
 public class DeclarationStatement : Statement
 {
     public Modifiers modifiers { get; }
-    public string name { get; }
+    public Identifier name { get; }
     public TypeClause type { get; }
     public Expression assignment { get; }
+    VariableSymbol ConstructSymbol() => throw new NotImplementedException();
 
-    public DeclarationStatement(Modifiers modifiers, LexerNode var, LexerNode name, TypeClause type, LexerNode equal, Expression expression, LexerNode semicolon) : 
+    public DeclarationStatement(Modifiers modifiers, LexerNode var, Identifier name, TypeClause type, LexerNode equal, Expression expression, LexerNode semicolon) : 
         base(TextLocation.Embrace(modifiers.location, semicolon.location))
     {
-        Debug.Assert(name.value != null);
-
         this.modifiers = modifiers;
-        this.name = name.value;
+        this.name = name;
         this.type = type;
         this.assignment = expression;
     }
-
-    VariableSymbol ConstructSymbol() => new VariableSymbol(name, modifiers.ConstructSymbol(), type.ConstructSymbol());
 }

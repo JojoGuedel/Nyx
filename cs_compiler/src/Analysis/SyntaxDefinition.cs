@@ -190,9 +190,9 @@ public class SyntaxDefinition
         syntax.DefineKeyword("else", SyntaxKind.Keyword_Else);
         syntax.DefineKeyword("and", SyntaxKind.Keyword_And);
         syntax.DefineKeyword("or", SyntaxKind.Keyword_Or);
-        syntax.DefineKeyword("switch", SyntaxKind.Keyword_Switch);
-        syntax.DefineKeyword("case", SyntaxKind.Keyword_Case);
-        syntax.DefineKeyword("default", SyntaxKind.Keyword_Default);
+        // syntax.DefineKeyword("switch", SyntaxKind.Keyword_Switch);
+        // syntax.DefineKeyword("case", SyntaxKind.Keyword_Case);
+        // syntax.DefineKeyword("default", SyntaxKind.Keyword_Default);
         // syntax.DefineKeyword("for", SyntaxKind.Keyword_For);
         // syntax.DefineKeyword("in", SyntaxKind.Keyword_In);
         // syntax.DefineKeyword("do", SyntaxKind.Keyword_Do);

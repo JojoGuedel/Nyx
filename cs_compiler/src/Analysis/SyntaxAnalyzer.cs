@@ -1,535 +1,302 @@
+using System.Collections.Immutable;
+using Nyx.Diagnostics;
+using Nyx.Utils;
+
 namespace Nyx.Analysis;
 
-using Diagnostics;
-
-class SyntaxAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
+public class SyntaxAnalyzer2 : Analyzer<LexerNode, Node>
 {
-    SyntaxDefinition _syntax;
-    SyntaxNode _currentToken { get => _Peek(0); }
-    int _currentEmptySyntaxPos { get => _currentToken.location.pos + _currentToken.location.len; }
-    bool _isCurrentValid;
-
-    public SyntaxAnalyzer(SyntaxDefinition syntax, List<SyntaxNode> tokens) : base(tokens, tokens.Last())
+    SyntaxDefinition _syntax; 
+    // TODO: probably change this
+    public SyntaxAnalyzer2(SyntaxDefinition syntax, List<LexerNode> values) : 
+        base(values, values.Last())
     {
         _syntax = syntax;
-        _isCurrentValid = true;
     }
 
-    public override IEnumerable<SyntaxNode> GetAll()
+    public override IEnumerable<Node> GetAll()
     {
-        yield return _ParseCompilationUnit();
+        throw new NotImplementedException();
     }
 
-    SyntaxNode _MatchToken(params SyntaxKind[] kinds)
+    LexerNode _Match(SyntaxKind kind)
     {
-        foreach (var kind in kinds)
-        {
-            if (_currentToken.kind == kind) 
-            {
-                _isCurrentValid = true;
-
-                return _ReadNext();
-            }
-        }
-
-        if (!_isCurrentValid)
-            return new SyntaxNode(kinds[0], _currentToken.location);
-
-        _isCurrentValid = false;
-
-        var ret = new SyntaxNode(kinds[0], _currentToken.location);
-        diagnostics.Add(new UnexpectedToken(_ReadNext(), kinds));
-        return ret;
-    }
-
-    SyntaxNode _ParseCompilationUnit()
-    {
-        List<SyntaxNode> nodes = new List<SyntaxNode>();
-
-        while (_pos < _values.Count - 1)
-            nodes.Add(_ParseTopLevelItem());
-        nodes.Add(_MatchToken(SyntaxKind.Token_End));
-
-        return new SyntaxNode(SyntaxKind.Syntax_CompilationUnit, nodes);
-    }
-
-    SyntaxNode _ParseTopLevelItem()
-    {
-        var modifiers = _ParseModifiers();
-
-        switch (_currentToken.kind)
-        {
-            case SyntaxKind.Keyword_Function:
-                return _ParseFunctionImplementation(modifiers);
-            default:
-                diagnostics.Add(new InvalidToplevelItem(_currentToken));
-                return new SyntaxNode(SyntaxKind.Syntax_Error, _ReadNext());
-        }
-    }
-
-    SyntaxNode _ParseModifiers()
-    {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_Modifiers,
-            _ParseOptional(SyntaxKind.Keyword_Static),
-            _ParseOptional(SyntaxKind.Keyword_Mutable)
-        );
-    }
-
-    SyntaxNode _ParseOptional(SyntaxKind kind)
-    {
-        if (_currentToken.kind == kind)
+        if (_current.kind == kind)
             return _ReadNext();
-
-        return SyntaxNode.EmptySyntax(_currentEmptySyntaxPos);
+        
+        throw new NotImplementedException();
+        // TODO: adjust diagnostics to new node type
+        // diagnostics.Add(new UnexpectedToken(_current, kind));
+        // _IncrementPos();
+        // return new ErrorNode(_last.location);
     }
 
-    SyntaxNode _ParseName()
+    ImmutableArray<T> _ParseUntil<T>(SyntaxKind terminator, Func<T> parseCB, SyntaxKind separator = SyntaxKind.Token_Comma)
     {
-        // TODO: implement parse name the right way
-        return _MatchToken(SyntaxKind.Token_Literal);
-    }
-
-    SyntaxNode _ParseFunctionImplementation(SyntaxNode modifiers)
-    {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_FunctionImplementation,
-            modifiers,
-            _MatchToken(SyntaxKind.Keyword_Function),
-            _ParseName(),
-            _MatchToken(SyntaxKind.Token_LParen),
-            _ParseParameters(),
-            _MatchToken(SyntaxKind.Token_RParen),
-            _MatchToken(SyntaxKind.Token_Colon),
-            _ParseBlock()
-        );
-    }
-
-    SyntaxNode _ParseParameters()
-    {
-        var nodes = new List<SyntaxNode>();
-
-        while (_currentToken.kind != SyntaxKind.Token_RParen)
+        var nodes = new List<T>();
+        
+        while (_current.kind != terminator)
         {
-            nodes.Add(_ParseParameter());
+            nodes.Add(parseCB());
 
-            if (_currentToken.kind != SyntaxKind.Token_Comma)
+            if (_current.kind != separator)
                 break;
 
-            nodes.Add(_ReadNext());
+            _IncrementPos();
         }
 
-        if (nodes.Count == 0)
-            nodes.Add(SyntaxNode.EmptySyntax(_currentEmptySyntaxPos));
+        return nodes.ToImmutableArray();
+    }
 
-        return new SyntaxNode
+    Function _ParseFunction() => new Function
+    (
+        _ParseModifiers(),
+        _Match(SyntaxKind.Token_LParen),
+        _ParseUntil(SyntaxKind.Token_RParen, _PraseParameter),
+        _Match(SyntaxKind.Token_RParen),
+        _ParseFunctionTypeClause(),
+        _ParseBlock()
+    );
+
+    Modifiers _ParseModifiers() => new Modifiers
+    (
+        _ParseOptional(SyntaxKind.Keyword_Static),
+        _ParseOptional(SyntaxKind.Keyword_Mutable)
+    );
+
+    Node _ParseOptional(SyntaxKind kind) 
+    {
+        if (_current.kind == kind)
+            return _ReadNext();
+        
+        return new EmptyNode(_current.location.pos);
+    }
+
+    Parameter _PraseParameter() => new Parameter
+    (
+        _ParseModifiers(),
+        _Match(SyntaxKind.Keyword_Var),
+        _Match(SyntaxKind.Token_Identifier),
+        _ParseTypeClause()
+    );
+
+    Identifier _ParseIdentifier() => new Identifier(_Match(SyntaxKind.Token_Identifier));
+    // TODO: change this
+    Expression _ParseName() => _ParseExpression();
+
+    TypeClause _ParseTypeClause() => new TypeClause
+    (
+        _Match(SyntaxKind.Token_Colon),
+        _ParseName()
+    );
+
+    TypeClause _ParseFunctionTypeClause() => new TypeClause
+    (
+        _Match(SyntaxKind.Token_RArrow),
+        _ParseName()
+    );
+
+    Block _ParseBlock()
+    {
+        var statements = new List<Statement>();
+        var start = _current.location;
+
+        _Match(SyntaxKind.Token_BeginBlock);
+
+        while(_current.kind != SyntaxKind.Token_EndBlock)
+            statements.Add(_ParseStatement());
+
+        return new Block
         (
-            SyntaxKind.Syntax_Parameters,
-            nodes
+            statements.ToImmutableArray(), 
+            TextLocation.Embrace(start, _ReadNext().location)
         );
     }
 
-    SyntaxNode _ParseParameter()
+    Statement _ParseStatement()
     {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_Parameter,
-            _ParseModifiers(),
-            _MatchToken(SyntaxKind.Keyword_Var),
-            _MatchToken(SyntaxKind.Token_Literal),
-            _ParseTypeClause()
-        );
-    }
-
-    SyntaxNode _ParseTypeClause()
-    {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_TypeClause,
-            _MatchToken(SyntaxKind.Token_Colon),
-            _ParseName()
-        );
-    }
-
-    SyntaxNode _ParseBlock()
-    {
-        var nodes = new List<SyntaxNode>();
-        nodes.Add(_MatchToken(SyntaxKind.Token_BeginBlock));
-
-        while (_currentToken.kind != SyntaxKind.Token_EndBlock)
-            nodes.Add(_ParseStatement());
-
-        if (nodes.Count <= 1)
-            diagnostics.Add(new EmptyBlock(_currentToken.location));
-
-        nodes.Add(_MatchToken(SyntaxKind.Token_EndBlock));
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_Block,
-            nodes
-        );
-    }
-
-    SyntaxNode _ParseStatement()
-    {
-        switch (_currentToken.kind)
+        switch (_current.kind)
         {
             case SyntaxKind.Keyword_Mutable:
             case SyntaxKind.Keyword_Var:
-                return _ParseVariableDeclarationStatement();
+                return _ParsesDeclarationStatement();
             case SyntaxKind.Keyword_Return:
                 return _ParseReturnStatement();
             case SyntaxKind.Keyword_If:
                 return _ParseIfStatement();
-            case SyntaxKind.Keyword_Switch:
-                return _ParseSwitchStatement();
             case SyntaxKind.Keyword_While:
                 return _ParseWhileStatement();
             case SyntaxKind.Keyword_Continue:
-                return _ParseContinueStatement();
             case SyntaxKind.Keyword_Break:
-                return _ParseBreakStatement();
+                return _ParseFlowControlStatement();
             default:
                 return _ParseExpressionStatement();
         }
     }
-    
-    SyntaxNode _ParseVariableDeclarationStatement()
+
+    DeclarationStatement _ParsesDeclarationStatement() => new DeclarationStatement
+    (
+        _ParseModifiers(),
+        _Match(SyntaxKind.Keyword_Var),
+        _ParseIdentifier(),
+        _ParseTypeClause(),
+        _Match(SyntaxKind.Token_Equal),
+        _ParseExpression(), 
+        _Match(SyntaxKind.Token_Semicolon)
+    );
+
+    ReturnStatement _ParseReturnStatement() => new ReturnStatement
+    (
+        _Match(SyntaxKind.Keyword_Return),
+        _ParseExpression(),
+        _Match(SyntaxKind.Token_Semicolon)
+    );
+
+    IfStatement _ParseIfStatement() => new IfStatement
+    (
+        _Match(SyntaxKind.Keyword_If),
+        _ParseExpression(),
+        _ParseBlock(),
+        _ParseElseStatement()
+    );
+
+    Statement _ParseElseStatement()
     {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_VariableDeclarationStatement,
-            _ParseModifiers(),
-            _MatchToken(SyntaxKind.Keyword_Var),
-            _MatchToken(SyntaxKind.Token_Literal),
-            // TODO: parse optional type clause
-            _ParseTypeClause(),
-            // TODO: make assignment optional maybe?
-            _MatchToken(SyntaxKind.Token_Equal),
-            _ParseExpression(),
-            _MatchToken(SyntaxKind.Token_Semicolon)
-        );
-    }
-    
-    SyntaxNode _ParseReturnStatement()
-    {
-        // TODO: parse, return error
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_ReturnStatement,
-            _MatchToken(SyntaxKind.Keyword_Return),
-            _ParseExpression(),
-            _MatchToken(SyntaxKind.Token_Semicolon)
-        );
-    }
-    
-    SyntaxNode _ParseIfStatement()
-    {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_IfStatement,
-            _MatchToken(SyntaxKind.Keyword_If),
-            _ParseExpression(),
-            _MatchToken(SyntaxKind.Token_Colon),
-            _ParseBlock(),
-            _ParseElse()
-        );
+        if (_current.kind != SyntaxKind.Keyword_Else)
+            return new EmptyStatement(_current.location.pos);
+
+        _ReadNext();
+        return _ParseIfStatement();
     }
 
-    SyntaxNode _ParseElse()
-    {
-        if (_currentToken.kind != SyntaxKind.Keyword_Else)
-            return SyntaxNode.EmptySyntax(_currentEmptySyntaxPos);
+    WhileStatement _ParseWhileStatement() => new WhileStatement
+    (
+        _Match(SyntaxKind.Keyword_While),
+        _ParseExpression(),
+        _ParseBlock()
+    );
 
-        if (_Peek(1).kind == SyntaxKind.Keyword_If)
-            return new SyntaxNode
-            (
-                SyntaxKind.Syntax_ElseIfStatement,
-                _ReadNext(),
-                _ParseIfStatement()
-            );
-
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_ElseStatement,
-            _ReadNext(),
-            _MatchToken(SyntaxKind.Token_Colon),
-            _ParseBlock()
-        );
-    }
-    
-    SyntaxNode _ParseWhileStatement()
+    FlowControlStatement _ParseFlowControlStatement()
     {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_WhileStatement,
-            _MatchToken(SyntaxKind.Keyword_While),
-            _ParseExpression(),
-            _MatchToken(SyntaxKind.Token_Colon),
-            _ParseBlock()
-        );
-    }
+        List<LexerNode> statements = new List<LexerNode>();
         
-    SyntaxNode _ParseContinueStatement()
-    {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_ContinueStatement,
-            _MatchToken(SyntaxKind.Keyword_Continue),
-            _MatchToken(SyntaxKind.Token_Colon)
-        );
+        while (_current.kind == SyntaxKind.Keyword_Continue || _current.kind == SyntaxKind.Keyword_Break)
+            statements.Add(_ReadNext());
+
+        return new FlowControlStatement(statements.ToImmutableArray(), _Match(SyntaxKind.Token_Semicolon));
     }
 
-    SyntaxNode _ParseBreakStatement()
-    {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_BreakStatement,
-            _MatchToken(SyntaxKind.Keyword_Break),
-            // TODO: manage double breaks
-            _MatchToken(SyntaxKind.Token_Colon)
-        );
-    }
+    ExpressionStatement _ParseExpressionStatement() => new ExpressionStatement
+    (
+        _ParseExpression(),
+        _Match(SyntaxKind.Token_Semicolon)
+    );
 
-    SyntaxNode _ParseSwitchStatement()
-    {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_SwitchStatement,
-            _MatchToken(SyntaxKind.Keyword_Switch),
-            _ParseSwitchBlock()
-        );
-    }
-
-    SyntaxNode _ParseSwitchBlock()
-    {
-        var nodes = new List<SyntaxNode>();
-        nodes.Add(_MatchToken(SyntaxKind.Token_BeginBlock));
-
-        while (_currentToken.kind != SyntaxKind.Token_EndBlock)
-        {
-            switch (_currentToken.kind)
-            {
-                case SyntaxKind.Keyword_Case:
-                    return _ParseCaseStatement();
-                case SyntaxKind.Keyword_Default:
-                    return _ParseDefaultStatement();
-                default:
-                    diagnostics.Add(new InvalidSwitchBlock(_currentToken));
-                    return new SyntaxNode(SyntaxKind.Syntax_Error, _ReadNext());
-            }
-        }
-
-        if (nodes.Count <= 1)
-            diagnostics.Add(new EmptyBlock(_currentToken.location));
-
-        nodes.Add(_MatchToken(SyntaxKind.Token_EndBlock));
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_SwitchBlock,
-            nodes
-        );
-    }
-
-    SyntaxNode _ParseCaseStatement()
-    {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_CaseStatement,
-            _MatchToken(SyntaxKind.Keyword_Case),
-            _ParseExpression(),
-            _MatchToken(SyntaxKind.Token_Colon),
-            _ParseBlock()
-        );
-    }
-
-    SyntaxNode _ParseDefaultStatement()
-    {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_DefaultStatement,
-            _MatchToken(SyntaxKind.Keyword_Default),
-            _MatchToken(SyntaxKind.Token_Colon),
-            _ParseBlock()
-        );
-    }
-
-    SyntaxNode _ParseExpressionStatement()
-    {
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_ExpressionStatement,
-            _ParseBinaryExpression(_syntax.maxOperatorPrecedence),
-            _MatchToken(SyntaxKind.Token_Semicolon)
-        );
-    }
-
-    SyntaxNode _ParseExpression()
+    Expression _ParseExpression()
     {
         return _ParseBinaryExpression(_syntax.maxOperatorPrecedence);
     }
 
-    SyntaxNode _ParseBinaryExpression(int currentPrecedence)
+    Expression _ParseBinaryExpression(int currentPrecedence)
     {
         if (currentPrecedence == 0)
             return _ParsePrefix();
  
         var left = _ParseBinaryExpression(currentPrecedence - 1);
 
-        while (_syntax.BinaryOperatorPrecedence(_currentToken.kind) == currentPrecedence)
-        {
-            left = new SyntaxNode
-            (
-                SyntaxKind.Syntax_BinaryOperation,
-                left,
-                _ReadNext(),
-                _ParseBinaryExpression(currentPrecedence - 1)
-            );
-        }
+        while (_syntax.BinaryOperatorPrecedence(_current.kind) == currentPrecedence) left = new BinaryExpression
+        (
+            left,
+            _ReadNext(),
+            _ParseBinaryExpression(currentPrecedence - 1)
+        );
 
         return left;
     }
 
-    SyntaxNode _ParsePrefix()
+    Expression _ParsePrefix()
     {
-        var syntaxKind = SyntaxKind.Syntax_Empty;
-
-        switch (_currentToken.kind)
+        switch (_current.kind)
         {
             case SyntaxKind.Token_Plus:
-                syntaxKind = SyntaxKind.Syntax_PrefixPlus;
-                break;
             case SyntaxKind.Token_Minus:
-                syntaxKind = SyntaxKind.Syntax_PrefixMinus;
-                break;
             case SyntaxKind.Keyword_Not:
-                syntaxKind = SyntaxKind.Syntax_PrefixNot;
-                break;
             case SyntaxKind.Token_PlusPlus:
-                syntaxKind = SyntaxKind.Syntax_PrefixPlusPlus;
-                break;
             case SyntaxKind.Token_MinusMinus:
-                syntaxKind = SyntaxKind.Syntax_PrefixMinusMinus;
-                break;
+                return new Prefix(_ReadNext(), _ParsePrefix());
         }
 
-        if (syntaxKind == SyntaxKind.Syntax_Empty)
-            return _ParsePostfix();
-
-        return new SyntaxNode
-        (
-            syntaxKind,
-            _ReadNext(),
-            _ParsePrefix()
-        );
+        return _ParsePostFix();
     }
 
-    SyntaxNode _ParsePostfix()
+    Expression _ParsePostFix()
     {
         var expr = _ParsePrimary();
-        var isPostfix = true;
 
-        while (isPostfix)
+        while(true)
         {
-            switch (_currentToken.kind)
+            switch (_current.kind)
             {
                 case SyntaxKind.Token_LParen:
-                    expr = new SyntaxNode
-                    (
-                        SyntaxKind.Syntax_FunctionCall,
-                        expr,
-                        _MatchToken(SyntaxKind.Token_LParen),
-                        _ParseArguments(SyntaxKind.Syntax_Arguments, SyntaxKind.Token_RParen),
-                        _MatchToken(SyntaxKind.Token_RParen)
-                    );
+                    expr = _ParseFunctionCall(expr);
                     break;
                 case SyntaxKind.Token_LSquare:
-                    expr = new SyntaxNode
-                    (
-                        SyntaxKind.Syntax_Subscript,
-                        expr,
-                        _MatchToken(SyntaxKind.Token_LSquare),
-                        _ParseArguments(SyntaxKind.Syntax_Subscript, SyntaxKind.Token_RSquare),
-                        _MatchToken(SyntaxKind.Token_RSquare)
-                    );
+                    expr = _ParseSubscript(expr);
+                    break;
+                case SyntaxKind.Token_Dot:
+
                     break;
                 case SyntaxKind.Token_PlusPlus:
-                    expr = new SyntaxNode
-                    (
-                        SyntaxKind.Syntax_PostfixIncrement,
-                        expr,
-                        _ReadNext()
-                    );
-                    break;
                 case SyntaxKind.Token_MinusMinus:
-                    expr = new SyntaxNode
-                    (
-                        SyntaxKind.Syntax_PostfixDecrement,
-                        expr,
-                        _ReadNext()
-                    );
+                    expr = new Postfix(expr, _ReadNext());
                     break;
                 default:
-                    isPostfix = false;
-                    break;
+                    return expr;
             }
         }
-
-        return expr;
     }
 
-    SyntaxNode _ParsePrimary()
+    FunctionCall _ParseFunctionCall(Expression expr) => new FunctionCall
+    (
+        expr,
+        _Match(SyntaxKind.Token_LParen),
+        _ParseUntil(SyntaxKind.Token_RParen, _ParseExpression),
+        _Match(SyntaxKind.Token_RParen)
+    );
+
+    Subscript _ParseSubscript(Expression expr) => new Subscript
+    (
+        expr,
+        _Match(SyntaxKind.Token_LSquare),
+        _ParseUntil(SyntaxKind.Token_RSquare, _ParseExpression),
+        _Match(SyntaxKind.Token_RSquare)
+    );
+
+    MemberAccess _ParseMemberAccess(Expression expr) => new MemberAccess
+    (
+        expr,
+        _Match(SyntaxKind.Token_Dot),
+        _ParseName()
+    );
+
+    Expression _ParsePrimary()
     {
-        switch (_currentToken.kind)
+        switch (_current.kind)
         {
             case SyntaxKind.Token_Number:
+                return new Number(_ReadNext());
             case SyntaxKind.Token_String:
-            case SyntaxKind.Token_Literal:
-                return _ReadNext();
+                return new String(_ReadNext());
+            case SyntaxKind.Token_Identifier:
+                return new Identifier(_ReadNext());
+            case SyntaxKind.Token_LParen:
+                _ReadNext();
+                var expr = _ParseExpression();
+                _Match(SyntaxKind.Token_RParen);
+                return expr;
         }
 
-        diagnostics.Add(new InvalidStatement(_currentToken));
-
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_Error,
-            _ReadNext()
-        );
-    }
-
-    SyntaxNode _ParseArguments(SyntaxKind kind, SyntaxKind terminator)
-    {
-        var nodes = new List<SyntaxNode>();
-        
-        while (_currentToken.kind != terminator)
-        {
-            nodes.Add(new SyntaxNode(SyntaxKind.Syntax_Argument, _ParseExpression()));
-
-            if (_currentToken.kind != SyntaxKind.Token_Comma)
-                break;
-
-            nodes.Add(_ReadNext());
-        }
-
-        if (nodes.Count == 0)
-            nodes.Add(SyntaxNode.EmptySyntax(_currentEmptySyntaxPos));
-
-        return new SyntaxNode
-        (
-            kind,
-            nodes
-        );
-    }
-
-    SyntaxNode _ParseArgument()
-    {
-        // TODO: implement optional arguments
-        return new SyntaxNode
-        (
-            SyntaxKind.Syntax_Argument,
-            _ParseExpression()
-        );
+        // TODO: diagnostics
+        throw new NotImplementedException();
     }
 }

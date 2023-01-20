@@ -3,7 +3,7 @@ namespace Nyx.Analysis;
 using Diagnostics;
 using Utils;
 
-public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
+public class LexicalAnalyzer : Analyzer<char, LexerNode>
 {
     SyntaxDefinition _syntax;
     string _text;
@@ -23,7 +23,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
         _newLine = true;
     }
 
-    public SyntaxNode GetNext()
+    public LexerNode GetNext()
     {
         _start = _pos;
 
@@ -38,10 +38,10 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
             if (_length % _syntax.indentSize != 0)
             {
                 diagnostics.Add(new InvalidIndent(_location));
-                return new SyntaxNode(SyntaxKind.Token_Indent, _location, isValid: false);
+                return GetNext();
             }
             else if (_length > 0)
-                return new SyntaxNode(SyntaxKind.Token_Indent, _location);
+                return new LexerNode(SyntaxKind.Token_Indent, _location);
 
             _newLine = false;
         }
@@ -52,7 +52,7 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
             while (char.IsDigit(_currentChar)) 
                 _pos++;
             // TODO: Handle '.'
-            return new SyntaxNode(SyntaxKind.Token_Number, _location, value: _subString);
+            return new LexerNode(SyntaxKind.Token_Number, _location, value: _subString);
         }
         // lex strings
         else if (_syntax.GetSingleTokenKind(_currentChar) == SyntaxKind.Token_StringMarker)
@@ -66,19 +66,19 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
                 if (_syntax.IsLineTerminator(_currentChar))
                 {
                     diagnostics.Add(new StringNotTerminated(_location, terminator));
-                    return new SyntaxNode(SyntaxKind.Token_String, _location, isValid: false);
+                    return new LexerNode(SyntaxKind.Token_String, _location);
                 }
             }
             _pos += 2;
 
-            return new SyntaxNode(SyntaxKind.Token_String, _location);
+            return new LexerNode(SyntaxKind.Token_String, _location);
         }
         else if (_syntax.GetDoubleTokenKind((_currentChar, _nextChar)) == SyntaxKind.Token_CommentMarker)
         {
             while (!_syntax.IsLineTerminator(_currentChar))
                 _IncrementPos();
             
-            return new SyntaxNode(SyntaxKind.Token_Comment, _location);
+            return new LexerNode(SyntaxKind.Token_Comment, _location);
         }
         // lex operators and names
         else
@@ -99,13 +99,13 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
                         kind = _syntax.GetKeyword(_text.Substring(_start, _length));
 
                         if (kind != SyntaxKind.Token_Error)
-                            return new SyntaxNode(kind, _location);
+                            return new LexerNode(kind, _location);
 
-                        return new SyntaxNode(SyntaxKind.Token_Literal, _location, value: _subString);
+                        return new LexerNode(SyntaxKind.Token_Identifier, _location, value: _subString);
                     }
 
                     _pos++;
-                    return new SyntaxNode(SyntaxKind.Token_InvalidChar, _location, value: _subString);
+                    return new LexerNode(SyntaxKind.Token_InvalidChar, _location, value: _subString);
                 }
                 else if (kind == SyntaxKind.Token_NewLine)
                     _newLine = true;
@@ -114,14 +114,13 @@ public class LexicalAnalyzer : Analyzer<char, SyntaxNode>
                 _pos++;
             _pos++;
 
-            return new SyntaxNode(kind, _location);
+            return new LexerNode(kind, _location);
         }
     }
 
-    public override IEnumerable<SyntaxNode> GetAll()
+    public override IEnumerable<LexerNode> GetAll()
     {
-        SyntaxNode token;
-
+        LexerNode token;
         do
         {
             token = GetNext();

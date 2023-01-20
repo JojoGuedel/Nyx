@@ -13,3 +13,14 @@ public class ExpressionStatement : Statement
         this.expression = expression;
     }
 }
+
+public class ReturnStatement : Statement
+{
+    public Expression expression { get; }
+
+    public ReturnStatement(LexerNode @return, Expression expression, LexerNode semicolon) : 
+        base(TextLocation.Embrace(@return.location, semicolon.location))
+    {
+        this.expression = expression;
+    }
+}

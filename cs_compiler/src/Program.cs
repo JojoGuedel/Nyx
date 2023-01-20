@@ -5,7 +5,7 @@ using Nyx.Utils;
 
 var running = true;
 var syntax = SyntaxDefinition.Default();
-var syntaxNodeWriter = new SytnaxNodeWriter(Console.Out);
+var syntaxNodeWriter = new NodeWriter(Console.Out);
 
 var input =
 @"

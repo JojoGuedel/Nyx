@@ -5,16 +5,13 @@ namespace Nyx.Analysis;
 
 public class  TypeClause : Node
 {
-    public string name { get; }
+    public Expression type { get; }
+    public TypeSymbol ConstructSymbol() => throw new NotImplementedException();
 
     // TODO: make constructor for arrow
-    public TypeClause(LexerNode clauseInit, LexerNode name) :
-        base(name.location)
+    public TypeClause(LexerNode clauseInit, Expression type) :
+        base(type.location)
     {
-        Debug.Assert(name.value != null);
-
-        this.name = name.value;
+        this.type = type;
     }
-
-    public TypeSymbol ConstructSymbol() => new TypeSymbol(name);
 }

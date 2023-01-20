@@ -3,22 +3,22 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
+public class PostlexicalAnalyzer : Analyzer<LexerNode, LexerNode>
 {
     SyntaxDefinition _syntax;
     int _currentIndentDepth;
     int _currentLineIndentDepth;
-    SyntaxNode _currentToken { get => _Peek(0); }
+    LexerNode _currentToken { get => _Peek(0); }
     TextLocation _currentHiddenLocation { get => new TextLocation(_currentToken.location.pos, 0); }
 
-    public PostlexicalAnalyzer(SyntaxDefinition syntax, List<SyntaxNode> tokens) : base(tokens, tokens.Last())
+    public PostlexicalAnalyzer(SyntaxDefinition syntax, List<LexerNode> tokens) : base(tokens, tokens.Last())
     {
         _syntax = syntax;
         _currentIndentDepth = 0;
         _currentLineIndentDepth = 0;
     }
 
-    bool _Discard(SyntaxNode token)
+    bool _Discard(LexerNode token)
     {
         return
             token.kind == SyntaxKind.Token_Discard ||
@@ -26,7 +26,7 @@ public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             _syntax.IsWhiteSpace(token.kind);
     }
 
-    bool _IsEmptyToken(SyntaxNode token)
+    bool _IsEmptyToken(LexerNode token)
     {
         return
             _Discard(token) ||
@@ -34,7 +34,7 @@ public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
             token.kind == SyntaxKind.Token_EndBlock;
     }
 
-    bool _IsEmptyLine(List<SyntaxNode> line)
+    bool _IsEmptyLine(List<LexerNode> line)
     {
         var isEmpty = true;
 
@@ -50,12 +50,12 @@ public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
         return isEmpty;
     }
 
-    List<SyntaxNode> GetNextLine()
+    List<LexerNode> GetNextLine()
     {
-        var line = new List<SyntaxNode>();
+        var line = new List<LexerNode>();
         var indentDepth = 0;
 
-        while (_currentToken.kind == SyntaxKind.Token_Indent && _currentToken.isValid)
+        while (_currentToken.kind == SyntaxKind.Token_Indent)
         {
             _IncrementPos();
             indentDepth++;
@@ -64,10 +64,10 @@ public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
         var d = indentDepth - _currentIndentDepth;
 
         if (d == 1)
-            line.Add(new SyntaxNode(SyntaxKind.Token_BeginBlock, _currentHiddenLocation));
+            line.Add(new LexerNode(SyntaxKind.Token_BeginBlock, _currentHiddenLocation));
         else if (d < 0)
             for (var i = 0; i < -d; i++)
-                line.Add(new SyntaxNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation));
+                line.Add(new LexerNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation));
         else if (d > 1)
             diagnostics.Add(new TooManyIndents(_currentToken.location));
         
@@ -78,13 +78,13 @@ public class PostlexicalAnalyzer : Analyzer<SyntaxNode, SyntaxNode>
 
         if (_currentToken.kind == SyntaxKind.Token_End)
             for (var i = 0; i < _currentIndentDepth + d; i++)
-                line.Add(new SyntaxNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation));
+                line.Add(new LexerNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation));
         line.Add(_ReadNext());
         
         return line;
     }
 
-    public override IEnumerable<SyntaxNode> GetAll()
+    public override IEnumerable<LexerNode> GetAll()
     {
         while (!isFinished)
         {
