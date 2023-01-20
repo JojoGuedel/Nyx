@@ -74,4 +74,5 @@ public enum SyntaxKind
     Keyword_While,
     Keyword_Continue,
     Keyword_Break,
+    Error,
 }

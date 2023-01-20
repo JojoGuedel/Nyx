@@ -4,11 +4,11 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class SyntaxAnalyzer2 : Analyzer<LexerNode, Node>
+public class SyntaxAnalyzer : Analyzer<LexerNode, Node>
 {
     SyntaxDefinition _syntax; 
     // TODO: probably change this
-    public SyntaxAnalyzer2(SyntaxDefinition syntax, List<LexerNode> values) : 
+    public SyntaxAnalyzer(SyntaxDefinition syntax, List<LexerNode> values) : 
         base(values, values.Last())
     {
         _syntax = syntax;
@@ -16,7 +16,7 @@ public class SyntaxAnalyzer2 : Analyzer<LexerNode, Node>
 
     public override IEnumerable<Node> GetAll()
     {
-        throw new NotImplementedException();
+        yield return _ParseCompilationUnit();
     }
 
     LexerNode _Match(SyntaxKind kind)
@@ -24,11 +24,10 @@ public class SyntaxAnalyzer2 : Analyzer<LexerNode, Node>
         if (_current.kind == kind)
             return _ReadNext();
         
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
         // TODO: adjust diagnostics to new node type
         // diagnostics.Add(new UnexpectedToken(_current, kind));
-        // _IncrementPos();
-        // return new ErrorNode(_last.location);
+        return new ErrorNode(_ReadNext());
     }
 
     ImmutableArray<T> _ParseUntil<T>(SyntaxKind terminator, Func<T> parseCB, SyntaxKind separator = SyntaxKind.Token_Comma)
@@ -48,13 +47,34 @@ public class SyntaxAnalyzer2 : Analyzer<LexerNode, Node>
         return nodes.ToImmutableArray();
     }
 
+    Identifier _ParseIdentifier() => new Identifier(_Match(SyntaxKind.Token_Identifier));
+    // TODO: change this
+    Expression _ParseName() => _ParsePrimary();
+
+    CompilationUnit _ParseCompilationUnit()
+    {
+        var members = new List<Member>();
+
+        // TODO: check if there are no endless loops
+        while (_current.kind != SyntaxKind.Token_End)
+            members.Add(_ParseMember());
+        
+        return new CompilationUnit(members.ToImmutableArray(), _ReadNext());
+    }
+
+    // TODO: parse structs
+    Member _ParseMember() => _ParseFunction();
+
     Function _ParseFunction() => new Function
     (
         _ParseModifiers(),
+        _Match(SyntaxKind.Keyword_Function),
+        _ParseName(),
         _Match(SyntaxKind.Token_LParen),
         _ParseUntil(SyntaxKind.Token_RParen, _PraseParameter),
         _Match(SyntaxKind.Token_RParen),
         _ParseFunctionTypeClause(),
+        _Match(SyntaxKind.Token_Colon),
         _ParseBlock()
     );
 
@@ -79,10 +99,6 @@ public class SyntaxAnalyzer2 : Analyzer<LexerNode, Node>
         _Match(SyntaxKind.Token_Identifier),
         _ParseTypeClause()
     );
-
-    Identifier _ParseIdentifier() => new Identifier(_Match(SyntaxKind.Token_Identifier));
-    // TODO: change this
-    Expression _ParseName() => _ParseExpression();
 
     TypeClause _ParseTypeClause() => new TypeClause
     (

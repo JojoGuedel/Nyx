@@ -7,3 +7,15 @@ public class EmptyNode : Node
     //TODO: check if this needs to be 0
     public EmptyNode(int pos) : base(new TextLocation(pos, 1)) { }
 }
+
+public class ErrorNode : LexerNode
+{
+    public LexerNode errorNode { get; }
+
+    //TODO: check if this needs to be 0
+    public ErrorNode(LexerNode node) : 
+        base(SyntaxKind.Error, node.location) 
+    { 
+        errorNode = node;
+    }
+}
