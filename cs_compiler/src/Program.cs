@@ -15,8 +15,12 @@ var input =
 
 // no templates
 
+static func add(var a: i32, var b: i32) -> i32:
+    return a + b;
+
 static func main() -> void:
-    mut var a: i32 = 20;";
+    mut var a: i32 = 23123;
+    print(a);";
 
 Compile(input);
 Console.ReadKey(true);

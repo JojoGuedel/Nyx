@@ -33,7 +33,7 @@ public abstract class Node
     
     protected void _WriteArray(TextWriter writer, string indent, bool isLast, string name, Node[] array)
     {
-        _WriteName(writer, indent, isLast, name);
+        _WriteName(writer, indent, isLast, $"{name}[]");
         indent += _ChildIndent(isLast);
 
         if (array.Length == 0)
