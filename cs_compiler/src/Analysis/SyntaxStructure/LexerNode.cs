@@ -13,4 +13,12 @@ public class LexerNode : Node
         this.kind = kind;
         this.value = value;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "LexerNode");
+        indent += _ChildIndent(isLast);
+        _WriteKind(writer, indent, false, kind);
+        _WriteString(writer, indent, true, value == null? "null" : value);
+    }
 }

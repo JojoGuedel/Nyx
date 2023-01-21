@@ -12,4 +12,11 @@ public class Block : Node
     {
         this.statements = statements;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "Block");
+        indent += _ChildIndent(isLast);
+        _WriteArray(writer, indent, true, "Statement", Array.ConvertAll(statements.ToArray(), (Statement statement) => (Node)statement));
+    }
 }

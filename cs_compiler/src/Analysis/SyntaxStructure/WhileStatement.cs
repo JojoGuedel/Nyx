@@ -13,4 +13,12 @@ public class WhileStatement : Statement
         this.condition = condition;
         this.body = body;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "FunctionCall");
+        indent += _ChildIndent(isLast);
+        condition.Write(writer, indent, false);
+        body.Write(writer, indent, true);
+    }
 }

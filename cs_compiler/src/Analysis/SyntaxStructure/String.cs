@@ -16,4 +16,11 @@ public class String : Expression
 
         value = @string.value;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "String");
+        indent += _ChildIndent(isLast);
+        _WriteString(writer, indent, true, value);
+    }
 }

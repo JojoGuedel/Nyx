@@ -19,4 +19,13 @@ public class Parameter : Node
         this.name = name.value;
         this.type = type;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "Parameter");
+        indent += _ChildIndent(isLast);
+        modifiers.Write(writer, indent, false);
+        _WriteString(writer, indent, false, name);
+        type.Write(writer, indent, true);
+    }
 }

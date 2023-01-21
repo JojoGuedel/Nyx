@@ -30,4 +30,15 @@ public class Function : Member
         this.type = type;
         this.body = body;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "Function");
+        indent += _ChildIndent(isLast);
+        modifiers.Write(writer, indent, false);
+        name.Write(writer, indent, false);
+        _WriteArray(writer, indent, false, "Parameter", Array.ConvertAll(parameters.ToArray(), (Parameter parameter) => (Node)parameter));
+        type.Write(writer, indent, false);
+        body.Write(writer, indent, true);
+    }
 }

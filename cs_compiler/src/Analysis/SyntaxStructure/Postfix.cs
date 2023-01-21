@@ -6,7 +6,7 @@ namespace Nyx.Analysis;
 public class Postfix : Expression
 {
     public Expression expression { get; }
-    public SyntaxKind postfix { get; }
+    public LexerNode postfix { get; }
 
     public override TypeSymbol? typeSymbol => throw new NotImplementedException();
 
@@ -14,6 +14,14 @@ public class Postfix : Expression
         base(TextLocation.Embrace(expression.location, postfix.location))
     {
         this.expression = expression;
-        this.postfix = postfix.kind;
+        this.postfix = postfix;
+    }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "Postfix");
+        indent += _ChildIndent(isLast);
+        expression.Write(writer, indent, false);
+        postfix.Write(writer, indent, true);
     }
 }

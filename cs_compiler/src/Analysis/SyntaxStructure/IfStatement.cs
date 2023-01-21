@@ -16,4 +16,13 @@ public class IfStatement : Statement
         this.body = body;
         this.@else = @else;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "IfStatement");
+        indent += _ChildIndent(isLast);
+        condition.Write(writer, indent, false);
+        body.Write(writer, indent, false);
+        @else.Write(writer, indent, true);
+    }
 }

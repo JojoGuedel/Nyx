@@ -13,4 +13,11 @@ public class Identifier : Expression
         Debug.Assert(name.value != null);
         this.name = name.value;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "Identifier");
+        indent += _ChildIndent(isLast);
+        _WriteString(writer, indent, true, name);
+    }
 }

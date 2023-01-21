@@ -12,15 +12,11 @@ public class ExpressionStatement : Statement
     {
         this.expression = expression;
     }
-}
 
-public class ReturnStatement : Statement
-{
-    public Expression expression { get; }
-
-    public ReturnStatement(LexerNode @return, Expression expression, LexerNode semicolon) : 
-        base(TextLocation.Embrace(@return.location, semicolon.location))
+    public override void Write(TextWriter writer, string indent, bool isLast)
     {
-        this.expression = expression;
+        _WriteName(writer, indent, isLast, "ExpressionStatement");
+        indent += _ChildIndent(isLast);
+        expression.Write(writer, indent, true);
     }
 }

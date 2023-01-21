@@ -14,4 +14,11 @@ public class Number : Expression
         
         value = number.value;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "Number");
+        indent += _ChildIndent(isLast);
+        _WriteString(writer, indent, true, value);
+    }
 }

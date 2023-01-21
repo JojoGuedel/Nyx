@@ -1,10 +1,11 @@
-﻿using Nyx.Analysis;
+﻿using System.Collections.Immutable;
+using Nyx.Analysis;
 using Nyx.Diagnostics;
 using Nyx.Utils;
 
 var running = true;
 var syntax = SyntaxDefinition.Default();
-var syntaxNodeWriter = new NodeWriter(Console.Out);
+var nodeWriter = new NodeWriter(Console.Out);
 
 var input =
 @"
@@ -65,8 +66,8 @@ void Compile(string input)
     tokens = postLexicalAnalyzer.GetAll().ToList();
 
     var syntaxAnaylzer = new SyntaxAnalyzer(syntax, tokens);
-    var compilationUnit = syntaxAnaylzer.GetAll().ToList();
-    syntaxNodeWriter.Write(compilationUnit);
+    var compilationUnit = syntaxAnaylzer.GetAll().ToImmutableArray();
+    nodeWriter.Write(compilationUnit);
     Console.WriteLine();
 
     diagnosticWriter.Write(lexicalAnalyzer.diagnostics);

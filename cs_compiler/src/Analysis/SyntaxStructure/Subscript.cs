@@ -16,4 +16,12 @@ public class Subscript : Expression
         this.expression = expression;
         this.arguments = arguments;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "Subscript");
+        indent += _ChildIndent(isLast);
+        expression.Write(writer, indent, false);
+        _WriteArray(writer, indent, true, "arguments", Array.ConvertAll(arguments.ToArray(), (Expression statement) => (Node)statement));
+    }
 }

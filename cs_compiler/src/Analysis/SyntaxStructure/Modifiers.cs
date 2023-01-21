@@ -5,19 +5,27 @@ namespace Nyx.Analysis;
 
 public class Modifiers : Node 
 {
-    public Node staticNode { get; }
-    public Node mutableNode { get; }
+    public Node @static { get; }
+    public Node mutable { get; }
 
-    public Modifiers(Node staticNode, Node mutableNode) :
-        base(TextLocation.Embrace(staticNode.location, mutableNode.location))
+    public Modifiers(Node @static, Node mutableNode) :
+        base(TextLocation.Embrace(@static.location, mutableNode.location))
     {
-        this.staticNode = staticNode;
-        this.mutableNode = mutableNode;
+        this.@static = @static;
+        this.mutable = mutableNode;
     }
     
     public SymbolModifiers ConstructSymbol() => new SymbolModifiers
     (
-        !(staticNode is EmptyNode),
-        !(mutableNode is EmptyNode)
+        !(@static is EmptyNode),
+        !(mutable is EmptyNode)
     );
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "Modifiers");
+        indent += _ChildIndent(isLast);
+        @static.Write(writer, indent, false);
+        mutable.Write(writer, indent, true);
+    }
 }

@@ -20,4 +20,14 @@ public class DeclarationStatement : Statement
         this.type = type;
         this.assignment = expression;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "Binary Expression");
+        indent += _ChildIndent(isLast);
+        modifiers.Write(writer, indent, false);
+        name.Write(writer, indent, false);
+        type.Write(writer, indent, false);
+        assignment.Write(writer, indent, true);
+    }
 }

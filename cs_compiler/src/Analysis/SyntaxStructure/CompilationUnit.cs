@@ -12,4 +12,11 @@ public class CompilationUnit : Node
     {
         this.members = members;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "CompilationUnit");
+        indent += _ChildIndent(isLast);
+        _WriteArray(writer, indent, true, "Member", Array.ConvertAll(members.ToArray(), (Member member) => (Node)member));
+    }
 }

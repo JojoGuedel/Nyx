@@ -15,4 +15,12 @@ public class MemberAccess : Expression
         this.expression = expression;
         this.name = name;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "MemberAccess");
+        indent += _ChildIndent(isLast);
+        expression.Write(writer, indent, false);
+        name.Write(writer, indent, true);
+    }
 }

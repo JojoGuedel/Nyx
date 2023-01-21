@@ -12,6 +12,13 @@ public class FlowControlStatement : Statement
     {
         this.statements = statements;
     }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "FlowControlStatement");
+        indent += _ChildIndent(isLast);
+        _WriteArray(writer, indent, true, "LexerNode", Array.ConvertAll(statements.ToArray(), (LexerNode statement) => (Node)statement));
+    }
 }
 
 
