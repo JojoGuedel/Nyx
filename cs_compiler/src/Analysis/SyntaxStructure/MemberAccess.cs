@@ -1,4 +1,4 @@
-using Nyx.Symbols;
+using System.Diagnostics;
 using Nyx.Utils;
 
 namespace Nyx.Analysis;
@@ -6,14 +6,15 @@ namespace Nyx.Analysis;
 public class MemberAccess : Expression
 {
     public Expression expression { get; }
-    public Expression name { get; }
-    public override TypeSymbol? typeSymbol => throw new NotImplementedException();
+    public Identifier name { get; }
     
-    public MemberAccess(Expression expression, LexerNode dot, Expression name) : 
+    public MemberAccess(Expression expression, LexerNode dot, LexerNode name) : 
         base(TextLocation.Embrace(expression.location, name.location))
     {
+        Debug.Assert(name.value != null);
+
         this.expression = expression;
-        this.name = name;
+        this.name = new Identifier(name);
     }
 
     public override void Write(TextWriter writer, string indent, bool isLast)

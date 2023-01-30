@@ -1,0 +1,22 @@
+Wtrait MyTrait:
+    // maybe "int a"?
+    var a: int => pub get, set;
+
+    pub static func add(var a: Property, var b: Property) -> int or error;
+
+struct MyStruct:
+    extends MyTrait;
+
+// not like this
+pub static func MyStruct.add(var a: Property, var b: Property) -> int or error:
+    return a.a + b.a;
+
+// more something like this
+pub static func MyStruct.add(a, b):
+    return a.a + b.a;
+
+// or this
+pub static func MyStruct.add(a, b) return a.a + b.a;
+
+global func main() -> void:
+    ;

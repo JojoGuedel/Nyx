@@ -6,9 +6,9 @@ namespace Nyx.Analysis;
 
 public class SyntaxAnalyzer : Analyzer<LexerNode, Node>
 {
-    SyntaxDefinition _syntax; 
+    SyntaxInfo _syntax; 
     // TODO: probably change this
-    public SyntaxAnalyzer(SyntaxDefinition syntax, List<LexerNode> values) : 
+    public SyntaxAnalyzer(SyntaxInfo syntax, List<LexerNode> values) : 
         base(values, values.Last())
     {
         _syntax = syntax;
@@ -49,7 +49,7 @@ public class SyntaxAnalyzer : Analyzer<LexerNode, Node>
 
     Identifier _ParseIdentifier() => new Identifier(_Match(SyntaxKind.Token_Identifier));
     // TODO: change this
-    Expression _ParseName() => _ParsePrimary();
+    Expression _ParseName() => _ParsePostFix();
 
     CompilationUnit _ParseCompilationUnit()
     {
@@ -80,6 +80,7 @@ public class SyntaxAnalyzer : Analyzer<LexerNode, Node>
 
     Modifiers _ParseModifiers() => new Modifiers
     (
+        _ParseOptional(SyntaxKind.Keyword_Global),
         _ParseOptional(SyntaxKind.Keyword_Static),
         _ParseOptional(SyntaxKind.Keyword_Mutable)
     );
@@ -260,7 +261,7 @@ public class SyntaxAnalyzer : Analyzer<LexerNode, Node>
                     expr = _ParseSubscript(expr);
                     break;
                 case SyntaxKind.Token_Dot:
-
+                    expr = _ParseMemberAccess(expr);
                     break;
                 case SyntaxKind.Token_PlusPlus:
                 case SyntaxKind.Token_MinusMinus:
@@ -292,7 +293,7 @@ public class SyntaxAnalyzer : Analyzer<LexerNode, Node>
     (
         expr,
         _Match(SyntaxKind.Token_Dot),
-        _ParseName()
+        _Match(SyntaxKind.Token_Identifier)
     );
 
     Expression _ParsePrimary()

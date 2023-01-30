@@ -5,7 +5,7 @@ namespace Nyx.Tests;
 
 public class LexicalAnalyzerTests
 {
-    static SyntaxDefinition _syntax = SyntaxDefinition.Default();
+    static SyntaxInfo _syntax = SyntaxInfo.Default();
 
     [Theory]
     [MemberData(nameof(GetSingleTokenData))]

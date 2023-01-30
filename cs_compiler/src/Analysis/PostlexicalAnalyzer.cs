@@ -5,13 +5,13 @@ namespace Nyx.Analysis;
 
 public class PostlexicalAnalyzer : Analyzer<LexerNode, LexerNode>
 {
-    SyntaxDefinition _syntax;
+    SyntaxInfo _syntax;
     int _currentIndentDepth;
     int _currentLineIndentDepth;
     LexerNode _currentToken { get => _Peek(0); }
     TextLocation _currentHiddenLocation { get => new TextLocation(_currentToken.location.pos, 0); }
 
-    public PostlexicalAnalyzer(SyntaxDefinition syntax, List<LexerNode> tokens) : base(tokens, tokens.Last())
+    public PostlexicalAnalyzer(SyntaxInfo syntax, List<LexerNode> tokens) : base(tokens, tokens.Last())
     {
         _syntax = syntax;
         _currentIndentDepth = 0;

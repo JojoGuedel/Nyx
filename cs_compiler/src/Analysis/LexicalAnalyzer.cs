@@ -5,7 +5,7 @@ using Utils;
 
 public class LexicalAnalyzer : Analyzer<char, LexerNode>
 {
-    SyntaxDefinition _syntax;
+    SyntaxInfo _syntax;
     string _text;
     int _start;
     char _currentChar { get => _Peek(0); }
@@ -16,7 +16,7 @@ public class LexicalAnalyzer : Analyzer<char, LexerNode>
     bool _newLine;
 
 
-    public LexicalAnalyzer(SyntaxDefinition syntax, string text) : base(text.ToList(), syntax.endSymbol)
+    public LexicalAnalyzer(SyntaxInfo syntax, string text) : base(text.ToList(), syntax.endSymbol)
     {
         _syntax = syntax;
         _text = text;

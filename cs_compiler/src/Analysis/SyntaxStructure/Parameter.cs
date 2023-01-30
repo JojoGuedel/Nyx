@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Nyx.Symbols;
 using Nyx.Utils;
 
 namespace Nyx.Analysis;
