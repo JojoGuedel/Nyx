@@ -26,25 +26,19 @@ public class Name
     }
 }
 
-public class ScopeStack
-{
-    // TODO: reduce complexity???
-    Scope globalScope;
-    Stack<StructScope> structScopes;
-    Stack<ObjectScope> objectScopes;
-    Stack<ExecScope> execScopes;
-}
-
 public class Environment
 {
-    Stack<Scope> _scopes;
-    Scope _current { get => _scopes.Peek(); }
-    
-    public GlobalScope globalScope => (GlobalScope)_scopes.Last();
+    ScopeSymbol _current;
 
     public Environment()
     {
-        _scopes = new Stack<Scope>();
+        _current = new GlobalScope();
+    }
+
+    public void ExitAll()
+    {
+        while(_current.parent is not null)
+            _current = _current.parent;
     }
 
     public void EnterNamespace(Name name)
@@ -101,16 +95,93 @@ public class Environment
     // }
 }
 
-public abstract class Scope
+public class Namespace : Symbol
 {
-    public abstract Symbol LookupSymbol(Name name);
+    public Namespace(ScopeSymbol? parent) : base(parent) { }
+
+    bool _DeclObject() 
+    {
+        throw new NotImplementedException();
+    }
+
+    bool _DeclFunction() 
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Symbol? LookupSymbol(Name name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override bool DeclareSymbol(Symbol symbol)
+    {
+        if (symbol is )
+        throw new NotImplementedException();
+    }
 }
 
-public class ExecScope : Scope
+public class Scope
+{
+    Scope? _parent;
+    Dictionary<string, Symbol> _scope;
+
+    public Scope()
+    {
+        _scope = new Dictionary<string, Symbol>();
+    }
+
+    public Symbol? LookupSymbol(Name name)
+    {
+        var current = name.chain[0];
+
+        if (_parent is null)
+            return _LookupSymbol(name, 0);
+        
+        if (!_scope.ContainsKey(name.chain[0]))
+            ;
+
+        return 
+    }
+
+    public bool DeclareSymbol(Symbol symbol)
+    {
+        return _scope.TryAdd(symbol.name, symbol);
+    }
+
+    Symbol? _LookupSymbol(Name name, int index)
+    {
+        if ()
+
+        if (index >= name.chain.Length)
+            ;
+    }
+}
+
+public abstract class ScopeSymbol : Symbol
+{
+    public ScopeSymbol? parent { get; }
+    public Dictionary<string, Symbol> scope;
+
+    public ScopeSymbol(ScopeSymbol? parent)
+    {
+        this.parent = parent;
+        scope = new Dictionary<string, Symbol>();
+    }    
+
+    public abstract bool DeclareSymbol(Symbol symbol);
+}
+
+public class ExecScope : ScopeSymbol
 {
     Dictionary<string, Variable> _variables;
 
     public bool DeclVariable() 
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Symbol LookupSymbol(Name name)
     {
         throw new NotImplementedException();
     }
@@ -132,23 +203,7 @@ public class ObjectScope : Scope
     }
 }
 
-public class StructScope : Scope
-{
-    Dictionary<string, StructScope> _namespaces;
-    Dictionary<string, Object> _objects;
-
-    public bool DeclObject() 
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool DeclFunction() 
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class GlobalScope : StructScope
+public class GlobalScope : Namespace
 {
     // TODO: maybe allow global variables?
     Dictionary<string, Function> _functions;
@@ -169,7 +224,7 @@ public class ObjectDecl : Declaration
     string name;
 
     // List<TraitDeclaration> traits;
-    StructScope declaration;
+    Namespace declaration;
 }
 
 public class Parameters
@@ -204,29 +259,30 @@ public class VariableDecl : Declaration
 
 public abstract class Symbol
 {
-    public abstract Declaration declaration { get; }
+    public string name { get; }
+    // public abstract Declaration declaration { get; }
 }
 
 public class Function : Symbol
 {
-    public override FunctionDecl declaration => throw new NotImplementedException();
+    // public override FunctionDecl declaration => throw new NotImplementedException();
 
     ExecScope? implementation;
 }
 
 public class Object : Symbol
 {
-    public override ObjectDecl declaration => throw new NotImplementedException();
+    // public override ObjectDecl declaration => throw new NotImplementedException();
 }
 
 public class Property : Symbol
 {
-    public override PropertyDecl declaration => throw new NotImplementedException();
+    // public override PropertyDecl declaration => throw new NotImplementedException();
 }
 
 public class Variable : Symbol
 {
-    public override VariableDecl declaration => throw new NotImplementedException();
+    // public override VariableDecl declaration => throw new NotImplementedException();
 }
 
 public class Modifiers
