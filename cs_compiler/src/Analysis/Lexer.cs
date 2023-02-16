@@ -3,7 +3,7 @@ namespace Nyx.Analysis;
 using Diagnostics;
 using Utils;
 
-public class LexicalAnalyzer : Analyzer<char, LexerNode>
+public class Lexer : Analyzer<char, LexerNode>
 {
     SyntaxInfo _syntax;
     string _text;
@@ -16,7 +16,7 @@ public class LexicalAnalyzer : Analyzer<char, LexerNode>
     bool _newLine;
 
 
-    public LexicalAnalyzer(SyntaxInfo syntax, string text) : base(text.ToList(), syntax.endSymbol)
+    public Lexer(SyntaxInfo syntax, string text) : base(text.ToList(), syntax.endSymbol)
     {
         _syntax = syntax;
         _text = text;

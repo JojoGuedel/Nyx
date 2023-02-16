@@ -15,9 +15,6 @@ var input =
 
 // no templates
 
-static func add(var a: i32, var b: i32) -> i32:
-    return a + b;
-
 static func main() -> void:
     mut var a: i32 = 23123;
     print(a);";
@@ -63,13 +60,13 @@ void Compile(string input)
     var textInfo = new TextInfo(input);
     Console.WriteLine(textInfo.ToString());
 
-    var lexicalAnalyzer = new LexicalAnalyzer(syntax, input);
+    var lexicalAnalyzer = new Lexer(syntax, input);
     var tokens = lexicalAnalyzer.GetAll().ToList();
 
-    var postLexicalAnalyzer = new PostlexicalAnalyzer(syntax, tokens);
+    var postLexicalAnalyzer = new PostLexer(syntax, tokens);
     tokens = postLexicalAnalyzer.GetAll().ToList();
 
-    var syntaxAnaylzer = new SyntaxAnalyzer(syntax, tokens);
+    var syntaxAnaylzer = new Parser(syntax, tokens);
     var compilationUnit = syntaxAnaylzer.GetAll().ToImmutableArray();
     nodeWriter.Write(compilationUnit);
     Console.WriteLine();

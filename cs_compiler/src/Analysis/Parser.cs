@@ -4,11 +4,11 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class SyntaxAnalyzer : Analyzer<LexerNode, Node>
+public class Parser : Analyzer<LexerNode, Node>
 {
     SyntaxInfo _syntax; 
     // TODO: probably change this
-    public SyntaxAnalyzer(SyntaxInfo syntax, List<LexerNode> values) : 
+    public Parser(SyntaxInfo syntax, List<LexerNode> values) : 
         base(values, values.Last())
     {
         _syntax = syntax;
@@ -49,7 +49,16 @@ public class SyntaxAnalyzer : Analyzer<LexerNode, Node>
 
     Identifier _ParseIdentifier() => new Identifier(_Match(SyntaxKind.Token_Identifier));
     // TODO: change this
-    Expression _ParseName() => _ParsePostFix();
+
+    Expression _ParseName()
+    {
+        Expression expr = _ParseIdentifier();
+
+        while (_current.kind == SyntaxKind.Token_Dot)
+            expr = _ParseMemberAccess(expr);
+
+        return expr;
+    }
 
     CompilationUnit _ParseCompilationUnit()
     {

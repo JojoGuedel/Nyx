@@ -14,7 +14,7 @@ public class LexicalAnalyzerTests
     [MemberData(nameof(GetAdditionalTokenData))]
     void TestTokens(string input, params SyntaxKind[] expected)
     {
-        var lexicalAnalyzer = new LexicalAnalyzer(_syntax, input);
+        var lexicalAnalyzer = new Lexer(_syntax, input);
         var result = lexicalAnalyzer.GetAll().ToList();
 
         for (int i = 0; i < expected.Length; i++)

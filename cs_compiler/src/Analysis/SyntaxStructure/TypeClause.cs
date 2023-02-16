@@ -3,7 +3,6 @@ namespace Nyx.Analysis;
 public class  TypeClause : Node
 {
     public Expression type { get; }
-    public TypeSystem.Symbol? symbol { get; private set; }
 
     // TODO: make constructor for arrow
     public TypeClause(LexerNode clauseInit, Expression type) :
@@ -19,12 +18,12 @@ public class  TypeClause : Node
         type.Write(writer, indent, true);
     }
 
-    public bool TryAssignSymbol(TypeSystem.Symbol typeSymbol)
-    {
-        if (this.symbol is not null)
-            return false;
+    // public bool TryAssignSymbol(TypeSystem.Symbol typeSymbol)
+    // {
+    //     if (this.symbol is not null)
+    //         return false;
         
-        symbol = typeSymbol;
-        return true;
-    }
+    //     symbol = typeSymbol;
+    //     return true;
+    // }
 }
