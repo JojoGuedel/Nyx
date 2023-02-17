@@ -5,10 +5,18 @@ namespace Nyx.Symbols;
 public abstract class Symbol
 {
     public string name { get; }
+    public string fullName { get; }
+
     public abstract ReadonlyScope? scope { get; }
 
-    public Symbol(string name)
+    public Symbol(string name, Symbol? parent)
     {
         this.name = name;
+        fullName = string.Empty;
+
+        if (parent is not null)
+            fullName += parent.fullName + ".";
+        
+        fullName += this.name;
     }
 }

@@ -6,7 +6,7 @@ public class Namespace : Symbol
 {
     public override Scope scope { get; }
 
-    public Namespace(string name) : base(name)
+    public Namespace(string name, Namespace? parent) : base(name, parent)
     {
         scope = new Scope();
     }

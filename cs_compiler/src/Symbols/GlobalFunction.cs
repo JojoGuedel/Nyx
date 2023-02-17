@@ -11,7 +11,7 @@ public class GlobalFunction : Symbol
     // TODO: system to automaticly recognize returntype
     public Type returnType { get; }
 
-    public GlobalFunction(string name, ImmutableArray<Parameter> parameters, Type returnType) : base(name)
+    public GlobalFunction(string name, ImmutableArray<Parameter> parameters, Type returnType) : base(name, null)
     {
         this.parameters = parameters;
         this.returnType = returnType;

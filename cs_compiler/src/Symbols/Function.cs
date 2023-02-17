@@ -12,7 +12,7 @@ public class Function : Symbol
     public Type returnType { get; }
     public FunctionModifier modifiers { get; }
 
-    public Function(string name, ImmutableArray<Parameter> parameters, Type returnType, FunctionModifier modifiers) : base(name)
+    public Function(string name, ImmutableArray<Parameter> parameters, Type returnType, FunctionModifier modifiers, Type parent) : base(name, parent)
     {
         this.parameters = parameters;
         this.returnType = returnType;

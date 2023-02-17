@@ -9,7 +9,7 @@ public class Variable : Symbol
     public Type type { get; }
     public VariableModifier modifiers { get; }
 
-    public Variable(string name, Type type, VariableModifier modifiers) : base(name)
+    public Variable(string name, Type type, VariableModifier modifiers) : base(name, null)
     {
         this.type = type;
         this.modifiers = modifiers;

@@ -18,8 +18,7 @@ public class ReadonlyScope
     }
 }
 
-public class 
-Scope : ReadonlyScope
+public class Scope : ReadonlyScope
 {
     public bool DeclareSymbol(Symbol symbol)
     {

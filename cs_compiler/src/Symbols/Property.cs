@@ -9,7 +9,7 @@ public class Property : Symbol
     public Type type { get; }
     public PropertyModifier modifiers { get; }
 
-    public Property(string name, Type type, PropertyModifier modifiers) : base(name)
+    public Property(string name, Type type, PropertyModifier modifiers, Type parent) : base(name, parent)
     {
         this.type = type;
         this.modifiers = modifiers;
