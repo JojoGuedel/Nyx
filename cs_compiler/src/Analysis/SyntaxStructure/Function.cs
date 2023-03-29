@@ -42,3 +42,39 @@ public class Function : Member
         body.Write(writer, indent, true);
     }
 }
+
+public abstract class StructMember : Node
+{
+    protected StructMember(TextLocation location) : base(location) { }
+}
+
+public class FunctionDefinition : StructMember
+{
+
+}
+
+public class Property : StructMember
+{
+
+}
+
+public class Struct : Member
+{
+    public Identifier name { get; }
+    public ImmutableArray<StructMember> members { get; }
+
+    public Struct(LexerNode @struct, Identifier name, ImmutableArray<StructMember> members) : 
+        base(members.Length > 0? TextLocation.Embrace(@struct.location, members.Last().location) : name.location)
+    {
+        this.name = name;
+        this.members = members;
+    }
+
+    public override void Write(TextWriter writer, string indent, bool isLast)
+    {
+        _WriteName(writer, indent, isLast, "Struct");
+        indent += _ChildIndent(isLast);
+        name.Write(writer, indent, false);
+        _WriteArray(writer, indent, true, "Parameter", Array.ConvertAll(members.ToArray(), (StructMember member) => (Node)member));
+    }
+}

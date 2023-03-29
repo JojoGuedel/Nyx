@@ -1,8 +1,8 @@
-Wtrait MyTrait:
+trait MyTrait:
     // maybe "int a"?
     var a: int => pub get, set;
 
-    pub static func add(var a: Property, var b: Property) -> int or error;
+    pub static func add(var a: Property, var b: Property): int or error => none;
 
 struct MyStruct:
     extends MyTrait;

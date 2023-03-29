@@ -6,7 +6,7 @@ namespace Nyx.Analysis;
 public class MemberAccess : Expression
 {
     public Expression expression { get; }
-    public Identifier name { get; }
+    public Identifier identifier { get; }
     
     public MemberAccess(Expression expression, LexerNode dot, LexerNode name) : 
         base(TextLocation.Embrace(expression.location, name.location))
@@ -14,7 +14,7 @@ public class MemberAccess : Expression
         Debug.Assert(name.value != null);
 
         this.expression = expression;
-        this.name = new Identifier(name);
+        this.identifier = new Identifier(name);
     }
 
     public override void Write(TextWriter writer, string indent, bool isLast)
@@ -22,6 +22,6 @@ public class MemberAccess : Expression
         _WriteName(writer, indent, isLast, "MemberAccess");
         indent += _ChildIndent(isLast);
         expression.Write(writer, indent, false);
-        name.Write(writer, indent, true);
+        identifier.Write(writer, indent, true);
     }
 }

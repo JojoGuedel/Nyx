@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cs_compiler", "cs_compiler\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cs_compiler_tests", "cs_compiler_tests\cs_compiler_tests.csproj", "{3F0EA723-B087-4FCB-BA44-9BF37A7AF055}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cs_compiler_sandbox", "cs_compiler_sandbox\cs_compiler_sandbox.csproj", "{E8E83072-0593-4E52-AACD-16AE5E369D69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{3F0EA723-B087-4FCB-BA44-9BF37A7AF055}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F0EA723-B087-4FCB-BA44-9BF37A7AF055}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F0EA723-B087-4FCB-BA44-9BF37A7AF055}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8E83072-0593-4E52-AACD-16AE5E369D69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8E83072-0593-4E52-AACD-16AE5E369D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8E83072-0593-4E52-AACD-16AE5E369D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8E83072-0593-4E52-AACD-16AE5E369D69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

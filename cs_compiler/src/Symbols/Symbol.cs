@@ -7,7 +7,7 @@ public abstract class Symbol
     public string name { get; }
     public string fullName { get; }
 
-    public abstract ReadonlyScope? scope { get; }
+    public abstract IReadonlyScope? scope { get; }
 
     public Symbol(string name, Symbol? parent)
     {

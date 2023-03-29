@@ -181,6 +181,7 @@ public class SyntaxInfo
         syntax.DefineDoubleToken(('/', '='), SyntaxKind.Token_SlashEqual);
         syntax.DefineDoubleToken(('%', '='), SyntaxKind.Token_PercentEqual);
 
+        syntax.DefineKeyword("struct", SyntaxKind.Keyword_Struct);
         syntax.DefineKeyword("global", SyntaxKind.Keyword_Global);
         syntax.DefineKeyword("static", SyntaxKind.Keyword_Static);
         syntax.DefineKeyword("mut", SyntaxKind.Keyword_Mutable);

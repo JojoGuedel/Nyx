@@ -72,7 +72,21 @@ public class Parser : Analyzer<LexerNode, Node>
     }
 
     // TODO: parse structs
-    Member _ParseMember() => _ParseFunction();
+    Member _ParseMember()
+    {
+        switch(_current.kind)
+        {
+            case SyntaxKind.Keyword_Function:
+                return _ParseFunction();
+            case SyntaxKind.Keyword_Struct:
+                throw new NotImplementedException();
+            case SyntaxKind.Keyword_Global:
+                return _ParseGlobal();
+            default: 
+                // TODO: add diagnostics
+                throw new NotImplementedException();
+        }
+    }
 
     Function _ParseFunction() => new Function
     (
@@ -87,9 +101,24 @@ public class Parser : Analyzer<LexerNode, Node>
         _ParseBlock()
     );
 
+    // TODO: parse global variables
+    GlobalMember _ParseGlobal() => _ParseGlobalFunction();
+
+    GlobalFunction _ParseGlobalFunction() => new GlobalFunction
+    (
+        _Match(SyntaxKind.Keyword_Global),
+        _Match(SyntaxKind.Keyword_Function),
+        _ParseIdentifier(),
+        _Match(SyntaxKind.Token_LParen),
+        _ParseUntil(SyntaxKind.Token_RParen, _PraseParameter),
+        _Match(SyntaxKind.Token_RParen),
+        _ParseFunctionTypeClause(),
+        _Match(SyntaxKind.Token_Colon),
+        _ParseBlock()
+    );
+
     Modifiers _ParseModifiers() => new Modifiers
     (
-        _ParseOptional(SyntaxKind.Keyword_Global),
         _ParseOptional(SyntaxKind.Keyword_Static),
         _ParseOptional(SyntaxKind.Keyword_Mutable)
     );
@@ -264,7 +293,7 @@ public class Parser : Analyzer<LexerNode, Node>
             switch (_current.kind)
             {
                 case SyntaxKind.Token_LParen:
-                    expr = _ParseFunctionCall(expr);
+                    expr = _ParseCall(expr);
                     break;
                 case SyntaxKind.Token_LSquare:
                     expr = _ParseSubscript(expr);
@@ -282,7 +311,7 @@ public class Parser : Analyzer<LexerNode, Node>
         }
     }
 
-    FunctionCall _ParseFunctionCall(Expression expr) => new FunctionCall
+    FunctionCall _ParseCall(Expression expr) => new FunctionCall
     (
         expr,
         _Match(SyntaxKind.Token_LParen),

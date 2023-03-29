@@ -15,7 +15,8 @@ var input =
 
 // no templates
 
-static func main() -> void:
+global func main() -> void:
+    a.b.c.d.e;
     mut var a: i32 = 23123;
     print(a);";
 
@@ -27,19 +28,6 @@ Console.ReadKey(true);
 //     Console.Write("> ");
 
 //     var input = Console.ReadLine();
-//     input =
-// @"
-// func b(c,):
-//         // var a = 10;
-//     if true:
-//         pass;
-//     else if true:
-//         pass;
-//     else:
-//         pass;
-
-// func d():
-//     pass;";
 
 //     if (input is null)
 //         input=String.Empty;
