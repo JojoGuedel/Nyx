@@ -27,7 +27,7 @@ func add(value):
     return error "Only add numbers bigger than 0" if (value < 0) else self.sum += value;
 
 // create exposed variable
-global var sum: float;
+global mut var sum: float;
 
 // there is only one main function that is allways global and return void or error
 global func main():
