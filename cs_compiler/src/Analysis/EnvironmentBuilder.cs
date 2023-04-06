@@ -90,7 +90,7 @@ public class EnvironmentBuilder
     {
         foreach(var member in _compilationUnit.members)
         {
-            
+            if (member is )
         } 
         throw new NotImplementedException();
     }

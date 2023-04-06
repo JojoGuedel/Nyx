@@ -84,7 +84,7 @@ public class PostLexer : Analyzer<LexerNode, LexerNode>
         return line;
     }
 
-    public override IEnumerable<LexerNode> GetAll()
+    public override IEnumerable<LexerNode> Analyze()
     {
         while (!isFinished)
         {

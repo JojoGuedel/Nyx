@@ -14,7 +14,7 @@ public class Parser : Analyzer<LexerNode, Node>
         _syntax = syntax;
     }
 
-    public override IEnumerable<Node> GetAll()
+    public override IEnumerable<Node> Analyze()
     {
         yield return _ParseCompilationUnit();
     }

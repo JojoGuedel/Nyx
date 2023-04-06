@@ -49,13 +49,13 @@ void Compile(string input)
     Console.WriteLine(textInfo.ToString());
 
     var lexicalAnalyzer = new Lexer(syntax, input);
-    var tokens = lexicalAnalyzer.GetAll().ToList();
+    var tokens = lexicalAnalyzer.Analyze().ToList();
 
     var postLexicalAnalyzer = new PostLexer(syntax, tokens);
-    tokens = postLexicalAnalyzer.GetAll().ToList();
+    tokens = postLexicalAnalyzer.Analyze().ToList();
 
     var syntaxAnaylzer = new Parser(syntax, tokens);
-    var compilationUnit = syntaxAnaylzer.GetAll().ToImmutableArray();
+    var compilationUnit = syntaxAnaylzer.Analyze().ToImmutableArray();
     nodeWriter.Write(compilationUnit);
     Console.WriteLine();
 

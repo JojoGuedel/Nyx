@@ -118,7 +118,7 @@ public class Lexer : Analyzer<char, LexerNode>
         }
     }
 
-    public override IEnumerable<LexerNode> GetAll()
+    public override IEnumerable<LexerNode> Analyze()
     {
         LexerNode token;
         do

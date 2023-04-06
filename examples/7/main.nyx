@@ -21,10 +21,10 @@ global struct MyStruct:
 func MyStruct.funcOne():
     return A();
 
-func add(value):
+func MyStruct.add(value):
     // oneliners
     // if the value is bigger than 0 then this funtion will return void and not the sum
-    return error "Only add numbers bigger than 0" if (value < 0) else self.sum += value;
+    return error "Only add numbers bigger than 0." if (value < 0) else self.sum += value;
 
 // create exposed variable
 global mut var sum: float;
