@@ -2,14 +2,6 @@ using System.Collections.Immutable;
 
 namespace Nyx.Analysis;
 
-public static class NodeWriterIndents
-{
-    public const string indent = "    ";
-    public const string childIndent = "│   ";
-    public const string childNode = "├── ";
-    public const string leafNode = "└── ";
-}
-
 public class NodeWriter
 {
     TextWriter _writer;

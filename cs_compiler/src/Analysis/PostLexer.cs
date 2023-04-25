@@ -1,103 +1,99 @@
+using System.Diagnostics;
 using Nyx.Diagnostics;
 using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class PostLexer : Analyzer<LexerNode, LexerNode>
+internal class PostLexer
 {
-    SyntaxInfo _syntax;
-    int _currentIndentDepth;
-    int _currentLineIndentDepth;
-    LexerNode _currentToken { get => _Peek(0); }
-    TextLocation _currentHiddenLocation { get => new TextLocation(_currentToken.location.pos, 0); }
+    IEnumerator<Token> _source;
 
-    public PostLexer(SyntaxInfo syntax, List<LexerNode> tokens) : base(tokens, tokens.Last())
+    bool _finished = false;
+
+    Token _last;
+    Token _current;
+
+    int _indent = 0;
+    int _lineIndent = 0;
+
+    public PostLexer(IEnumerator<Token> source)
     {
-        _syntax = syntax;
-        _currentIndentDepth = 0;
-        _currentLineIndentDepth = 0;
+        _source = source;
+
+        // TODO: this is not a good solution. I have to fix this later
+        _current = _Next();
+        _last = new Token(TokenKind._error, _current.location.Point());
+
+        _Next();
     }
 
-    bool _Discard(LexerNode token)
+    Token _Next()
     {
-        return
-            token.kind == SyntaxKind.Token_Discard ||
-            token.kind == SyntaxKind.Token_Comment ||
-            _syntax.IsWhiteSpace(token.kind);
+        Debug.Assert(_source.MoveNext());
+
+        _last = _current;
+        _current = _source.Current;
+
+        return _last;
     }
 
-    bool _IsEmptyToken(LexerNode token)
+    List<Token> _GetLine()
     {
-        return
-            _Discard(token) ||
-            token.kind == SyntaxKind.Token_BeginBlock ||
-            token.kind == SyntaxKind.Token_EndBlock;
-    }
+        var line = new List<Token>();
+        var indent = 0;
 
-    bool _IsEmptyLine(List<LexerNode> line)
-    {
-        var isEmpty = true;
-
-        foreach(var token in line)
+        while (_current.kind == TokenKind.indent)
         {
-            if (!_IsEmptyToken(token))
-            {
-                isEmpty = false;
-                break;
-            }
+            _Next();
+            indent++;
         }
 
-        return isEmpty;
-    }
-
-    List<LexerNode> GetNextLine()
-    {
-        var line = new List<LexerNode>();
-        var indentDepth = 0;
-
-        while (_currentToken.kind == SyntaxKind.Token_Indent)
-        {
-            _IncrementPos();
-            indentDepth++;
-        }
-
-        var d = indentDepth - _currentIndentDepth;
-
+        var d = indent - _indent;
         if (d == 1)
-            line.Add(new LexerNode(SyntaxKind.Token_BeginBlock, _currentHiddenLocation));
+            line.Add(new Token(TokenKind.beginBlock, _current.location.Point()));
         else if (d < 0)
             for (var i = 0; i < -d; i++)
-                line.Add(new LexerNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation));
+                line.Add(new Token(TokenKind.endBlock, _current.location.Point()));
         else if (d > 1)
-            diagnostics.Add(new TooManyIndents(_currentToken.location));
+            // TODO: diagnostics
+            throw new NotImplementedException();
         
-        _currentLineIndentDepth = indentDepth;
+        _lineIndent = indent;
 
-        while(!_syntax.IsLineTerminator(_currentToken.kind))
-            line.Add(_ReadNext());
+        while(!SyntaxInfo.IsLineTerminator(_current.kind))
+            line.Add(_Next());
 
-        if (_currentToken.kind == SyntaxKind.Token_End)
-            for (var i = 0; i < _currentIndentDepth + d; i++)
-                line.Add(new LexerNode(SyntaxKind.Token_EndBlock, _currentHiddenLocation));
-        line.Add(_ReadNext());
+        if (_current.kind == TokenKind.end)
+            for (var i = 0; i < _indent + d; i++)
+                line.Add(new Token(TokenKind.endBlock, _current.location.Point()));
+        line.Add(_current);
         
         return line;
     }
 
-    public override IEnumerable<LexerNode> Analyze()
+    bool _IsEmptyLine(IEnumerable<Token> line)
     {
-        while (!isFinished)
+        foreach(var token in line)
+            if (!SyntaxInfo.IsEmpty(token.kind))
+                return false;
+
+        return true;
+    }
+
+    internal IEnumerable<Token> Analyze()
+    {
+        while (_current.kind != TokenKind.end)
         {
-            var currentLine = GetNextLine();
+            var line = _GetLine();
 
-            if (!_IsEmptyLine(currentLine))
-            {
-                foreach(var token in currentLine)
-                    if (!_Discard(token))
-                        yield return token;
+            if (_IsEmptyLine(line))
+                continue;
 
-                _currentIndentDepth = _currentLineIndentDepth;
-            }
+            foreach(var token in line)
+                if (!SyntaxInfo.IsDiscard(token.kind))
+                    yield return token;
+
+            _indent = _lineIndent;
         }
     }
 }

@@ -1,207 +1,178 @@
+using System.Collections.Immutable;
+using System.Diagnostics;
+
 namespace Nyx.Analysis;
 
-public class SyntaxInfo
+internal static class SyntaxInfo
 {
-    public int indentSize { get; }
-    public char escapeSymbol { get; }
-    public char newLineSymbol { get; }
-    public char endSymbol { get; }
+    private static ImmutableDictionary<char, TokenKind> _singleMarker;
+    private static ImmutableDictionary<(char, char), TokenKind> _doubleMarker;
+    private static ImmutableDictionary<string, TokenKind> _keywords;
 
-    public int maxOperatorPrecedence { get; }
+    internal const int maxOperatorPrecedence = 7;
+    internal const int tokenKindIndex = -9;
+    internal const int indentSize = 4;
 
-    public Dictionary<char, SyntaxKind> singleTokens { get; }
-    public Dictionary<(char, char), SyntaxKind> doubleTokens { get; }
+    internal const char escapeChar = '\\';
+    internal const char newLineChar = '\n';
+    internal const char endChar = '\0';
 
-    public Dictionary<string, SyntaxKind> keywords { get; }
-
-    public SyntaxInfo(
-        int indentSize=4,
-        char escapeSymbol = '\\',
-        char lineEndSymbol = '\n',
-        char endSymbol='\u0000'
-    )
+    static SyntaxInfo()
     {
-        singleTokens = new Dictionary<char, SyntaxKind>();
-        doubleTokens = new Dictionary<(char, char), SyntaxKind>();
+        var singleMarker = ImmutableDictionary.CreateBuilder<char, TokenKind>();
+        var doubleMarker = ImmutableDictionary.CreateBuilder<(char, char), TokenKind>();
+        var keywords = ImmutableDictionary.CreateBuilder<string, TokenKind>();
 
-        keywords = new Dictionary<string, SyntaxKind>();
+        // Markers
+        singleMarker.Add('\r', TokenKind.discard);
+        singleMarker.Add(' ', TokenKind.space);
+        singleMarker.Add(newLineChar, TokenKind.newLine);
+        singleMarker.Add(endChar, TokenKind.end);
 
-        this.indentSize = indentSize;
+        // charMarker has to be singleMarker or it will break the lexer
+        singleMarker.Add('\'', TokenKind.charMarker);
+        // stringMarker has to be singleMarker or it will break the lexer
+        singleMarker.Add('"', TokenKind.stringMarker);
+        singleMarker.Add(escapeChar, TokenKind.escapeChar);
+        doubleMarker.Add(('/', '/'), TokenKind.comment);
+        doubleMarker.Add(('/', '*'), TokenKind.commentBeginMarker);
+        doubleMarker.Add(('*', '/'), TokenKind.commentEndMarker);
 
-        this.escapeSymbol = escapeSymbol;
+        singleMarker.Add('(', TokenKind.lParen);
+        singleMarker.Add(')', TokenKind.rParen);
+        singleMarker.Add('[', TokenKind.lSquare);
+        singleMarker.Add(']', TokenKind.rSquare);
 
-        this.newLineSymbol = lineEndSymbol;
-        DefineSingleToken(lineEndSymbol, SyntaxKind.Token_NewLine);
+        singleMarker.Add('.', TokenKind.dot);
+        singleMarker.Add(',', TokenKind.comma);
+        singleMarker.Add(':', TokenKind.colon);
+        singleMarker.Add(';', TokenKind.semiColon);
+        doubleMarker.Add(('-', '>'), TokenKind.rArrow);
+        doubleMarker.Add(('=', '>'), TokenKind.bigRArrow);
 
-        this.endSymbol = endSymbol;
-        DefineSingleToken(endSymbol, SyntaxKind.Token_End);
+        singleMarker.Add('+', TokenKind.plus);
+        singleMarker.Add('-', TokenKind.minus);
+        singleMarker.Add('*', TokenKind.star);
+        singleMarker.Add('/', TokenKind.slash);
 
-        maxOperatorPrecedence = 7;
+        singleMarker.Add('<', TokenKind.less);
+        singleMarker.Add('>', TokenKind.greater);
+        singleMarker.Add('=', TokenKind.equal);
+        singleMarker.Add('%', TokenKind.percent);
+
+        doubleMarker.Add(('=', '='), TokenKind.equalEqual);
+        doubleMarker.Add(('!', '='), TokenKind.notEqual);
+        doubleMarker.Add(('<', '='), TokenKind.lessEqual);
+        doubleMarker.Add(('>', '='), TokenKind.greaterEqual);
+
+        doubleMarker.Add(('+', '+'), TokenKind.plusPlus);
+        doubleMarker.Add(('+', '='), TokenKind.plusEqual);
+        doubleMarker.Add(('-', '-'), TokenKind.minusMinus);
+        doubleMarker.Add(('-', '='), TokenKind.minusEqual);
+        doubleMarker.Add(('*', '='), TokenKind.starEqual);
+        doubleMarker.Add(('/', '='), TokenKind.slashEqual);
+        doubleMarker.Add(('%', '='), TokenKind.percentEqual);
+
+        // Keywords
+        keywords.Add("namespace", TokenKind.@namespace);
+        keywords.Add("struct", TokenKind.@struct);
+        keywords.Add("func", TokenKind.function);
+        keywords.Add("var", TokenKind.var);
+
+        keywords.Add("global", TokenKind.global);
+        keywords.Add("static", TokenKind.@static);
+        
+        keywords.Add("mut", TokenKind.mutable);
+        keywords.Add("pub", TokenKind.@public);
+        keywords.Add("get", TokenKind.get);
+        keywords.Add("set", TokenKind.set);
+
+        keywords.Add("return", TokenKind.@return);
+        keywords.Add("error", TokenKind.error);
+
+        keywords.Add("if", TokenKind.@if);
+        keywords.Add("else", TokenKind.@else);
+        keywords.Add("not", TokenKind.not);
+        keywords.Add("and", TokenKind.and);
+        keywords.Add("or", TokenKind.or);
+
+        keywords.Add("switch", TokenKind.@switch);
+        keywords.Add("case", TokenKind.@case);
+        keywords.Add("default", TokenKind.@default);
+        keywords.Add("for", TokenKind.@for);
+        keywords.Add("do", TokenKind.@do);
+        keywords.Add("while", TokenKind.@while);
+        keywords.Add("continue", TokenKind.@continue);
+        keywords.Add("break", TokenKind.@break);
+
+        keywords.Add("include", TokenKind.include);
+        keywords.Add("as", TokenKind.@as);
+
+        _singleMarker = singleMarker.ToImmutable();
+        _doubleMarker = doubleMarker.ToImmutable();
+        _keywords = keywords.ToImmutable();
     }
 
-    public void DefineSingleToken(char pattern, SyntaxKind kind)
-    {
-        singleTokens.Add(pattern, kind);
-    }
+    internal static TokenKind GetTokenKind(char pattern) => _singleMarker.GetValueOrDefault(pattern);
+    internal static TokenKind GetTokenKind((char, char) pattern) => _doubleMarker.GetValueOrDefault(pattern);
+    internal static TokenKind GetTokenKind(string name) => _keywords.GetValueOrDefault(name);
 
-    public SyntaxKind GetSingleTokenKind(char pattern)
+    internal static TokenKind GetMarker((char, char) pattern)
     {
-        var kind = SyntaxKind.Token_Error;
-        singleTokens.TryGetValue(pattern, out kind);
+        var kind = GetTokenKind(pattern);
+
+        if (kind == TokenKind._error)
+            kind = GetTokenKind(pattern.Item2);
+
         return kind;
     }
 
-    public void DefineDoubleToken((char, char) pattern, SyntaxKind kind)
-    {
-        doubleTokens.Add(pattern, kind);
-    }
+    internal static bool IsLineTerminator(TokenKind marker) => marker == TokenKind.newLine || marker == TokenKind.end;
+    internal static bool IsLineTerminator((char, char) pattern) => IsLineTerminator(GetMarker(pattern));
 
-    public SyntaxKind GetDoubleTokenKind((char, char) pattern)
-    {
-        var kind = SyntaxKind.Token_Error;
-        doubleTokens.TryGetValue(pattern, out kind);
-        return kind;
-    }
+    internal static bool IsWhiteSpace(TokenKind marker) => marker == TokenKind.space || marker == TokenKind.newLine || marker == TokenKind.indent;
+    internal static bool IsWhiteSpace((char, char) pattern) => IsWhiteSpace(GetMarker(pattern));
 
-    public void DefineKeyword(string pattern, SyntaxKind kind)
-    {
-        keywords.Add(pattern, kind);
-    }
+    internal static bool IsBlockTerminator(TokenKind marker) => marker == TokenKind.end || marker == TokenKind.endBlock;
 
-    public SyntaxKind GetKeyword(string pattern)
-    {
-        var kind = SyntaxKind.Token_Error;
-        keywords.TryGetValue(pattern, out kind);
-        return kind;
-    }
+    internal static bool IsBlockCommentTerimator(TokenKind marker) => marker == TokenKind.end || marker == TokenKind.commentEndMarker;
+    internal static bool IsBlockCommentTerimator((char, char) pattern) => IsBlockCommentTerimator(GetMarker(pattern));
+    
+    internal static bool IsDiscard(TokenKind marker) => marker == TokenKind.discard || marker == TokenKind.comment || marker == TokenKind.space || marker == TokenKind.indent;
 
-    public bool IsLineTerminator(char pattern)
-    {
-        return
-            pattern == newLineSymbol ||
-            pattern == endSymbol;
-    }
+    internal static bool IsEmpty(TokenKind marker) =>  IsDiscard(marker) || marker ==  TokenKind.newLine || marker == TokenKind.beginBlock || marker == TokenKind.endBlock;
 
-    public bool IsLineTerminator(SyntaxKind kind)
+    internal static int GetOperatorPrecedence(TokenKind marker)
     {
-        return
-            kind == SyntaxKind.Token_NewLine ||
-            kind == SyntaxKind.Token_End;
-    }
-
-    public bool IsWhiteSpace(SyntaxKind kind)
-    {
-        return
-            kind == SyntaxKind.Token_Indent ||
-            kind == SyntaxKind.Token_Space ||
-            kind == SyntaxKind.Token_NewLine;
-    }
-
-    public bool IsBlockTerminator(SyntaxKind kind)
-    {
-        return 
-            kind == SyntaxKind.Token_EndBlock ||
-            kind == SyntaxKind.Token_End;
-    }
-
-    public int BinaryOperatorPrecedence(SyntaxKind kind)
-    {
-        switch (kind)
+        switch (marker)
         {
-            case SyntaxKind.Token_Equal:
-            case SyntaxKind.Token_PlusEqual:
-            case SyntaxKind.Token_MinusEqual:
-            case SyntaxKind.Token_StarEqual:
-            case SyntaxKind.Token_SlashEqual:
-            case SyntaxKind.Token_PercentEqual:
+            case TokenKind.equal:
+            case TokenKind.plusEqual:
+            case TokenKind.minusEqual:
+            case TokenKind.starEqual:
+            case TokenKind.slashEqual:
+            case TokenKind.percentEqual:
                 return 7;
-            case SyntaxKind.Keyword_Or:
+            case TokenKind.or:
                 return 6;
-            case SyntaxKind.Keyword_And:
+            case TokenKind.and:
                 return 5;
-            case SyntaxKind.Token_EqualEqual:
-            case SyntaxKind.Token_NotEqual:
+            case TokenKind.equalEqual:
+            case TokenKind.notEqual:
                 return 4;
-            case SyntaxKind.Token_Greater:
-            case SyntaxKind.Token_GreaterEqual:
-            case SyntaxKind.Token_Less:
-            case SyntaxKind.Token_LessEqual:
+            case TokenKind.greater:
+            case TokenKind.greaterEqual:
+            case TokenKind.less:
+            case TokenKind.lessEqual:
                 return 3;
-            case SyntaxKind.Token_Plus:
-            case SyntaxKind.Token_Minus:
+            case TokenKind.plus:
+            case TokenKind.minus:
                 return 2;
-            case SyntaxKind.Token_Star:
-            case SyntaxKind.Token_Slash:
+            case TokenKind.star:
+            case TokenKind.slash:
                 return 1;
             default: 
                 return 0;
         }
-    }
-
-    public static SyntaxInfo Default()
-    {
-        var syntax = new SyntaxInfo();
-
-        syntax.DefineSingleToken('\r', SyntaxKind.Token_Discard);
-        syntax.DefineSingleToken(' ', SyntaxKind.Token_Space);
-        syntax.DefineDoubleToken(('/', '/'), SyntaxKind.Token_CommentMarker);
-        syntax.DefineSingleToken('"', SyntaxKind.Token_StringMarker);
-
-        syntax.DefineSingleToken('(', SyntaxKind.Token_LParen);
-        syntax.DefineSingleToken(')', SyntaxKind.Token_RParen);
-        syntax.DefineSingleToken('[', SyntaxKind.Token_LSquare);
-        syntax.DefineSingleToken(']', SyntaxKind.Token_RSquare);
-
-        syntax.DefineSingleToken('.', SyntaxKind.Token_Dot);
-        syntax.DefineSingleToken(',', SyntaxKind.Token_Comma);
-        syntax.DefineSingleToken(':', SyntaxKind.Token_Colon);
-        syntax.DefineSingleToken(';', SyntaxKind.Token_Semicolon);
-        syntax.DefineDoubleToken(('-', '>'), SyntaxKind.Token_RArrow);
-
-        syntax.DefineSingleToken('+', SyntaxKind.Token_Plus);
-        syntax.DefineSingleToken('-', SyntaxKind.Token_Minus);
-        syntax.DefineSingleToken('*', SyntaxKind.Token_Star);
-        syntax.DefineSingleToken('/', SyntaxKind.Token_Slash);
-
-        syntax.DefineSingleToken('<', SyntaxKind.Token_Less);
-        syntax.DefineSingleToken('>', SyntaxKind.Token_Greater);
-        syntax.DefineSingleToken('=', SyntaxKind.Token_Equal);
-        syntax.DefineSingleToken('%', SyntaxKind.Token_Percent);
-
-        syntax.DefineDoubleToken(('=', '='), SyntaxKind.Token_EqualEqual);
-        syntax.DefineDoubleToken(('!', '='), SyntaxKind.Token_NotEqual);
-        syntax.DefineDoubleToken(('<', '='), SyntaxKind.Token_LessEqual);
-        syntax.DefineDoubleToken(('>', '='), SyntaxKind.Token_GreaterEqual);
-
-        syntax.DefineDoubleToken(('+', '+'), SyntaxKind.Token_PlusPlus);
-        syntax.DefineDoubleToken(('+', '='), SyntaxKind.Token_PlusEqual);
-        syntax.DefineDoubleToken(('-', '-'), SyntaxKind.Token_MinusMinus);
-        syntax.DefineDoubleToken(('-', '='), SyntaxKind.Token_MinusEqual);
-        syntax.DefineDoubleToken(('*', '='), SyntaxKind.Token_StarEqual);
-        syntax.DefineDoubleToken(('/', '='), SyntaxKind.Token_SlashEqual);
-        syntax.DefineDoubleToken(('%', '='), SyntaxKind.Token_PercentEqual);
-
-        syntax.DefineKeyword("struct", SyntaxKind.Keyword_Struct);
-        syntax.DefineKeyword("global", SyntaxKind.Keyword_Global);
-        syntax.DefineKeyword("static", SyntaxKind.Keyword_Static);
-        syntax.DefineKeyword("mut", SyntaxKind.Keyword_Mutable);
-        syntax.DefineKeyword("var", SyntaxKind.Keyword_Var);
-        syntax.DefineKeyword("func", SyntaxKind.Keyword_Function);
-        syntax.DefineKeyword("return", SyntaxKind.Keyword_Return);
-        syntax.DefineKeyword("if", SyntaxKind.Keyword_If);
-        syntax.DefineKeyword("else", SyntaxKind.Keyword_Else);
-        syntax.DefineKeyword("and", SyntaxKind.Keyword_And);
-        syntax.DefineKeyword("or", SyntaxKind.Keyword_Or);
-        // syntax.DefineKeyword("switch", SyntaxKind.Keyword_Switch);
-        // syntax.DefineKeyword("case", SyntaxKind.Keyword_Case);
-        // syntax.DefineKeyword("default", SyntaxKind.Keyword_Default);
-        // syntax.DefineKeyword("for", SyntaxKind.Keyword_For);
-        // syntax.DefineKeyword("in", SyntaxKind.Keyword_In);
-        // syntax.DefineKeyword("do", SyntaxKind.Keyword_Do);
-        syntax.DefineKeyword("while", SyntaxKind.Keyword_While);
-        syntax.DefineKeyword("continue", SyntaxKind.Keyword_While);
-        syntax.DefineKeyword("break", SyntaxKind.Keyword_While);
-
-        return syntax;
     }
 }

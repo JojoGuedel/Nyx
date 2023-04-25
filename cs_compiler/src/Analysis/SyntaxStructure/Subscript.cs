@@ -20,6 +20,6 @@ public class Subscript : Expression
         _WriteName(writer, indent, isLast, "Subscript");
         indent += _ChildIndent(isLast);
         expression.Write(writer, indent, false);
-        _WriteArray(writer, indent, true, "arguments", Array.ConvertAll(arguments.ToArray(), (Expression statement) => (Node)statement));
+        _WriteArray(writer, indent, true, "arguments", Array.ConvertAll(arguments.ToArray(), (Expression statement) => (_Node)statement));
     }
 }

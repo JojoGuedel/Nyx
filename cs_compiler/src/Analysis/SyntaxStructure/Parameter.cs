@@ -3,7 +3,7 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class Parameter : Node
+public class Parameter : _Node
 {
     public Modifiers modifiers { get; }
     public string name { get; }

@@ -3,7 +3,7 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class Block : Node
+public class Block : _Node
 {
     public ImmutableArray<Statement> statements;
 
@@ -17,6 +17,6 @@ public class Block : Node
     {
         _WriteName(writer, indent, isLast, "Block");
         indent += _ChildIndent(isLast);
-        _WriteArray(writer, indent, true, "Statement", Array.ConvertAll(statements.ToArray(), (Statement statement) => (Node)statement));
+        _WriteArray(writer, indent, true, "Statement", Array.ConvertAll(statements.ToArray(), (Statement statement) => (_Node)statement));
     }
 }

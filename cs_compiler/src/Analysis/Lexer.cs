@@ -1,156 +1,212 @@
+using System.Diagnostics;
+
 namespace Nyx.Analysis;
 
-using Diagnostics;
-using Utils;
-
-public class Lexer : Analyzer<char, LexerNode>
+internal class Lexer
 {
-    SyntaxInfo _syntax;
-    string _text;
-    int _start;
-    char _currentChar { get => _Peek(0); }
-    char _nextChar { get => _Peek(1); }
-    int _length { get => _pos - _start; }
-    TextLocation _location { get => new TextLocation(_start, _length); }
-    string _subString { get => _text.Substring(_start, _length); }
-    bool _newLine;
+    TextReader _source;
 
+    // TODO: make this actually represent the file name
+    string _fileName = "stdin";
 
-    public Lexer(SyntaxInfo syntax, string text) : base(text.ToList(), syntax.endSymbol)
+    bool _finished = false;
+
+    char _last = SyntaxInfo.endChar;
+    char _current = SyntaxInfo.endChar;
+    char _next = SyntaxInfo.endChar;
+
+    bool _newLine = true;
+    long _pos = 0;
+    long _start = 0;
+    long _length { get => _pos - _start; }
+    long _line = 1;
+    long _lineBegin = 1;
+
+    // TODO: Fix location.
+    Location _location { get => new Location(_fileName, _start, _length, _lineBegin, _line); }
+
+    // Dictionary<Token, string> _values = new Dictionary<Token, string>();
+
+    internal Lexer(TextReader source)
     {
-        _syntax = syntax;
-        _text = text;
-        _newLine = true;
+        _source = source;
     }
 
-    public LexerNode GetNext()
+    char _Next()
+    {
+        _last = _current;
+        _current = _next;
+        _next = _Read();
+
+        return _last;
+    }
+
+    char _Next(int increment)
+    {
+        Debug.Assert(increment <= 0);
+
+        _last = _current;
+        
+        for(int i = 0; i < increment; i++)
+        {
+            _current = _next;
+            _next = _Read();
+        }
+
+        return _last;
+    }
+
+    char _Read()
+    {
+        var result = _source.Read();
+
+        if (result < 0)
+            return SyntaxInfo.endChar;
+
+        return (char) result; 
+    }
+
+    Token _LexComment()
+    {
+        while (!SyntaxInfo.IsLineTerminator((_last, _current)))
+            _Next();
+        
+        _Next();
+            
+        return new Token(TokenKind.comment, _location);
+    }
+
+    Token _LexBlockComment()
+    {
+        while (!SyntaxInfo.IsBlockCommentTerimator((_last, _current)))
+            _Next();
+        
+        _Next();
+            
+        return new Token(TokenKind.comment, _location);
+    }
+
+    ValueToken _LexCharSequence(TokenKind kind)
+    {
+        var terminator = _current;
+
+        var value = string.Empty;
+        while ((_current == SyntaxInfo.escapeChar || _next != terminator))
+        {
+            if (SyntaxInfo.IsLineTerminator((_last, _current)))
+                // TODO: diagnostics
+                throw new NotImplementedException();
+
+            value += _Next();
+        }
+
+        _Next(2);
+
+        if (kind == TokenKind.@char && value.Length != 3)
+            // TODO: diagnostics
+            throw new NotImplementedException();
+
+        return new ValueToken(kind, _location, value);
+    }
+
+    internal Token LexNext()
     {
         _start = _pos;
+        _lineBegin = _line;
 
         // lex indents after a new line
         if (_newLine)
         {
-            _SkipBlankLines();
+            while (_length < SyntaxInfo.indentSize && SyntaxInfo.GetTokenKind(_current) == TokenKind.space)
+                _Next();
 
-            while (_length < _syntax.indentSize && _syntax.GetSingleTokenKind(_currentChar) == SyntaxKind.Token_Space) 
-                _pos++;
-
-            if (_length % _syntax.indentSize != 0)
+            if (_length % SyntaxInfo.indentSize != 0)
             {
-                diagnostics.Add(new InvalidIndent(_location));
-                return GetNext();
+                // TODO: diagnostics
+                throw new NotImplementedException();
             }
             else if (_length > 0)
-                return new LexerNode(SyntaxKind.Token_Indent, _location);
+                return new Token(TokenKind.indent, _location);
 
             _newLine = false;
         }
 
         // lex numbers
-        if (char.IsDigit(_currentChar))
+        if (char.IsDigit(_current))
         {
-            while (char.IsDigit(_currentChar)) 
-                _pos++;
+            var value = string.Empty;
+            while (char.IsDigit(_current)) 
+                value += _Next();
             // TODO: Handle '.'
-            return new LexerNode(SyntaxKind.Token_Number, _location, value: _subString);
-        }
-        // lex strings
-        else if (_syntax.GetSingleTokenKind(_currentChar) == SyntaxKind.Token_StringMarker)
-        {
-            var terminator = _currentChar;
-
-            while (_currentChar == _syntax.escapeSymbol || _nextChar != terminator)
-            {
-                _pos++;
-
-                if (_syntax.IsLineTerminator(_currentChar))
-                {
-                    diagnostics.Add(new StringNotTerminated(_location, terminator));
-                    return new LexerNode(SyntaxKind.Token_String, _location);
-                }
-            }
-            _pos += 2;
-
-            return new LexerNode(SyntaxKind.Token_String, _location);
-        }
-        else if (_syntax.GetDoubleTokenKind((_currentChar, _nextChar)) == SyntaxKind.Token_CommentMarker)
-        {
-            while (!_syntax.IsLineTerminator(_currentChar))
-                _IncrementPos();
-            
-            return new LexerNode(SyntaxKind.Token_Comment, _location);
+            // TODO: Handle formats
+            // TODO: handle scientific format
+            return new Token(TokenKind.number, _location);
         }
         // lex operators and names
         else
         {
-            var kind = _syntax.GetDoubleTokenKind((_currentChar, _nextChar));
+            var increment = 2;
+            var kind = SyntaxInfo.GetTokenKind((_current, _next));
 
-            if (kind == SyntaxKind.Token_Error)
+            if (kind == TokenKind._error)
             {
-                kind = _syntax.GetSingleTokenKind(_currentChar);
-
-                if (kind == SyntaxKind.Token_Error)
-                {
-                    while (char.IsLetterOrDigit(_currentChar) || _currentChar == '_') 
-                        _pos++;
-
-                    if (_length > 0)
-                    {
-                        kind = _syntax.GetKeyword(_text.Substring(_start, _length));
-
-                        if (kind != SyntaxKind.Token_Error)
-                            return new LexerNode(kind, _location);
-
-                        return new LexerNode(SyntaxKind.Token_Identifier, _location, value: _subString);
-                    }
-
-                    _pos++;
-                    return new LexerNode(SyntaxKind.Token_InvalidChar, _location, value: _subString);
-                }
-                else if (kind == SyntaxKind.Token_NewLine)
-                    _newLine = true;
+                increment = 1;
+                kind = SyntaxInfo.GetTokenKind(_current);
             }
-            else
-                _pos++;
-            _pos++;
+            
+            switch (kind)
+            {
+                case TokenKind._error:
+                    break;
+                // filter specialcases
+                case TokenKind.commentMarker:
+                    return _LexComment();
+                case TokenKind.commentBeginMarker:
+                    return _LexBlockComment();
+                case TokenKind.stringMarker:
+                    return _LexCharSequence(TokenKind.@string);
+                case TokenKind.charMarker:
+                    return _LexCharSequence(TokenKind.@char);
+                case TokenKind.end:
+                    _finished = true;
+                    break;
+                // handle new lines
+                case TokenKind.newLine:
+                    _line++;
+                    _newLine = true;
+                    goto default;
+                // filter markers
+                default:
+                    _Next(increment);
+                    return new Token(kind, _location);
+            }
 
-            return new LexerNode(kind, _location);
+            var value = string.Empty;
+            while (char.IsLetterOrDigit(_current) || _current == '_')
+                value += _Next();
+
+            // filter invalid chars
+            if (_length <= 0)
+            {
+                _Next();
+                return new Token(TokenKind.invalidChar, _location);
+            }
+
+            kind = SyntaxInfo.GetTokenKind(value);
+            // filter keywords
+            if (kind != TokenKind._error)
+                return new Token(kind, _location);
+
+            return new Token(TokenKind.identifier, _location);
         }
     }
 
-    public override IEnumerable<LexerNode> Analyze()
+    internal IEnumerable<Token> Analyze()
     {
-        LexerNode token;
-        do
-        {
-            token = GetNext();
-            yield return token;
-        }
-        while (!isFinished);
+        do 
+            yield return LexNext();
+        while (!_finished);
 
-        yield return GetNext();
-    }
-
-    void _SkipBlankLines()
-    {
-        int offset = 0;
-        int blankLineCount = 0;
-
-        while (true)
-        {
-            int currentOffset = 0;
-
-            while (char.IsWhiteSpace(_Peek(offset + currentOffset)))
-                currentOffset++;
-
-            if (_Peek(offset + currentOffset) != _syntax.newLineSymbol)
-                break;
-            // TODO: checks special case with endSymbol
-
-            offset += currentOffset;
-            blankLineCount++;
-        }
-
-        _pos += offset;
+        _source.Close();
     }
 }

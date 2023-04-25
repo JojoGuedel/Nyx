@@ -60,12 +60,12 @@ class TypeScope : IScope
 
 public class EnvironmentBuilder
 {
-    CompilationUnit _compilationUnit;
+    _CompilationUnit _compilationUnit;
 
     Scope _globalScope;
     Scope _currentScope;
 
-    public EnvironmentBuilder(CompilationUnit compilationUnit)
+    public EnvironmentBuilder(_CompilationUnit compilationUnit)
     {
         _compilationUnit = compilationUnit;
 

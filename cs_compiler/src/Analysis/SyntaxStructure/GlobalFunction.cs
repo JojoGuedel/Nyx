@@ -34,7 +34,7 @@ public class GlobalFunction : GlobalMember
         _WriteName(writer, indent, isLast, "GlobalFunction");
         indent += _ChildIndent(isLast);
         name.Write(writer, indent, false);
-        _WriteArray(writer, indent, false, "Parameter", Array.ConvertAll(parameters.ToArray(), (Parameter parameter) => (Node)parameter));
+        _WriteArray(writer, indent, false, "Parameter", Array.ConvertAll(parameters.ToArray(), (Parameter parameter) => (_Node)parameter));
         type.Write(writer, indent, false);
         body.Write(writer, indent, true);
     }

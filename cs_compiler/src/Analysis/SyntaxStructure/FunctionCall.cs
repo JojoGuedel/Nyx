@@ -21,6 +21,6 @@ public class FunctionCall : Expression
         _WriteName(writer, indent, isLast, "FunctionCall");
         indent += _ChildIndent(isLast);
         expression.Write(writer, indent, false);
-        _WriteArray(writer, indent, true, "arguments", Array.ConvertAll(arguments.ToArray(), (Expression statement) => (Node)statement));
+        _WriteArray(writer, indent, true, "arguments", Array.ConvertAll(arguments.ToArray(), (Expression statement) => (_Node)statement));
     }
 }

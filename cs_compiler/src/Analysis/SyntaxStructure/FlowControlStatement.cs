@@ -17,7 +17,7 @@ public class FlowControlStatement : Statement
     {
         _WriteName(writer, indent, isLast, "FlowControlStatement");
         indent += _ChildIndent(isLast);
-        _WriteArray(writer, indent, true, "LexerNode", Array.ConvertAll(statements.ToArray(), (LexerNode statement) => (Node)statement));
+        _WriteArray(writer, indent, true, "LexerNode", Array.ConvertAll(statements.ToArray(), (LexerNode statement) => (_Node)statement));
     }
 }
 

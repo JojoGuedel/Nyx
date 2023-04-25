@@ -4,7 +4,7 @@ using Nyx.Diagnostics;
 using Nyx.Utils;
 
 var running = true;
-var syntax = SyntaxInfo.Default();
+var syntax = __SyntaxInfo.Default();
 var nodeWriter = new NodeWriter(Console.Out);
 
 var input =

@@ -1,20 +1,56 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using Nyx.Diagnostics;
 using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class Parser : Analyzer<LexerNode, Node>
+internal class Parser
 {
-    SyntaxInfo _syntax; 
+    IEnumerator<Token> _source;
+
+    Token _last;
+    Token _current;
+
+    internal Parser(IEnumerator<Token> source)
+    {
+        _source = source;
+    }
+
+    Token _Next()
+    {
+        Debug.Assert(_source.MoveNext());
+
+        _last = _current;
+        _current = _source.Current;
+
+        return _last;
+    }
+
+    internal _CompilationUnit Analyze() => ParseCompilationUnit();
+
+    internal _CompilationUnit ParseCompilationUnit()
+    {
+        var members = new List<Member>();
+
+        while (_current.kind != TokenKind.end)
+            members.Add(_ParseMember());
+        
+        return new CompilationUnit(members.ToImmutableArray(), _current);
+    }
+}
+
+public class _Parser : Analyzer<LexerNode, _Node>
+{
+    _SyntaxInfo _syntax; 
     // TODO: probably change this
-    public Parser(SyntaxInfo syntax, List<LexerNode> values) : 
+    public _Parser(_SyntaxInfo syntax, List<LexerNode> values) : 
         base(values, values.Last())
     {
         _syntax = syntax;
     }
 
-    public override IEnumerable<Node> Analyze()
+    public override IEnumerable<_Node> Analyze()
     {
         yield return _ParseCompilationUnit();
     }
@@ -60,7 +96,7 @@ public class Parser : Analyzer<LexerNode, Node>
         return expr;
     }
 
-    CompilationUnit _ParseCompilationUnit()
+    _CompilationUnit _ParseCompilationUnit()
     {
         var members = new List<Member>();
 
@@ -68,7 +104,7 @@ public class Parser : Analyzer<LexerNode, Node>
         while (_current.kind != SyntaxKind.Token_End)
             members.Add(_ParseMember());
         
-        return new CompilationUnit(members.ToImmutableArray(), _ReadNext());
+        return new _CompilationUnit(members.ToImmutableArray(), _ReadNext());
     }
 
     // TODO: parse structs
@@ -123,7 +159,7 @@ public class Parser : Analyzer<LexerNode, Node>
         _ParseOptional(SyntaxKind.Keyword_Mutable)
     );
 
-    Node _ParseOptional(SyntaxKind kind) 
+    _Node _ParseOptional(SyntaxKind kind) 
     {
         if (_current.kind == kind)
             return _ReadNext();

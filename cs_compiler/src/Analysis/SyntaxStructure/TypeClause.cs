@@ -1,6 +1,6 @@
 namespace Nyx.Analysis;
 
-public class  TypeClause : Node
+public class  TypeClause : _Node
 {
     public Expression type { get; }
 

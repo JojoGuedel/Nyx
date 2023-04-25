@@ -2,7 +2,7 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public abstract class Member : Node
+public abstract class Member : _Node
 {
     protected Member(TextLocation location) : base(location) { }
 }

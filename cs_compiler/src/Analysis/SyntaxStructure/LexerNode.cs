@@ -2,7 +2,7 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class LexerNode : Node
+public class LexerNode : _Node
 {
     public SyntaxKind kind { get; }
     public string? value { get; }

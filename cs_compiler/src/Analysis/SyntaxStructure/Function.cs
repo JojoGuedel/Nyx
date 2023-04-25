@@ -37,13 +37,13 @@ public class Function : Member
         indent += _ChildIndent(isLast);
         modifiers.Write(writer, indent, false);
         name.Write(writer, indent, false);
-        _WriteArray(writer, indent, false, "Parameter", Array.ConvertAll(parameters.ToArray(), (Parameter parameter) => (Node)parameter));
+        _WriteArray(writer, indent, false, "Parameter", Array.ConvertAll(parameters.ToArray(), (Parameter parameter) => (_Node)parameter));
         type.Write(writer, indent, false);
         body.Write(writer, indent, true);
     }
 }
 
-public abstract class StructMember : Node
+public abstract class StructMember : _Node
 {
     protected StructMember(TextLocation location) : base(location) { }
 }
@@ -75,6 +75,6 @@ public class Struct : Member
         _WriteName(writer, indent, isLast, "Struct");
         indent += _ChildIndent(isLast);
         name.Write(writer, indent, false);
-        _WriteArray(writer, indent, true, "Parameter", Array.ConvertAll(members.ToArray(), (StructMember member) => (Node)member));
+        _WriteArray(writer, indent, true, "Parameter", Array.ConvertAll(members.ToArray(), (StructMember member) => (_Node)member));
     }
 }

@@ -3,11 +3,11 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public abstract class Node
+public abstract class _Node
 {
     public TextLocation location { get; }
 
-    public Node(TextLocation location)
+    public _Node(TextLocation location)
     {
         this.location = location;
     }
@@ -31,7 +31,7 @@ public abstract class Node
         _WriteName(writer, indent, isLast, $"Kind: {kind}");
     }
     
-    protected void _WriteArray(TextWriter writer, string indent, bool isLast, string name, Node[] array)
+    protected void _WriteArray(TextWriter writer, string indent, bool isLast, string name, _Node[] array)
     {
         _WriteName(writer, indent, isLast, $"{name}[]");
         indent += _ChildIndent(isLast);
