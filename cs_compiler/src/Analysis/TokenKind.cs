@@ -14,6 +14,8 @@ internal enum TokenKind
     beginBlock,
     endBlock,
 
+    empty,
+
     // default
     _error,
 

@@ -4,7 +4,6 @@ using Nyx.Diagnostics;
 using Nyx.Utils;
 
 var running = true;
-var syntax = __SyntaxInfo.Default();
 var nodeWriter = new NodeWriter(Console.Out);
 
 var input =
@@ -20,7 +19,7 @@ global func main() -> void:
     mut var a: i32 = 23123;
     print(a);";
 
-Compile(input);
+Compile("input");
 Console.ReadKey(true);
 
 // while (running)
@@ -43,25 +42,30 @@ Console.ReadKey(true);
 
 void Compile(string input)
 {
-    var diagnosticWriter = new DiagnosticWriter(Console.Out, input, 2);
+    // var diagnosticWriter = new DiagnosticWriter(Console.Out, input, 2);
 
-    var textInfo = new TextInfo(input);
-    Console.WriteLine(textInfo.ToString());
+    // var textInfo = new TextInfo(input);
+    // Console.WriteLine(textInfo.ToString());
 
-    var lexicalAnalyzer = new Lexer(syntax, input);
-    var tokens = lexicalAnalyzer.Analyze().ToList();
+    var lexer = new Lexer(new StringReader(input));
+    var tokens = lexer.Analyze().ToList();
 
-    var postLexicalAnalyzer = new PostLexer(syntax, tokens);
-    tokens = postLexicalAnalyzer.Analyze().ToList();
+    nodeWriter.Write(tokens.Cast<Node>().ToImmutableArray());
 
-    var syntaxAnaylzer = new Parser(syntax, tokens);
-    var compilationUnit = syntaxAnaylzer.Analyze().ToImmutableArray();
-    nodeWriter.Write(compilationUnit);
+    var postLexer = new PostLexer(tokens.GetEnumerator());
+    tokens = postLexer.Analyze().ToList();
+
     Console.WriteLine();
+    nodeWriter.Write(tokens.Cast<Node>().ToImmutableArray());
 
-    diagnosticWriter.Write(lexicalAnalyzer.diagnostics);
-    diagnosticWriter.Write(postLexicalAnalyzer.diagnostics);
-    diagnosticWriter.Write(syntaxAnaylzer.diagnostics);
+    // var syntaxAnaylzer = new Parser(syntax, tokens);
+    // var compilationUnit = syntaxAnaylzer.Analyze().ToImmutableArray();
+    // nodeWriter.Write(compilationUnit);
+    // Console.WriteLine();
+
+    // diagnosticWriter.Write(lexicalAnalyzer.diagnostics);
+    // diagnosticWriter.Write(postLexicalAnalyzer.diagnostics);
+    // diagnosticWriter.Write(syntaxAnaylzer.diagnostics);
 }
 
 void ManageEscapeCommands(string command)

@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using Nyx.Diagnostics;
-using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
@@ -10,8 +8,8 @@ internal class PostLexer
 
     bool _finished = false;
 
-    Token _last;
-    Token _current;
+    Token _last = Token.Empty();
+    Token _current = Token.Empty();
 
     int _indent = 0;
     int _lineIndent = 0;
@@ -19,20 +17,18 @@ internal class PostLexer
     public PostLexer(IEnumerator<Token> source)
     {
         _source = source;
-
-        // TODO: this is not a good solution. I have to fix this later
-        _current = _Next();
-        _last = new Token(TokenKind._error, _current.location.Point());
-
+        
         _Next();
     }
 
     Token _Next()
     {
-        Debug.Assert(_source.MoveNext());
+        if (_source.MoveNext())
+            _current = _source.Current;
+        else
+            _current = Token.Empty();
 
         _last = _current;
-        _current = _source.Current;
 
         return _last;
     }
@@ -66,7 +62,8 @@ internal class PostLexer
         if (_current.kind == TokenKind.end)
             for (var i = 0; i < _indent + d; i++)
                 line.Add(new Token(TokenKind.endBlock, _current.location.Point()));
-        line.Add(_current);
+
+        line.Add(_Next());
         
         return line;
     }

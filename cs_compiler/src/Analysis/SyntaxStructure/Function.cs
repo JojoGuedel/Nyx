@@ -3,7 +3,7 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class Function : Member
+public class Function : _Member
 {
     public Modifiers modifiers;
     public Expression name { get; }
@@ -48,17 +48,17 @@ public abstract class StructMember : _Node
     protected StructMember(TextLocation location) : base(location) { }
 }
 
-public class FunctionDefinition : StructMember
-{
+// public class FunctionDefinition : StructMember
+// {
 
-}
+// }
 
-public class Property : StructMember
-{
+// public class Property : StructMember
+// {
 
-}
+// }
 
-public class Struct : Member
+public class Struct : _Member
 {
     public Identifier name { get; }
     public ImmutableArray<StructMember> members { get; }

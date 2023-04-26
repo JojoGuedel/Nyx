@@ -16,24 +16,27 @@ internal class Lexer
     char _next = SyntaxInfo.endChar;
 
     bool _newLine = true;
-    long _pos = 0;
-    long _start = 0;
-    long _length { get => _pos - _start; }
-    long _line = 1;
-    long _lineBegin = 1;
+    int _pos = 0;
+    int _begin = 0;
+    int _length { get => _pos - _begin; }
+    int _line = 1;
+    int _lineBegin = 1;
 
     // TODO: Fix location.
-    Location _location { get => new Location(_fileName, _start, _length, _lineBegin, _line); }
+    Location _location { get => new Location(_begin, _pos, _lineBegin, _line); }
 
     // Dictionary<Token, string> _values = new Dictionary<Token, string>();
 
     internal Lexer(TextReader source)
     {
         _source = source;
+
+        _Next(2);
     }
 
     char _Next()
     {
+        _pos++;
         _last = _current;
         _current = _next;
         _next = _Read();
@@ -43,7 +46,7 @@ internal class Lexer
 
     char _Next(int increment)
     {
-        Debug.Assert(increment <= 0);
+        Debug.Assert(increment >= 0);
 
         _last = _current;
         
@@ -111,7 +114,7 @@ internal class Lexer
 
     internal Token LexNext()
     {
-        _start = _pos;
+        _begin = _pos;
         _lineBegin = _line;
 
         // lex indents after a new line
@@ -169,7 +172,7 @@ internal class Lexer
                     return _LexCharSequence(TokenKind.@char);
                 case TokenKind.end:
                     _finished = true;
-                    break;
+                    goto default;
                 // handle new lines
                 case TokenKind.newLine:
                     _line++;
@@ -197,7 +200,7 @@ internal class Lexer
             if (kind != TokenKind._error)
                 return new Token(kind, _location);
 
-            return new Token(TokenKind.identifier, _location);
+            return new ValueToken(TokenKind.identifier, _location, value);
         }
     }
 

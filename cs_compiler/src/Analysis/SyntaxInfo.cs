@@ -10,7 +10,7 @@ internal static class SyntaxInfo
     private static ImmutableDictionary<string, TokenKind> _keywords;
 
     internal const int maxOperatorPrecedence = 7;
-    internal const int tokenKindIndex = -9;
+    internal const int tokenKindIndex = -10;
     internal const int indentSize = 4;
 
     internal const char escapeChar = '\\';
@@ -19,6 +19,8 @@ internal static class SyntaxInfo
 
     static SyntaxInfo()
     {
+        Debug.Assert(TokenKind._error == 0);
+
         var singleMarker = ImmutableDictionary.CreateBuilder<char, TokenKind>();
         var doubleMarker = ImmutableDictionary.CreateBuilder<(char, char), TokenKind>();
         var keywords = ImmutableDictionary.CreateBuilder<string, TokenKind>();
