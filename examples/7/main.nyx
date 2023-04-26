@@ -1,0 +1,57 @@
+// include standart input / output
+include "stdio.nyx";
+// include other file and wrap it in the namespace "OtherFile"
+include "otherFile.nyx" as OtherFile;
+
+// set namespace of current file
+namespace MyNamespace;
+
+// define exposed struct
+global struct MyStruct:
+    // create int that can be read from outside but only set from inside
+    var sum: int => pub get, set;
+
+    // create public static function
+    pub static func funcOne(): A => none;
+
+    // create a public function that returns void or error and can set internal values
+    pub func add(var value: int): void or error => set;
+
+// function implementation
+func MyStruct.funcOne():
+    return A();
+
+func MyStruct.add(value):
+    // oneliners
+    // if the value is bigger than 0 then this funtion will return void and not the sum
+    return error "Only add numbers bigger than 0." if (value < 0) else self.sum += value;
+
+// create exposed variable
+global mut var sum: float;
+
+// there is only one main function that is allways global and return void or error
+global func main():
+    var a = MyStruct();
+    a.add(10);
+    // implicit conversion without casts
+    sum = a;
+    a.add(2);
+
+    // switch statements
+    switch (sum):
+        case 1:
+            print(a - 1);
+        case 2:
+            break;
+        default:
+            print(sum);
+    
+    // for loops
+    for (var i = 0; i < 10; i++):
+        print(f"I is {i}.");
+
+    // if statements
+    if (false):
+        // errors can be string or nothing
+        // later errors can be inherited and customized so more data can be providet
+        return error "This error will never happen.";

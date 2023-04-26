@@ -46,5 +46,5 @@ public abstract class Analyzer<InputT, OutputT>
         return _values[_pos + offset];
     }
 
-    public abstract IEnumerable<OutputT> GetAll();
+    internal abstract IEnumerable<OutputT> Analyze();
 }

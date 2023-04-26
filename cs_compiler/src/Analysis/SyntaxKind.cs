@@ -55,6 +55,8 @@ public enum SyntaxKind
     Token_SlashEqual,
     Token_PercentEqual,
 
+    Keyword_Struct,
+    Keyword_Global,
     Keyword_Static,
     Keyword_Mutable,
     Keyword_Var,

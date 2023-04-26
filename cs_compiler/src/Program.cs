@@ -4,7 +4,6 @@ using Nyx.Diagnostics;
 using Nyx.Utils;
 
 var running = true;
-var syntax = SyntaxDefinition.Default();
 var nodeWriter = new NodeWriter(Console.Out);
 
 var input =
@@ -15,10 +14,8 @@ var input =
 
 // no templates
 
-static func add(var a: i32, var b: i32) -> i32:
-    return a + b;
-
-static func main() -> void:
+global func main() -> void:
+    a.b.c.d.e;
     mut var a: i32 = 23123;
     print(a);";
 
@@ -30,19 +27,6 @@ Console.ReadKey(true);
 //     Console.Write("> ");
 
 //     var input = Console.ReadLine();
-//     input =
-// @"
-// func b(c,):
-//         // var a = 10;
-//     if true:
-//         pass;
-//     else if true:
-//         pass;
-//     else:
-//         pass;
-
-// func d():
-//     pass;";
 
 //     if (input is null)
 //         input=String.Empty;
@@ -58,25 +42,30 @@ Console.ReadKey(true);
 
 void Compile(string input)
 {
-    var diagnosticWriter = new DiagnosticWriter(Console.Out, input, 2);
+    // var diagnosticWriter = new DiagnosticWriter(Console.Out, input, 2);
 
-    var textInfo = new TextInfo(input);
-    Console.WriteLine(textInfo.ToString());
+    // var textInfo = new TextInfo(input);
+    // Console.WriteLine(textInfo.ToString());
 
-    var lexicalAnalyzer = new LexicalAnalyzer(syntax, input);
-    var tokens = lexicalAnalyzer.GetAll().ToList();
+    var lexer = new Lexer(new StringReader(input));
+    var tokens = lexer.Analyze().ToList();
 
-    var postLexicalAnalyzer = new PostlexicalAnalyzer(syntax, tokens);
-    tokens = postLexicalAnalyzer.GetAll().ToList();
+    nodeWriter.Write(tokens.Cast<Node>().ToImmutableArray());
 
-    var syntaxAnaylzer = new SyntaxAnalyzer(syntax, tokens);
-    var compilationUnit = syntaxAnaylzer.GetAll().ToImmutableArray();
-    nodeWriter.Write(compilationUnit);
+    var postLexer = new PostLexer(tokens.GetEnumerator());
+    tokens = postLexer.Analyze().ToList();
+
     Console.WriteLine();
+    nodeWriter.Write(tokens.Cast<Node>().ToImmutableArray());
 
-    diagnosticWriter.Write(lexicalAnalyzer.diagnostics);
-    diagnosticWriter.Write(postLexicalAnalyzer.diagnostics);
-    diagnosticWriter.Write(syntaxAnaylzer.diagnostics);
+    // var syntaxAnaylzer = new Parser(syntax, tokens);
+    // var compilationUnit = syntaxAnaylzer.Analyze().ToImmutableArray();
+    // nodeWriter.Write(compilationUnit);
+    // Console.WriteLine();
+
+    // diagnosticWriter.Write(lexicalAnalyzer.diagnostics);
+    // diagnosticWriter.Write(postLexicalAnalyzer.diagnostics);
+    // diagnosticWriter.Write(syntaxAnaylzer.diagnostics);
 }
 
 void ManageEscapeCommands(string command)

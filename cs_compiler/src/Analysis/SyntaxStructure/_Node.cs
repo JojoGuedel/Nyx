@@ -3,22 +3,22 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public abstract class Node
+public abstract class _Node
 {
     public TextLocation location { get; }
 
-    public Node(TextLocation location)
+    public _Node(TextLocation location)
     {
         this.location = location;
     }
 
     public abstract void Write(TextWriter writer, string indent, bool isLast);
 
-    protected string _ChildIndent(bool isLast) => isLast? NodeWriterIndents.indent : NodeWriterIndents.childIndent;
+    protected string _ChildIndent(bool isLast) => "";
 
     protected void _WriteName(TextWriter writer, string indent, bool isLast, string name)
     {
-        writer.WriteLine($"{indent}{(isLast? NodeWriterIndents.leafNode : NodeWriterIndents.childNode)}{name}");
+        // writer.WriteLine($"{indent}{(isLast? NodeWriterIndents.leafNode : NodeWriterIndents.childNode)}{name}");
     }
 
     protected void _WriteString(TextWriter writer, string indent, bool isLast, string value)
@@ -30,11 +30,11 @@ public abstract class Node
     {
         _WriteName(writer, indent, isLast, $"Kind: {kind}");
     }
-    
-    protected void _WriteArray(TextWriter writer, string indent, bool isLast, string name, Node[] array)
+
+    protected void _WriteArray(TextWriter writer, string indent, bool isLast, string name, _Node[] array)
     {
         _WriteName(writer, indent, isLast, $"{name}[]");
-        indent += _ChildIndent(isLast);
+        // indent += _ChildIndent(isLast);
 
         if (array.Length == 0)
             _WriteName(writer, indent, true, "Empty");

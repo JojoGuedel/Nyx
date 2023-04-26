@@ -1,6 +1,6 @@
 namespace Nyx.Analysis;
 
-public class SyntaxDefinition
+public class _SyntaxInfo
 {
     public int indentSize { get; }
     public char escapeSymbol { get; }
@@ -14,7 +14,7 @@ public class SyntaxDefinition
 
     public Dictionary<string, SyntaxKind> keywords { get; }
 
-    public SyntaxDefinition(
+    public _SyntaxInfo(
         int indentSize=4,
         char escapeSymbol = '\\',
         char lineEndSymbol = '\n',
@@ -138,9 +138,9 @@ public class SyntaxDefinition
         }
     }
 
-    public static SyntaxDefinition Default()
+    public static _SyntaxInfo Default()
     {
-        var syntax = new SyntaxDefinition();
+        var syntax = new _SyntaxInfo();
 
         syntax.DefineSingleToken('\r', SyntaxKind.Token_Discard);
         syntax.DefineSingleToken(' ', SyntaxKind.Token_Space);
@@ -181,6 +181,8 @@ public class SyntaxDefinition
         syntax.DefineDoubleToken(('/', '='), SyntaxKind.Token_SlashEqual);
         syntax.DefineDoubleToken(('%', '='), SyntaxKind.Token_PercentEqual);
 
+        syntax.DefineKeyword("struct", SyntaxKind.Keyword_Struct);
+        syntax.DefineKeyword("global", SyntaxKind.Keyword_Global);
         syntax.DefineKeyword("static", SyntaxKind.Keyword_Static);
         syntax.DefineKeyword("mut", SyntaxKind.Keyword_Mutable);
         syntax.DefineKeyword("var", SyntaxKind.Keyword_Var);

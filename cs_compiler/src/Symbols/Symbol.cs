@@ -1,13 +1,22 @@
+using Nyx.Analysis;
+
 namespace Nyx.Symbols;
 
 public abstract class Symbol
 {
     public string name { get; }
-    public SymbolKind kind { get; }
+    public string fullName { get; }
 
-    public Symbol(string name, SymbolKind kind)
+    public abstract IReadonlyScope? scope { get; }
+
+    public Symbol(string name, Symbol? parent)
     {
         this.name = name;
-        this.kind = kind;
+        fullName = string.Empty;
+
+        if (parent is not null)
+            fullName += parent.fullName + ".";
+        
+        fullName += this.name;
     }
 }

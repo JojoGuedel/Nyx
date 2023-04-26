@@ -5,7 +5,7 @@ namespace Nyx.Tests;
 
 public class LexicalAnalyzerTests
 {
-    static SyntaxDefinition _syntax = SyntaxDefinition.Default();
+    static __SyntaxInfo _syntax = __SyntaxInfo.Default();
 
     [Theory]
     [MemberData(nameof(GetSingleTokenData))]
@@ -14,8 +14,8 @@ public class LexicalAnalyzerTests
     [MemberData(nameof(GetAdditionalTokenData))]
     void TestTokens(string input, params SyntaxKind[] expected)
     {
-        var lexicalAnalyzer = new LexicalAnalyzer(_syntax, input);
-        var result = lexicalAnalyzer.GetAll().ToList();
+        var lexicalAnalyzer = new Lexer(_syntax, input);
+        var result = lexicalAnalyzer.Analyze().ToList();
 
         for (int i = 0; i < expected.Length; i++)
             Assert.Equal(expected[i], result[i].kind);

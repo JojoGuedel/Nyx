@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using Nyx.Symbols;
 using Nyx.Utils;
 
 namespace Nyx.Analysis;
@@ -8,7 +7,6 @@ public class Subscript : Expression
 {
     public Expression expression { get; }
     public ImmutableArray<Expression> arguments { get; }
-    public override TypeSymbol? typeSymbol => throw new NotImplementedException();
 
     public Subscript(Expression expression, LexerNode lSquare, ImmutableArray<Expression> arguments, LexerNode rSquare) : 
         base(TextLocation.Embrace(expression.location, rSquare.location))
@@ -22,6 +20,6 @@ public class Subscript : Expression
         _WriteName(writer, indent, isLast, "Subscript");
         indent += _ChildIndent(isLast);
         expression.Write(writer, indent, false);
-        _WriteArray(writer, indent, true, "arguments", Array.ConvertAll(arguments.ToArray(), (Expression statement) => (Node)statement));
+        _WriteArray(writer, indent, true, "arguments", Array.ConvertAll(arguments.ToArray(), (Expression statement) => (_Node)statement));
     }
 }

@@ -1,12 +1,8 @@
-using System.Diagnostics;
-using Nyx.Symbols;
-
 namespace Nyx.Analysis;
 
-public class  TypeClause : Node
+public class  TypeClause : _Node
 {
     public Expression type { get; }
-    public TypeSymbol ConstructSymbol() => throw new NotImplementedException();
 
     // TODO: make constructor for arrow
     public TypeClause(LexerNode clauseInit, Expression type) :
@@ -21,4 +17,13 @@ public class  TypeClause : Node
         indent += _ChildIndent(isLast);
         type.Write(writer, indent, true);
     }
+
+    // public bool TryAssignSymbol(TypeSystem.Symbol typeSymbol)
+    // {
+    //     if (this.symbol is not null)
+    //         return false;
+        
+    //     symbol = typeSymbol;
+    //     return true;
+    // }
 }

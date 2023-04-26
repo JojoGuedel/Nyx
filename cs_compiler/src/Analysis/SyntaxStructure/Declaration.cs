@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using Nyx.Symbols;
 using Nyx.Utils;
 
 namespace Nyx.Analysis;
@@ -10,7 +8,6 @@ public class DeclarationStatement : Statement
     public Identifier name { get; }
     public TypeClause type { get; }
     public Expression assignment { get; }
-    VariableSymbol ConstructSymbol() => throw new NotImplementedException();
 
     public DeclarationStatement(Modifiers modifiers, LexerNode var, Identifier name, TypeClause type, LexerNode equal, Expression expression, LexerNode semicolon) : 
         base(TextLocation.Embrace(modifiers.location, semicolon.location))
