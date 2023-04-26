@@ -36,7 +36,7 @@ internal static class SyntaxInfo
         // stringMarker has to be singleMarker or it will break the lexer
         singleMarker.Add('"', TokenKind.stringMarker);
         singleMarker.Add(escapeChar, TokenKind.escapeChar);
-        doubleMarker.Add(('/', '/'), TokenKind.comment);
+        doubleMarker.Add(('/', '/'), TokenKind.commentMarker);
         doubleMarker.Add(('/', '*'), TokenKind.commentBeginMarker);
         doubleMarker.Add(('*', '/'), TokenKind.commentEndMarker);
 

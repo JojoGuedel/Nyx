@@ -19,7 +19,7 @@ global func main() -> void:
     mut var a: i32 = 23123;
     print(a);";
 
-Compile("input");
+Compile(input);
 Console.ReadKey(true);
 
 // while (running)

@@ -23,12 +23,15 @@ internal class PostLexer
 
     Token _Next()
     {
-        if (_source.MoveNext())
-            _current = _source.Current;
-        else
-            _current = Token.Empty();
-
         _last = _current;
+
+        if (!_source.MoveNext())
+        {
+            _current = Token.Empty();
+            _finished = true;
+        }
+        else
+            _current = _source.Current;
 
         return _last;
     }
@@ -60,7 +63,7 @@ internal class PostLexer
             line.Add(_Next());
 
         if (_current.kind == TokenKind.end)
-            for (var i = 0; i < _indent + d; i++)
+            for (var i = 0; i < _indent; i++)
                 line.Add(new Token(TokenKind.endBlock, _current.location.Point()));
 
         line.Add(_Next());
@@ -79,7 +82,7 @@ internal class PostLexer
 
     internal IEnumerable<Token> Analyze()
     {
-        while (_current.kind != TokenKind.end)
+        while (!_finished)
         {
             var line = _GetLine();
 
