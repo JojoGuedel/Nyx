@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace Nyx.Analysis;
 
-public class Number : Expression
+public class Number : _Expression
 {
     public string value { get; }
 

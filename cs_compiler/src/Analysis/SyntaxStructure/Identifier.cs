@@ -2,20 +2,13 @@ using System.Diagnostics;
 
 namespace Nyx.Analysis;
 
-public class Identifier : Expression
+internal class Identifier : Expression
 {
-    public string name { get; }
+    internal override Location location => identifier.location;
+    internal ValueToken identifier { get; }
 
-    public Identifier(LexerNode name) : base(name.location)
+    internal Identifier(ValueToken identifier)
     {
-        Debug.Assert(name.value != null);
-        this.name = name.value;
-    }
-
-    public override void Write(TextWriter writer, string indent, bool isLast)
-    {
-        _WriteName(writer, indent, isLast, "Identifier");
-        indent += _ChildIndent(isLast);
-        _WriteString(writer, indent, true, name);
+        this.identifier = identifier;
     }
 }

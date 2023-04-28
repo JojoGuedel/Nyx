@@ -42,11 +42,6 @@ Console.ReadKey(true);
 
 void Compile(string input)
 {
-    // var diagnosticWriter = new DiagnosticWriter(Console.Out, input, 2);
-
-    // var textInfo = new TextInfo(input);
-    // Console.WriteLine(textInfo.ToString());
-
     var lexer = new Lexer(new StringReader(input));
     var tokens = lexer.Analyze().ToList();
 

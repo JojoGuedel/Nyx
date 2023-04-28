@@ -1,12 +1,8 @@
-using System.Diagnostics;
-
 namespace Nyx.Analysis;
 
 internal class PostLexer
 {
     IEnumerator<Token> _source;
-
-    bool _finished = false;
 
     Token _last = Token.Empty();
     Token _current = Token.Empty();
@@ -26,10 +22,7 @@ internal class PostLexer
         _last = _current;
 
         if (!_source.MoveNext())
-        {
             _current = Token.Empty();
-            _finished = true;
-        }
         else
             _current = _source.Current;
 
@@ -82,7 +75,7 @@ internal class PostLexer
 
     internal IEnumerable<Token> Analyze()
     {
-        while (!_finished)
+        while (_last.kind != TokenKind.end)
         {
             var line = _GetLine();
 
@@ -95,5 +88,7 @@ internal class PostLexer
 
             _indent = _lineIndent;
         }
+
+        yield return _last;
     }
 }

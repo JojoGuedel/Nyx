@@ -1,24 +1,17 @@
-using Nyx.Utils;
-
 namespace Nyx.Analysis;
 
-public class Modifiers : _Node 
+internal class Modifiers : Node
 {
-    public _Node @static { get; }
-    public _Node mutable { get; }
+    internal override Location location { get; }
 
-    public Modifiers(_Node @static, _Node mutableNode) :
-        base(TextLocation.Embrace(@static.location, mutableNode.location))
+    public Token @static { get; }
+    public Token mutable { get; }
+
+    internal Modifiers(Token @static, Token mutable)
     {
+        location = Location.Embrace(@static.location, mutable.location);
+
         this.@static = @static;
-        this.mutable = mutableNode;
-    }
-
-    public override void Write(TextWriter writer, string indent, bool isLast)
-    {
-        _WriteName(writer, indent, isLast, "Modifiers");
-        indent += _ChildIndent(isLast);
-        @static.Write(writer, indent, false);
-        mutable.Write(writer, indent, true);
+        this.mutable = mutable;
     }
 }

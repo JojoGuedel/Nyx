@@ -6,9 +6,6 @@ internal class Lexer
 {
     TextReader _source;
 
-    // TODO: make this actually represent the file name
-    string _fileName = "stdin";
-
     bool _finished = false;
 
     char _last = SyntaxInfo.endChar;

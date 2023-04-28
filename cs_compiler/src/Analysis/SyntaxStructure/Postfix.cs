@@ -2,12 +2,12 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class Postfix : Expression
+public class Postfix : _Expression
 {
-    public Expression expression { get; }
+    public _Expression expression { get; }
     public LexerNode postfix { get; }
 
-    public Postfix(Expression expression, LexerNode postfix) : 
+    public Postfix(_Expression expression, LexerNode postfix) : 
         base(TextLocation.Embrace(expression.location, postfix.location))
     {
         this.expression = expression;

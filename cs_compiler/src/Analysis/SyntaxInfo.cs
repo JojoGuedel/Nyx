@@ -31,9 +31,7 @@ internal static class SyntaxInfo
         singleMarker.Add(newLineChar, TokenKind.newLine);
         singleMarker.Add(endChar, TokenKind.end);
 
-        // charMarker has to be singleMarker or it will break the lexer
         singleMarker.Add('\'', TokenKind.charMarker);
-        // stringMarker has to be singleMarker or it will break the lexer
         singleMarker.Add('"', TokenKind.stringMarker);
         singleMarker.Add(escapeChar, TokenKind.escapeChar);
         doubleMarker.Add(('/', '/'), TokenKind.commentMarker);
@@ -48,7 +46,7 @@ internal static class SyntaxInfo
         singleMarker.Add('.', TokenKind.dot);
         singleMarker.Add(',', TokenKind.comma);
         singleMarker.Add(':', TokenKind.colon);
-        singleMarker.Add(';', TokenKind.semiColon);
+        singleMarker.Add(';', TokenKind.semicolon);
         doubleMarker.Add(('-', '>'), TokenKind.rArrow);
         doubleMarker.Add(('=', '>'), TokenKind.bigRArrow);
 
@@ -140,7 +138,7 @@ internal static class SyntaxInfo
     internal static bool IsBlockCommentTerimator(TokenKind marker) => marker == TokenKind.end || marker == TokenKind.commentEndMarker;
     internal static bool IsBlockCommentTerimator((char, char) pattern) => IsBlockCommentTerimator(GetMarker(pattern));
     
-    internal static bool IsDiscard(TokenKind marker) => marker == TokenKind.discard || marker == TokenKind.comment || marker == TokenKind.space || marker == TokenKind.indent;
+    internal static bool IsDiscard(TokenKind marker) => marker == TokenKind.discard || marker == TokenKind.comment || marker == TokenKind.space || marker == TokenKind.indent || marker == TokenKind.end;
 
     internal static bool IsEmpty(TokenKind marker) =>  IsDiscard(marker) || marker ==  TokenKind.newLine || marker == TokenKind.beginBlock || marker == TokenKind.endBlock;
 

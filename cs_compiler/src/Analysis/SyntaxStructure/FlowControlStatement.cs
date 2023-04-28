@@ -3,7 +3,7 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class FlowControlStatement : Statement
+public class FlowControlStatement : _Statement
 {
     public ImmutableArray<LexerNode> statements { get; }
 

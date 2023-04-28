@@ -3,11 +3,11 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class ExpressionStatement : Statement
+public class ExpressionStatement : _Statement
 {
-    Expression expression;
+    _Expression expression;
 
-    public ExpressionStatement(Expression expression, LexerNode semicolon) : 
+    public ExpressionStatement(_Expression expression, LexerNode semicolon) : 
         base(TextLocation.Embrace(expression.location, semicolon.location))
     {
         this.expression = expression;

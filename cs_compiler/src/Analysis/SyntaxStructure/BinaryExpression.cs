@@ -2,13 +2,13 @@ using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class BinaryExpression : Expression
+public class BinaryExpression : _Expression
 {
-    public Expression left { get; }
+    public _Expression left { get; }
     public LexerNode @operator { get; }
-    public Expression right { get; }
+    public _Expression right { get; }
 
-    public BinaryExpression(Expression left, LexerNode opeartor, Expression right) : 
+    public BinaryExpression(_Expression left, LexerNode opeartor, _Expression right) : 
         base(TextLocation.Embrace(left.location, right.location))
     {
         this.left = left;
