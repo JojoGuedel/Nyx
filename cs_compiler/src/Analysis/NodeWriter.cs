@@ -5,10 +5,10 @@ namespace Nyx.Analysis;
 
 internal class NodeWriter
 {
-    internal const string emptyIndent = "    ";
-    internal const string childIndent = "│   ";
-    internal const string childNodeIndent = "├── ";
-    internal const string leafNodeIndent = "└── ";
+    internal const string emptyIndent = "  ";
+    internal const string childIndent = "│ ";
+    internal const string childNodeIndent = "├─";
+    internal const string leafNodeIndent = "└─";
 
     TextWriter _writer;
 
@@ -19,7 +19,9 @@ internal class NodeWriter
 
     string _ComposeChildIndent(string indent, bool last) => indent + (last? emptyIndent : childIndent);
 
-    string _ComposeIndent(string indent, bool last) => indent + (last? leafNodeIndent : childNodeIndent);
+    string _ComposeIndent(bool last) => last? leafNodeIndent : childNodeIndent;
+
+    string _ComposeIndent(int index, bool last) => $"{_ComposeIndent(last)}[{index}]";
 
     string _ComposeValue(object? value) => value is null? "[null]" : value.ToString()?? "[null]";
 
@@ -35,38 +37,53 @@ internal class NodeWriter
         else if (typeof(IEnumerable<Node>).IsAssignableFrom(value.GetType()))
             _WriteEnumberable((IEnumerable<Node>)value, indent, last, property.Name);
         else
-            _writer.WriteLine(
-                _ComposeIndent(indent, last) +
-                $"{property.Name} ({value.GetType().Name}): {_ComposeValue(value)}");
+        {
+            _writer.Write(indent);
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            _writer.Write(_ComposeIndent(last));
+            _writer.WriteLine($"{property.Name}: {_ComposeValue(value)}");
+            Console.ResetColor();
+
+        }
     }
 
     void _WriteEnumberable(IEnumerable<Node> nodes, string indent, bool last, string? name = null)
     {
-        if (name is null)
-            _writer.WriteLine(
-                _ComposeIndent(indent, last) +
-                nodes.GetType().Name + $"[{nodes.Count()}] ");
-        else
-            _writer.WriteLine(
-                _ComposeIndent(indent, last) +
-                name + $" ({nodes.GetType().Name}[{nodes.Count()}])");
-
         var length = nodes.Count();
+
+        _writer.Write(indent);
+        _writer.Write(_ComposeIndent(last));
+        Console.ForegroundColor = ConsoleColor.Green;
+        if (name is null)
+            _writer.Write(nodes.GetType().Name);
+        else
+            _writer.Write(name);
+        _writer.WriteLine($"[{length}]");
+        Console.ResetColor();
+
         if (length == 0)
             return;
 
         indent = _ComposeChildIndent(indent, last);
 
-        var index = 1;
+        var index = 0;
         foreach(var node in nodes)
-            _Write(node, indent, index++ >= length);
+            _Write(node, indent, index >= length - 1, index++);
     }
 
-    void _Write(Node node, string indent,  bool last) 
+    void _Write(Node node, string indent, bool last, int? index = null) 
     {
-        _writer.WriteLine(
-            _ComposeIndent(indent, last) +
-            node.GetType().Name);
+        _writer.Write(indent);
+        _writer.Write(_ComposeIndent(last));
+        if (index is not null)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            _writer.Write($"[{index}]");
+        }
+        else
+            Console.ForegroundColor = ConsoleColor.Gray;
+        _writer.WriteLine(node.GetType().Name);
+        Console.ResetColor();
 
         indent = _ComposeChildIndent(indent, last);
 
