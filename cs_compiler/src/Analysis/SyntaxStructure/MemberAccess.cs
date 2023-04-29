@@ -9,7 +9,6 @@ internal class MemberAccess : Expression
     internal MemberAccess(Expression expression, Token dot, ValueToken name)
     {
         location = Location.Embrace(expression.location, name.location);
-
         this.expression = expression;
         this.identifier = new Identifier(name);
     }

@@ -1,23 +1,12 @@
-using System.Diagnostics;
-
 namespace Nyx.Analysis;
 
-public class String : _Expression
+internal class String : Expression
 {
-    public string value { get; }
+    internal override Location location => @string.location;
+    public ValueToken @string { get; }
 
-    public String(LexerNode @string) : 
-        base(@string.location)
+    public String(ValueToken @string)
     {
-        Debug.Assert(@string.value != null);
-
-        value = @string.value;
-    }
-
-    public override void Write(TextWriter writer, string indent, bool isLast)
-    {
-        _WriteName(writer, indent, isLast, "String");
-        indent += _ChildIndent(isLast);
-        _WriteString(writer, indent, true, value);
+        this.@string = @string;
     }
 }

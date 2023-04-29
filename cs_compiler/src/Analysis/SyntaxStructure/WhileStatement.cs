@@ -3,7 +3,6 @@ namespace Nyx.Analysis;
 internal class WhileStatement : Statement
 {
     internal override Location location { get; }
-
     public Expression condition { get; }
     public Block body { get; }
 
@@ -17,7 +16,6 @@ internal class WhileStatement : Statement
         Block body)
     {
         location = Location.Embrace(@while.location, body.location);
-
         this.condition = condition;
         this.body = body;
     }

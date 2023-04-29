@@ -56,8 +56,12 @@ internal class PostLexer
             line.Add(_Next());
 
         if (_current.kind == TokenKind.end)
+        {
+            line.Add(new Token(TokenKind.newLine, _last.location));
+
             for (var i = 0; i < _indent; i++)
                 line.Add(new Token(TokenKind.endBlock, _current.location.Point()));
+        }
 
         line.Add(_Next());
         

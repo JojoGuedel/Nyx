@@ -3,7 +3,6 @@ namespace Nyx.Analysis;
 internal class IfStatement : Statement
 {
     internal override Location location { get; }
-
     public Expression condition { get; }
     public Block body { get; }
     public Statement @else { get; }
@@ -19,7 +18,6 @@ internal class IfStatement : Statement
         Statement @else)
     {
         location = Location.Embrace(@if.location, @else.location);
-
         this.condition = condition;
         this.body = body;
         this.@else = @else;

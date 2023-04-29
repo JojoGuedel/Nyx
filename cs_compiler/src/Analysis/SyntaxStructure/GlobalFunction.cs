@@ -23,7 +23,6 @@ internal class GlobalFunction : GlobalMember
         Block body)
     {
         location = Location.Embrace(global.location, body.location);
-
         this.name = name;
         this.parameters = parameters;
         this.type = type;

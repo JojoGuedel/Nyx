@@ -1,22 +1,12 @@
-using System.Diagnostics;
-
 namespace Nyx.Analysis;
 
-public class Number : _Expression
+internal class Number : Expression
 {
-    public string value { get; }
+    internal override Location location => number.location;
+    public ValueToken number { get; }
 
-    public Number(LexerNode number) : base(number.location)
+    internal Number(ValueToken number)
     {
-        Debug.Assert(number.value != null);
-        
-        value = number.value;
-    }
-
-    public override void Write(TextWriter writer, string indent, bool isLast)
-    {
-        _WriteName(writer, indent, isLast, "Number");
-        indent += _ChildIndent(isLast);
-        _WriteString(writer, indent, true, value);
+       this.number = number;
     }
 }

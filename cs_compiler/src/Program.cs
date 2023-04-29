@@ -45,22 +45,16 @@ void Compile(string input)
     var lexer = new Lexer(new StringReader(input));
     var tokens = lexer.Analyze().ToList();
 
-    nodeWriter.Write(tokens.Cast<Node>().ToImmutableArray());
-
     var postLexer = new PostLexer(tokens.GetEnumerator());
     tokens = postLexer.Analyze().ToList();
 
-    Console.WriteLine();
     nodeWriter.Write(tokens.Cast<Node>().ToImmutableArray());
 
-    // var syntaxAnaylzer = new Parser(syntax, tokens);
-    // var compilationUnit = syntaxAnaylzer.Analyze().ToImmutableArray();
-    // nodeWriter.Write(compilationUnit);
-    // Console.WriteLine();
+    var parser = new Parser(tokens.GetEnumerator());
+    var compilationUnit = parser.Analyze();
 
-    // diagnosticWriter.Write(lexicalAnalyzer.diagnostics);
-    // diagnosticWriter.Write(postLexicalAnalyzer.diagnostics);
-    // diagnosticWriter.Write(syntaxAnaylzer.diagnostics);
+    Console.WriteLine();
+    nodeWriter.Write(compilationUnit);
 }
 
 void ManageEscapeCommands(string command)

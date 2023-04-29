@@ -1,22 +1,13 @@
-using System.Diagnostics;
-using Nyx.Utils;
-
 namespace Nyx.Analysis;
 
-public class ExpressionStatement : _Statement
+internal class ExpressionStatement : Statement
 {
-    _Expression expression;
+    internal override Location location { get; }
+    public Expression expression { get; }
 
-    public ExpressionStatement(_Expression expression, LexerNode semicolon) : 
-        base(TextLocation.Embrace(expression.location, semicolon.location))
+    internal ExpressionStatement(Expression expression, Token semicolon, Token newLine)
     {
+        location = Location.Embrace(expression.location, semicolon.location);
         this.expression = expression;
-    }
-
-    public override void Write(TextWriter writer, string indent, bool isLast)
-    {
-        _WriteName(writer, indent, isLast, "ExpressionStatement");
-        indent += _ChildIndent(isLast);
-        expression.Write(writer, indent, true);
     }
 }

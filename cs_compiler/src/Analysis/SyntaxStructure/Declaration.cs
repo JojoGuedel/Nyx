@@ -19,7 +19,6 @@ internal class DeclarationStatement : Statement
         Token newLine)
     {
         location = Location.Embrace(modifiers.location, semicolon.location);
-
         this.modifiers = modifiers;
         this.name = name;
         this.type = type;

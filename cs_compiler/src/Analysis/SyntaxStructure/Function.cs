@@ -24,7 +24,6 @@ internal class Function : Member
         Block body)
     {
         location = Location.Embrace(modifiers.location, body.location);
-
         this.modifiers = modifiers;
         this.name = name;
         this.parameters = parameters;

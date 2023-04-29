@@ -9,7 +9,7 @@ internal class Block : Node
 
     internal Block(ImmutableArray<Statement> statements, Location location)
     {
-        this.statements = statements;
         this.location = location;
+        this.statements = statements;
     }
 }
