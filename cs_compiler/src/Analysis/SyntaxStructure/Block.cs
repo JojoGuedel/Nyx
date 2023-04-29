@@ -1,22 +1,15 @@
 using System.Collections.Immutable;
-using Nyx.Utils;
 
 namespace Nyx.Analysis;
 
-public class Block : _Node
+internal class Block : Node
 {
-    public ImmutableArray<Statement> statements;
+    internal override Location location { get; }
+    public ImmutableArray<Statement> statements { get; }
 
-    public Block(ImmutableArray<Statement> statements, TextLocation location) : 
-        base(location)
+    internal Block(ImmutableArray<Statement> statements, Location location)
     {
+        this.location = location;
         this.statements = statements;
-    }
-
-    public override void Write(TextWriter writer, string indent, bool isLast)
-    {
-        _WriteName(writer, indent, isLast, "Block");
-        indent += _ChildIndent(isLast);
-        _WriteArray(writer, indent, true, "Statement", Array.ConvertAll(statements.ToArray(), (Statement statement) => (_Node)statement));
     }
 }

@@ -1,24 +1,14 @@
-using Nyx.Utils;
-
 namespace Nyx.Analysis;
 
-public class Postfix : Expression
+internal class Postfix : Expression
 {
+    internal override Location location => Location.Embrace(expression.location, postfix.location);
     public Expression expression { get; }
-    public LexerNode postfix { get; }
+    public Token postfix { get; }
 
-    public Postfix(Expression expression, LexerNode postfix) : 
-        base(TextLocation.Embrace(expression.location, postfix.location))
+    internal Postfix(Expression expression, Token postfix)
     {
         this.expression = expression;
         this.postfix = postfix;
-    }
-
-    public override void Write(TextWriter writer, string indent, bool isLast)
-    {
-        _WriteName(writer, indent, isLast, "Postfix");
-        indent += _ChildIndent(isLast);
-        expression.Write(writer, indent, false);
-        postfix.Write(writer, indent, true);
     }
 }

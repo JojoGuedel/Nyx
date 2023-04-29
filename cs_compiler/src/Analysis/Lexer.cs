@@ -6,9 +6,6 @@ internal class Lexer
 {
     TextReader _source;
 
-    // TODO: make this actually represent the file name
-    string _fileName = "stdin";
-
     bool _finished = false;
 
     char _last = SyntaxInfo.endChar;
@@ -143,7 +140,7 @@ internal class Lexer
             // TODO: Handle '.'
             // TODO: Handle formats
             // TODO: handle scientific format
-            return new Token(TokenKind.number, _location);
+            return new ValueToken(TokenKind.number, _location, value);
         }
         // lex operators and names
         else

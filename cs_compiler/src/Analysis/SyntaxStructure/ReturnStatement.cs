@@ -1,21 +1,13 @@
-using Nyx.Utils;
-
 namespace Nyx.Analysis;
 
-public class ReturnStatement : Statement
+internal class ReturnStatement : Statement
 {
+    internal override Location location { get; }
     public Expression expression { get; }
 
-    public ReturnStatement(LexerNode @return, Expression expression, LexerNode semicolon) : 
-        base(TextLocation.Embrace(@return.location, semicolon.location))
+    internal ReturnStatement(Token @return, Expression expression, Token semicolon, Token newLine)
     {
+        location = Location.Embrace(@return.location, semicolon.location);
         this.expression = expression;
-    }
-
-    public override void Write(TextWriter writer, string indent, bool isLast)
-    {
-        _WriteName(writer, indent, isLast, "ReturnStatement");
-        indent += _ChildIndent(isLast);
-        expression.Write(writer, indent, true);
     }
 }

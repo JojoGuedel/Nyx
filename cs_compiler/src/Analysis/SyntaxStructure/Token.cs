@@ -11,5 +11,6 @@ internal class Token : Node
         this.location = location;
     }
 
-    internal static Token Empty() => new Token(TokenKind._error, Location.Empty());
+    internal Token EmptyPoint() => new Token(TokenKind.empty, location.Point());
+    internal static Token Empty() => new Token(TokenKind.empty, Location.Empty());
 }

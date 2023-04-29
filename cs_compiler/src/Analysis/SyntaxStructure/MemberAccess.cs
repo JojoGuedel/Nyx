@@ -1,27 +1,15 @@
-using System.Diagnostics;
-using Nyx.Utils;
-
 namespace Nyx.Analysis;
 
-public class MemberAccess : Expression
+internal class MemberAccess : Expression
 {
-    public Expression expression { get; }
-    public Identifier identifier { get; }
-    
-    public MemberAccess(Expression expression, LexerNode dot, LexerNode name) : 
-        base(TextLocation.Embrace(expression.location, name.location))
-    {
-        Debug.Assert(name.value != null);
+    internal override Location location { get; }
+    internal Expression expression { get; }
+    internal Identifier identifier { get; }
 
+    internal MemberAccess(Expression expression, Token dot, ValueToken name)
+    {
+        location = Location.Embrace(expression.location, name.location);
         this.expression = expression;
         this.identifier = new Identifier(name);
-    }
-
-    public override void Write(TextWriter writer, string indent, bool isLast)
-    {
-        _WriteName(writer, indent, isLast, "MemberAccess");
-        indent += _ChildIndent(isLast);
-        expression.Write(writer, indent, false);
-        identifier.Write(writer, indent, true);
     }
 }

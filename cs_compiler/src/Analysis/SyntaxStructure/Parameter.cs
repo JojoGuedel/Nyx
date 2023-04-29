@@ -1,30 +1,16 @@
-using System.Diagnostics;
-using Nyx.Utils;
-
 namespace Nyx.Analysis;
 
-public class Parameter : _Node
+internal class Parameter : Node
 {
-    public Modifiers modifiers { get; }
-    public string name { get; }
-    public TypeClause type { get; }
+    internal override Location location => Location.Embrace(modifiers.location, typeClause.location);
+    Modifiers modifiers { get; }
+    Identifier identifier { get; }
+    TypeClause typeClause { get; }
 
-    public Parameter(Modifiers modifiers, LexerNode var, LexerNode name, TypeClause type) 
-        : base(TextLocation.Embrace(modifiers.location, type.location))
+    internal Parameter(Modifiers modifiers, Token var, Identifier identifier, TypeClause typeClause)
     {
-        Debug.Assert(name.value != null);
-
         this.modifiers = modifiers;
-        this.name = name.value;
-        this.type = type;
-    }
-
-    public override void Write(TextWriter writer, string indent, bool isLast)
-    {
-        _WriteName(writer, indent, isLast, "Parameter");
-        indent += _ChildIndent(isLast);
-        modifiers.Write(writer, indent, false);
-        _WriteString(writer, indent, false, name);
-        type.Write(writer, indent, true);
+        this.identifier = identifier;
+        this.typeClause = typeClause;
     }
 }

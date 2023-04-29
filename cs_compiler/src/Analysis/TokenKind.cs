@@ -40,7 +40,7 @@ internal enum TokenKind
     dot,
     comma,
     colon,
-    semiColon,
+    semicolon,
     rArrow,
     bigRArrow,
 
